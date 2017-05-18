@@ -28,9 +28,10 @@ export type Customer = {
 };
 ```
 
-## Usage
+## Installation and Usage
 
 ```
+npm install thrift2flow
 thrift2flow my/service.thrift
 ```
 
