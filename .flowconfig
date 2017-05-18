@@ -1,0 +1,9 @@
+[ignore]
+<PROJECT_ROOT>/flow-output/.*
+<PROJECT_ROOT>/lib/.*
+
+[libs]
+./typedefs
+
+[options]
+emoji=true

@@ -1,0 +1,34 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true
+  },
+  "extends": ["eslint-config-uber-es2015", "plugin:you-dont-need-lodash-underscore/compatible"],
+  "plugins": ["flowtype", "babel", "you-dont-need-lodash-underscore"],
+  "rules": {
+    "you-dont-need-lodash-underscore/concat": "error",
+    "you-dont-need-lodash-underscore/indexOf": "error",
+    "you-dont-need-lodash-underscore/lastIndexOf": "error",
+    "you-dont-need-lodash-underscore/join": "error",
+    "you-dont-need-lodash-underscore/reverse": "error",
+    "you-dont-need-lodash-underscore/fill": "error",
+    "you-dont-need-lodash-underscore/find": "error",
+    "you-dont-need-lodash-underscore/detect": "error",
+    "you-dont-need-lodash-underscore/findIndex": "error",
+    "you-dont-need-lodash-underscore/each": "error",
+    "you-dont-need-lodash-underscore/forEach": "error",
+    "you-dont-need-lodash-underscore/every": "error",
+    "flowtype/define-flow-type": 1,
+    "indent": 0,
+    "strict": 0,
+    "no-console": 0,
+    "guard-for-in": 0,
+    "operator-linebreak": 0,
+    "no-invalid-this": 0,
+    "babel/no-invalid-this": 2,
+    "max-len": 0,
+    "no-irregular-whitespace": 0,
+    "no-multiple-empty-lines": 0,
+    "no-inline-comments": 0
+  }
+}

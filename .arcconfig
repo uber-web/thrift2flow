@@ -1,0 +1,8 @@
+{
+  "phabricator.uri": "https://code.uberinternal.com/",
+  "git.default-relative-commit": "origin/master",
+
+  "unit.engine": "TAPTestEngine",
+  "unit.engine.tap.timeout": 90,
+  "unit.engine.tap.cover": "npm run lint"
+}
