@@ -50,9 +50,9 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStruct,EnumTypedef} from './types';
+import type {MyStructXXX,EnumTypedefXXX} from './types';
 
-function go(s : MyStruct, t: EnumTypedef) {
+function go(s : MyStructXXX, t: EnumTypedefXXX) {
   const values : string[] = [s.f_MyEnum, s.f_EnumTypedef, t];
   return [values];
 }

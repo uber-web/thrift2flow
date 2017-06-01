@@ -51,13 +51,13 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStruct,OtherStruct} from './types';
+import type {MyStructXXX,OtherStructXXX} from './types';
 
-function go(s : MyStruct) {
+function go(s : MyStructXXX) {
   const numbers : number[] = [
       s.f_numbers[0], s.f_MyByte[0], s.f_OtherStruct[0].num, s.f_numbersSet[0]
   ];
-  const structs : OtherStruct[] = [s.f_OtherStruct[0]];
+  const structs : OtherStructXXX[] = [s.f_OtherStruct[0]];
   return [numbers, structs];
 }
 `
@@ -90,13 +90,13 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStruct,OtherStruct} from './types';
+import type {MyStructXXX,OtherStructXXX} from './types';
 
-function go(s : MyStruct) {
+function go(s : MyStructXXX) {
   const numbers : number[] = [
       s.f_i32['ok'], s.f_MyByte[18], s.f_OtherStruct['hello'].num
   ];
-  const structs : OtherStruct[] = [s.f_OtherStruct['hello']];
+  const structs : OtherStructXXX[] = [s.f_OtherStruct['hello']];
   return [numbers, structs];
 }
 `

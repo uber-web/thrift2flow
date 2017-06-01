@@ -51,11 +51,11 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStruct,OtherStruct} from './types';
+import type {MyStructXXX,OtherStructXXX} from './types';
 
-function go(s : MyStruct) {
+function go(s : MyStructXXX) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
-  const structs : OtherStruct[] = [s.f_OtherStruct];
+  const structs : OtherStructXXX[] = [s.f_OtherStruct];
   return [numbers, structs];
 }
           `

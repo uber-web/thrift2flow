@@ -51,9 +51,9 @@ test(
       // language=JavaScript
       'index.js': `
 // @flow
-import type {Primitives} from './types';
+import type {PrimitivesXXX} from './types';
 
-function go(s : Primitives) {
+function go(s : PrimitivesXXX) {
   const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_i64, s.f_double];
   const booleans : boolean[] = [s.f_boolean];
   const strings : string[] = [s.f_string];
@@ -76,9 +76,9 @@ test(
       // language=JavaScript
       'index.js': `
 // @flow
-import type {Primitives} from './types';
+import type {PrimitivesXXX} from './types';
 
-function go(s : Primitives) {
+function go(s : PrimitivesXXX) {
   const numbers : number[] = [s.f_boolean];
   const booleans : boolean[] = [s.f_byte];
   return [numbers, booleans];

@@ -36,7 +36,8 @@ import {ThriftFileConverter} from '../main/convert';
 
 export const flowResultTest = (
   files: {[string]: string},
-  testFn: (Function, FlowResult) => void
+  testFn: (Function, FlowResult) => void,
+  suffix: string = 'XXX'
 ) => (t: Test) => {
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
@@ -45,7 +46,10 @@ export const flowResultTest = (
     .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p =>
-      fs.writeFileSync(p.replace(/\.thrift$/, '.js'), new ThriftFileConverter(p).generateFlowFile())
+      fs.writeFileSync(
+        p.replace(/\.thrift$/, '.js'),
+        new ThriftFileConverter(p, name => name + suffix).generateFlowFile()
+      )
     );
   fs.writeFileSync(path.resolve(root, '.flowconfig'), '');
   exec('flow check --json', {cwd: root}, (err, stdout, stderr) =>

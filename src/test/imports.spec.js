@@ -57,9 +57,9 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
             // @flow
-            import type {MyStruct} from './types';
+            import type {MyStructXXX} from './types';
 
-            function go(s : MyStruct) {
+            function go(s : MyStructXXX) {
               const numbers : number[] = [s.f_OtherStruct.num];
               return [numbers];
             }

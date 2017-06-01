@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+/* eslint-disable no-process-exit */
 // @flow
 
 import 'source-map-support/register';
@@ -30,21 +31,29 @@ import 'source-map-support/register';
 import 'babel-polyfill';
 import path from 'path';
 import fs from 'fs';
+import yargs from 'yargs';
 
 import commonPathPrefix from 'common-path-prefix';
 import mkdirp from 'mkdirp';
 import {ThriftFileConverter} from './convert';
 
-const thriftPaths = process.argv.slice(2).map(p => path.resolve(p));
+const argv = yargs
+  .usage('Usage: $0 [options] <thrift files..>')
+  .option('suffix', {describe: 'appended to generated type names', default: 'Type'})
+  .help('h')
+  .alias('h', 'help').argv;
+
+const thriftPaths = argv._;
 
 if (!thriftPaths.length) {
-  throw new Error(`Usage: ${process.argv[1]} my/service.thrift`);
+  yargs.showHelp();
+  process.exit(1);
 }
 
 const allOutput = {};
 
 for (const thriftPath of thriftPaths) {
-  const converter = new ThriftFileConverter(thriftPath);
+  const converter = new ThriftFileConverter(thriftPath, name => name + argv.suffix);
   converter
     .getImportAbsPaths()
     .filter(p => thriftPaths.indexOf(p) === -1)

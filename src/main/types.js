@@ -38,8 +38,17 @@ export class TypeConverter {
     string: 'string'
   };
 
+  transformName: string => string;
+
+  constructor(transformName: string => string) {
+    this.transformName = transformName;
+  }
+
   convert = (t: BaseType): string =>
-    this.arrayType(t) || this.mapType(t) || TypeConverter.primitives[t.baseType] || t.name;
+    this.arrayType(t) ||
+    this.mapType(t) ||
+    TypeConverter.primitives[t.baseType] ||
+    this.transformName(t.name);
 
   arrayType = (thriftValueType: BaseType) =>
     (thriftValueType instanceof ListType || thriftValueType instanceof SetType) &&

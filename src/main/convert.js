@@ -41,11 +41,14 @@ const thriftOptions = {
 export class ThriftFileConverter {
   thriftPath: string;
   thrift: Thrift;
-  types = new TypeConverter();
+  types: TypeConverter;
+  transformName: string => string;
 
-  constructor(thriftPath: string) {
+  constructor(thriftPath: string, transformName: string => string) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
+    this.transformName = transformName;
+    this.types = new TypeConverter(transformName);
   }
 
   generateFlowFile = () =>
@@ -79,13 +82,15 @@ export class ThriftFileConverter {
   };
 
   generateTypedef = (def: Typedef) =>
-    `export type ${def.id.name} = ${this.types.convert(def.valueType)};`;
+    `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
 
   generateEnum = (def: Enum) =>
-    `export type ${def.id.name} = ${def.definitions.map(d => `"${d.id.name}"`).join(' | ')};`;
+    `export type ${this.transformName(def.id.name)} = ${def.definitions
+      .map(d => `"${d.id.name}"`)
+      .join(' | ')};`;
 
   generateStruct = ({id: {name}, fields}: Struct) =>
-    `export type ${name} = {\n${Object.values(fields)
+    `export type ${this.transformName(name)} = {\n${Object.values(fields)
       .map(
         (f: Base) =>
           `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(f.valueType)};`
