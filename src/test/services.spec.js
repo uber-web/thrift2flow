@@ -24,12 +24,36 @@
 
 // @flow
 
-import 'source-map-support/register';
-import 'babel-polyfill';
+import test from 'tape';
+import type {Test} from 'tape';
 
-import './primitives.spec';
-import './collections.spec';
-import './imports.spec';
-import './typedefs.spec';
-import './services.spec';
-import './enums.spec';
+import {flowResultTest} from './util';
+
+// language=thrift
+const thrift = `
+  service MyService {
+   i32 getNumber(1: string a, 2: bool what)
+  }
+`;
+
+test(
+  'services happy path',
+  flowResultTest(
+    {
+      'types.thrift': thrift,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyServiceXXX} from './types';
+
+function go(s : MyServiceXXX) {
+  return s.getNumber({a: 'hello', what: true}) / 4;
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.deepEqual(r.errors, []);
+      t.end();
+    }
+  )
+);

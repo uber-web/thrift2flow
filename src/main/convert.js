@@ -30,7 +30,7 @@ import prettier from 'prettier';
 import path from 'path';
 
 import type {Base} from 'bufrw';
-import type {Struct, Field, Enum, Typedef} from 'thriftrw/ast';
+import type {Struct, Field, Enum, Typedef, FunctionDefinition, Service} from 'thriftrw/ast';
 
 const thriftOptions = {
   strict: false,
@@ -73,6 +73,8 @@ export class ThriftFileConverter {
         return this.generateEnum(def);
       case 'Typedef':
         return this.generateTypedef(def);
+      case 'Service':
+        return this.generateService(def);
       default:
         console.warn(
           `${path.basename(this.thriftPath)}: Skipping ${def.type} ${def.id ? def.id.name : '?'}`
@@ -80,6 +82,16 @@ export class ThriftFileConverter {
         return null;
     }
   };
+
+  generateService = (def: Service) =>
+    `export type ${this.transformName(def.id.name)} = {\n${def.functions
+      .map(this.generateFunction)
+      .join(',')}};`;
+
+  generateFunction = (fn: FunctionDefinition) =>
+    `${fn.id.name}: (${this.generateStructContents([
+      ...fn.fields
+    ])}) => ${this.types.convert(fn.returns)}`;
 
   generateTypedef = (def: Typedef) =>
     `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
@@ -90,12 +102,15 @@ export class ThriftFileConverter {
       .join(' | ')};`;
 
   generateStruct = ({id: {name}, fields}: Struct) =>
-    `export type ${this.transformName(name)} = {\n${Object.values(fields)
+    `export type ${this.transformName(name)} = ${this.generateStructContents(fields)};`;
+
+  generateStructContents = (fields: Object) =>
+    `{${Object.values(fields)
       .map(
         (f: Base) =>
           `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(f.valueType)};`
       )
-      .join('\n')}};`;
+      .join('\n')}}`;
 
   isOptional = (field: Field) => field.optional && field.defaultValue === null;
 
