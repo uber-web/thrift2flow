@@ -112,7 +112,7 @@ export class ThriftFileConverter {
       )
       .join('\n')}}`;
 
-  isOptional = (field: Field) => field.optional && field.defaultValue === null;
+  isOptional = (field: Field) => field.optional;
 
   generateImports = () =>
     this.getImportAbsPaths()

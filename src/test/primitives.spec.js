@@ -40,6 +40,8 @@ const primitiveStruct = `
     6: double f_double
     7: bool f_boolean
     8: string f_string
+    9: optional string f_optional
+    10: optional string f_default = "hello"
   }
 `;
 
@@ -91,6 +93,36 @@ function go(s : PrimitivesXXX) {
       t.equal(r.errors[1].level, 'error');
       t.equal((r.errors[0].message[0]: any).line, 6);
       t.equal((r.errors[1].message[0]: any).line, 7);
+      t.end();
+    }
+  )
+);
+
+test(
+  'primitives optional',
+  flowResultTest(
+    {
+      'types.thrift': primitiveStruct,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {PrimitivesXXX} from './types';
+
+function go(s : PrimitivesXXX) {
+  return [
+      s.f_string.length,
+      s.f_optional.length,
+      s.f_default.length
+  ];
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 2);
+      t.equal(r.errors[0].level, 'error');
+      t.equal(r.errors[1].level, 'error');
+      t.equal((r.errors[0].message[0]: any).line, 8);
+      t.equal((r.errors[1].message[0]: any).line, 9);
       t.end();
     }
   )
