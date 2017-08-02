@@ -89,9 +89,9 @@ export class ThriftFileConverter {
       .join(',')}};`;
 
   generateFunction = (fn: FunctionDefinition) =>
-    `${fn.id.name}: (${this.generateStructContents([
-      ...fn.fields
-    ])}) => ${this.types.convert(fn.returns)}`;
+    `${fn.id.name}: (${fn.fields.length ? this.generateStructContents([
+          ...fn.fields
+        ]) : ''}) => ${this.types.convert(fn.returns)}`;
 
   generateTypedef = (def: Typedef) =>
     `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
