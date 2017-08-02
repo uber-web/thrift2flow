@@ -127,3 +127,31 @@ function go(s : PrimitivesXXX) {
     }
   )
 );
+
+test(
+  'primitives exact types',
+  flowResultTest(
+    {
+      'types.thrift': `
+  struct Optionals {
+    1: optional byte f_byte
+  }
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {OptionalsXXX} from './types';
+
+function go() : OptionalsXXX {
+  return {f_byte: 0, notActualField: true};
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 1);
+      t.equal(r.errors[0].level, 'error');
+      t.equal((r.errors[0].message[0]: any).line, 6);
+      t.end();
+    }
+  )
+);

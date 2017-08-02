@@ -105,12 +105,12 @@ export class ThriftFileConverter {
     `export type ${this.transformName(name)} = ${this.generateStructContents(fields)};`;
 
   generateStructContents = (fields: Object) =>
-    `{${Object.values(fields)
+    `{|${Object.values(fields)
       .map(
         (f: Base) =>
           `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(f.valueType)};`
       )
-      .join('\n')}}`;
+      .join('\n')}|}`;
 
   isOptional = (field: Field) => field.optional;
 
