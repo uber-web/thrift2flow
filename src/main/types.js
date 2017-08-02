@@ -35,7 +35,8 @@ export class TypeConverter {
     i32: 'number',
     i64: 'number',
     double: 'number',
-    string: 'string'
+    string: 'string',
+    void: 'void'
   };
 
   transformName: string => string;

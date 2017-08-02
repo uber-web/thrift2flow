@@ -33,6 +33,7 @@ import {flowResultTest} from './util';
 const thrift = `
   service MyService {
    i32 getNumber(1: string a, 2: bool what)
+   void aVoid(1: i32 a)
   }
 `;
 
@@ -48,6 +49,14 @@ import type {MyServiceXXX} from './types';
 
 function go(s : MyServiceXXX) {
   return s.getNumber({a: 'hello', what: true}) / 4;
+}
+
+function callVoid(s : MyServiceXXX) {
+    ensureVoid(s.aVoid);
+}
+
+function ensureVoid(f : any => void) {
+    f(0);
 }
 `
     },
