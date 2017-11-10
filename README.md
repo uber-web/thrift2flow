@@ -31,7 +31,7 @@ export type Customer = {
 ## Installation and Usage
 
 ```
-npm install thrift2flow
+npm install -g thrift2flow
 thrift2flow my/service.thrift
 ```
 
