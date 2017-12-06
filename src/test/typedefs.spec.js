@@ -37,9 +37,15 @@ test(
       'types.thrift': `
 typedef byte MyByte
 typedef MyByte TransitiveTypedef
+typedef i64 (js.type = 'Date') Timestamp
+typedef i64 (js.type = 'Long') TimeDelta
+typedef i64 (js.type = 'Long') Long
 
 struct OtherStruct {
     1: i32 num
+    2: Timestamp ts
+    3: TimeDelta td
+    4: Long long
 }
 
 struct MyStruct {
@@ -51,12 +57,22 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX,OtherStructXXX} from './types';
+import type {
+    MyStructXXX,
+    OtherStructXXX,
+    TimestampXXX,
+    TimeDeltaXXX,
+    LongXXX
+} from './types';
 
 function go(s : MyStructXXX) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
   const structs : OtherStructXXX[] = [s.f_OtherStruct];
-  return [numbers, structs];
+  const timestamps : TimestampXXX[] = [new Date(), s.f_OtherStruct.ts];
+  const longs : LongXXX[] = [new Long(), s.f_OtherStruct.long];
+  const tds : TimeDeltaXXX[] = [new Long(), s.f_OtherStruct.td];
+
+  return [numbers, structs, timestamps, longs, tds];
 }
           `
     },

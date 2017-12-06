@@ -56,7 +56,9 @@ test(
 import type {PrimitivesXXX} from './types';
 
 function go(s : PrimitivesXXX) {
-  const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_i64, s.f_double];
+  const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_double];
+  const buffer: Buffer = s.f_i64;
+
   const booleans : boolean[] = [s.f_boolean];
   const strings : string[] = [s.f_string];
   return [numbers, booleans, strings];
