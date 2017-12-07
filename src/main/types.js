@@ -33,10 +33,15 @@ export class TypeConverter {
     i8: 'number',
     i16: 'number',
     i32: 'number',
-    i64: 'number',
+    i64: 'Buffer',
     double: 'number',
     string: 'string',
     void: 'void'
+  };
+
+  static i64Mappings = {
+    Long: 'Long',
+    Date: 'Date'
   };
 
   transformName: string => string;
@@ -45,9 +50,19 @@ export class TypeConverter {
     this.transformName = transformName;
   }
 
+  annotation(t:BaseType):string {
+      const jsType = t.annotations && t.annotations['js.type'];
+      // https://github.com/thriftrw/thriftrw-node/blob/8d36b5b83e5d22bf6c28339e3e894eb4926e556f/i64.js#L179
+      if (t.baseType === 'i64' && jsType) {
+        return TypeConverter.i64Mappings[jsType];
+      }
+      return '';
+  }
+
   convert = (t: BaseType): string =>
     this.arrayType(t) ||
     this.mapType(t) ||
+    this.annotation(t) ||
     TypeConverter.primitives[t.baseType] ||
     this.transformName(t.name);
 

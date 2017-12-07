@@ -26,7 +26,8 @@
 /* eslint-disable handle-callback-err */
 
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
+
 import {exec} from 'child_process';
 import type {Test} from 'tape';
 
@@ -51,7 +52,9 @@ export const flowResultTest = (
         new ThriftFileConverter(p, name => name + suffix).generateFlowFile()
       )
     );
-  fs.writeFileSync(path.resolve(root, '.flowconfig'), '');
+  fs.writeFileSync(path.resolve(root, '.flowconfig'), `[libs]
+./typedefs`);
+  fs.copy('./typedefs/', path.resolve(root, 'typedefs'));
   exec('flow check --json', {cwd: root}, (err, stdout, stderr) =>
     testFn(t, JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString()))
   );
