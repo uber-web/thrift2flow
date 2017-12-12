@@ -117,8 +117,16 @@ export class ThriftFileConverter {
   generateUnion = ({id: {name}, fields}: Struct) =>
     `export type ${this.transformName(name)} = ${this.generateUnionContents(fields)};`;
 
-  generateUnionContents = (fields: Object) =>
-    Object.values(fields).map((f: Base) => `{|${f.name}: ${this.types.convert(f.valueType)}|}`).join(' | ');
+  generateUnionContents = (fields: Object) => {
+    if (!fields.length) {
+      return this.generateStructContents(fields);
+    }
+    return Object.values(fields)
+      .map((f: Base) => {
+        return `{|${f.name}: ${this.types.convert(f.valueType)}|}`;
+      })
+      .join(' | ');
+  };
 
   isOptional = (field: Field) => field.optional;
 

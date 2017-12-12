@@ -24,13 +24,52 @@
 
 // @flow
 
-import 'source-map-support/register';
-import 'babel-polyfill';
+import test from 'tape';
+import type {Test} from 'tape';
 
-import './primitives.spec';
-import './collections.spec';
-import './imports.spec';
-import './typedefs.spec';
-import './services.spec';
-import './enums.spec';
-import './unions.spec';
+import {flowResultTest} from './util';
+
+test(
+  'unions',
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+typedef MyUnion UnionTypedef
+typedef MyEmptyUnion EmptyUnionTypedef
+
+union MyUnion {
+  1: string name
+  2: i32 size
+}
+
+union MyEmptyUnion {
+}
+
+struct MyStruct {
+  1: MyUnion f_MyUnion
+  2: MyEmptyUnion f_MyEmptyUnion
+  3: UnionTypedef f_UnionTypedef
+  4: EmptyUnionTypedef f_EmptyUnionTypedef
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyStructXXX,UnionTypedefXXX,EmptyUnionTypedefXXX} from './types';
+
+function go(s : MyStructXXX, u: UnionTypedefXXX, eu: EmptyUnionTypedefXXX) {
+  const unions : UnionTypedefXXX[] = [s.f_MyUnion];
+  const emptyunions : EmptyUnionTypedefXXX[] = [s.f_MyEmptyUnion];
+  const unionDefs: UnionTypedefXXX[] = [s.f_UnionTypedef];
+  const emptyunionDefs: EmptyUnionTypedefXXX[] = [s.f_EmptyUnionTypedef];
+  return [unions,unions,unionDefs,emptyunionDefs];
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.deepEqual(r.errors, []);
+      t.end();
+    }
+  )
+);
