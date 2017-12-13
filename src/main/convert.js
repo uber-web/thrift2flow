@@ -119,7 +119,7 @@ export class ThriftFileConverter {
 
   generateUnionContents = (fields: Object) => {
     if (!fields.length) {
-      return this.generateStructContents(fields);
+      return '{||}';
     }
     return Object.values(fields)
       .map((f: Base) => {

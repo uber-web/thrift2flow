@@ -63,7 +63,9 @@ function go(s : MyStructXXX, u: UnionTypedefXXX, eu: EmptyUnionTypedefXXX) {
   const emptyunions : EmptyUnionTypedefXXX[] = [s.f_MyEmptyUnion];
   const unionDefs: UnionTypedefXXX[] = [s.f_UnionTypedef];
   const emptyunionDefs: EmptyUnionTypedefXXX[] = [s.f_EmptyUnionTypedef];
-  return [unions,unions,unionDefs,emptyunionDefs];
+  const strings: string[] = [s.f_MyUnion.name || ''];
+  const numbers: number[] = [s.f_MyUnion.size || -1];
+  return [unions,unions,unionDefs,emptyunionDefs,strings,numbers];
 }
 `
     },
