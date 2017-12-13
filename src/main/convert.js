@@ -69,6 +69,8 @@ export class ThriftFileConverter {
       case 'Struct':
       case 'Exception':
         return this.generateStruct(def);
+      case 'Union':
+        return this.generateUnion(def);
       case 'Enum':
         return this.generateEnum(def);
       case 'Typedef':
@@ -111,6 +113,20 @@ export class ThriftFileConverter {
           `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(f.valueType)};`
       )
       .join('\n')}|}`;
+
+  generateUnion = ({id: {name}, fields}: Struct) =>
+    `export type ${this.transformName(name)} = ${this.generateUnionContents(fields)};`;
+
+  generateUnionContents = (fields: Object) => {
+    if (!fields.length) {
+      return '{||}';
+    }
+    return Object.values(fields)
+      .map((f: Base) => {
+        return `{|${f.name}: ${this.types.convert(f.valueType)}|}`;
+      })
+      .join(' | ');
+  };
 
   isOptional = (field: Field) => field.optional;
 

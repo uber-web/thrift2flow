@@ -33,3 +33,4 @@ import './imports.spec';
 import './typedefs.spec';
 import './services.spec';
 import './enums.spec';
+import './unions.spec';
