@@ -64,3 +64,42 @@ function go(s : MyStructXXX, t: EnumTypedefXXX) {
     }
   )
 );
+
+test(
+  'enums values',
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+typedef MyEnum EnumTypedef
+
+enum MyEnum {
+  OK = 1
+  ERROR = 2
+}
+
+struct MyStruct {
+  1: MyEnum f_MyEnum
+  2: EnumTypedef f_EnumTypedef
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyStructXXX,EnumTypedefXXX,MyEnumXXXKeys} from './types';
+
+function go(s : MyStructXXX, t: EnumTypedefXXX, k: MyEnumXXXKeys) {
+  const values : number[] = [s.f_MyEnum, s.f_EnumTypedef, t];
+  const keys : MyEnumXXXKeys = 'OK';
+  return [values, keys];
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.deepEqual(r.errors, []);
+      t.end();
+    },
+    'XXX',
+    true
+  )
+);

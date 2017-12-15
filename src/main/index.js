@@ -40,6 +40,7 @@ import {ThriftFileConverter} from './convert';
 const argv = yargs
   .usage('Usage: $0 [options] <thrift files..>')
   .option('suffix', {describe: 'appended to generated type names', default: 'Type'})
+  .option('enumvalues', {describe: 'use enum values type (number)', default: false})
   .help('h')
   .alias('h', 'help').argv;
 
@@ -53,7 +54,11 @@ if (!thriftPaths.length) {
 const allOutput = {};
 
 for (const thriftPath of thriftPaths) {
-  const converter = new ThriftFileConverter(thriftPath, name => name + argv.suffix);
+  const converter = new ThriftFileConverter(
+    thriftPath,
+    name => name + argv.suffix,
+    argv.enumvalues
+  );
   converter
     .getImportAbsPaths()
     .filter(p => thriftPaths.indexOf(p) === -1)

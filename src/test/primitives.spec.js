@@ -42,6 +42,7 @@ const primitiveStruct = `
     8: string f_string
     9: optional string f_optional
     10: optional string f_default = "hello"
+    11: binary f_binary
   }
 `;
 
@@ -57,11 +58,11 @@ import type {PrimitivesXXX} from './types';
 
 function go(s : PrimitivesXXX) {
   const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_double];
-  const buffer: Buffer = s.f_i64;
+  const buffers : Buffer[] = [s.f_i64, s.f_binary];
 
   const booleans : boolean[] = [s.f_boolean];
   const strings : string[] = [s.f_string];
-  return [numbers, booleans, strings];
+  return [numbers, booleans, strings, buffers];
 }
 `
     },
