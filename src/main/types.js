@@ -50,13 +50,13 @@ export class TypeConverter {
     this.transformName = transformName;
   }
 
-  annotation(t:BaseType):string {
-      const jsType = t.annotations && t.annotations['js.type'];
-      // https://github.com/thriftrw/thriftrw-node/blob/8d36b5b83e5d22bf6c28339e3e894eb4926e556f/i64.js#L179
-      if (t.baseType === 'i64' && jsType) {
-        return TypeConverter.i64Mappings[jsType];
-      }
-      return '';
+  annotation(t: BaseType): string {
+    const jsType = t.annotations && t.annotations['js.type'];
+    // https://github.com/thriftrw/thriftrw-node/blob/8d36b5b83e5d22bf6c28339e3e894eb4926e556f/i64.js#L179
+    if (t.baseType === 'i64' && jsType) {
+      return TypeConverter.i64Mappings[jsType];
+    }
+    return '';
   }
 
   convert = (t: BaseType): string =>
