@@ -52,8 +52,11 @@ export const flowResultTest = (
         new ThriftFileConverter(p, name => name + suffix).generateFlowFile()
       )
     );
-  fs.writeFileSync(path.resolve(root, '.flowconfig'), `[libs]
-./typedefs`);
+  fs.writeFileSync(
+    path.resolve(root, '.flowconfig'),
+    `[libs]
+./typedefs`
+  );
   fs.copy('./typedefs/', path.resolve(root, 'typedefs'));
   exec('flow check --json', {cwd: root}, (err, stdout, stderr) =>
     testFn(t, JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString()))
