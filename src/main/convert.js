@@ -43,12 +43,14 @@ export class ThriftFileConverter {
   thrift: Thrift;
   types: TypeConverter;
   transformName: string => string;
+  enumvalues: boolean;
 
-  constructor(thriftPath: string, transformName: string => string) {
+  constructor(thriftPath: string, transformName: string => string, enumvalues) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
     this.transformName = transformName;
     this.types = new TypeConverter(transformName);
+    this.enumvalues = enumvalues;
   }
 
   generateFlowFile = () =>
@@ -98,10 +100,22 @@ export class ThriftFileConverter {
   generateTypedef = (def: Typedef) =>
     `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
 
-  generateEnum = (def: Enum) =>
-    `export type ${this.transformName(def.id.name)} = ${def.definitions
-      .map(d => `"${d.id.name}"`)
-      .join(' | ')};`;
+  generateEnumValues = (def: Enum) =>
+    `${def.definitions.map((d, index) => `${d.value ? d.value.value : index}`).join(' | ')}`;
+
+  generateEnumKeys = (def: Enum) => `${def.definitions.map(d => `"${d.id.name}"`).join(' | ')};`;
+
+  generateEnum = (def: Enum) => {
+    if (this.enumvalues) {
+      return `export type ${this.transformName(def.id.name)} = ${this.generateEnumValues(def)};
+       export type ${this.transformName(def.id.name)}Keys = ${this.generateEnumKeys(def)};`;
+    } else {
+      return `export type ${this.transformName(def.id.name)}Values = ${this.generateEnumValues(
+        def
+      )};
+       export type ${this.transformName(def.id.name)} = ${this.generateEnumKeys(def)};`;
+    }
+  };
 
   generateStruct = ({id: {name}, fields}: Struct) =>
     `export type ${this.transformName(name)} = ${this.generateStructContents(fields)};`;

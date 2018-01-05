@@ -28,6 +28,7 @@ import {BaseType, ListType, MapType, SetType} from 'thriftrw/ast';
 
 export class TypeConverter {
   static primitives = {
+    binary: 'Buffer',
     bool: 'boolean',
     byte: 'number',
     i8: 'number',
