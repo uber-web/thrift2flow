@@ -41,7 +41,7 @@ const argv = yargs
   .usage('Usage: $0 [options] <thrift files..>')
   .option('suffix', {describe: 'appended to generated type names', default: 'Type'})
   .option('enumvalues', {describe: 'use enum values type (number)', default: false})
-  .option('withsource', {describe: 'prepend the source path of the thrift file', default: true})
+  .option('withsource', {describe: 'prepend the source path of the thrift file', default: false})
   .help('h')
   .alias('h', 'help').argv;
 
