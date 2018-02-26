@@ -39,7 +39,8 @@ export const flowResultTest = (
   files: {[string]: string},
   testFn: (Function, FlowResult) => void,
   suffix: string = 'XXX',
-  enumvalues: boolean = false
+  enumvalues: boolean = false,
+  withsource: boolean = true,
 ) => (t: Test) => {
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
@@ -50,7 +51,7 @@ export const flowResultTest = (
     .forEach(p =>
       fs.writeFileSync(
         p.replace(/\.thrift$/, '.js'),
-        new ThriftFileConverter(p, name => name + suffix, enumvalues).generateFlowFile()
+        new ThriftFileConverter(p, name => name + suffix, enumvalues, withsource).generateFlowFile()
       )
     );
   fs.writeFileSync(
