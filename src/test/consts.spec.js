@@ -24,14 +24,56 @@
 
 // @flow
 
-import 'source-map-support/register';
-import 'babel-polyfill';
+import test from 'tape';
+import type {Test} from 'tape';
 
-import './primitives.spec';
-import './collections.spec';
-import './imports.spec';
-import './typedefs.spec';
-import './services.spec';
-import './enums.spec';
-import './unions.spec';
-import './consts.spec';
+import {flowResultTest} from './util';
+
+test(
+  'consts',
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+typedef string Status
+typedef double Score
+
+const Status NOT_ELIGIBLE = "not_eligible"
+const string STATUS_ELIGIBLE_LITERAL = "eligible"
+
+const Score MIN_SCORE = 3.24
+const double MAX_SCORE = 4.00
+
+struct MyStruct {
+  1: required Status f_status
+  2: required Score f_score
+  2: optional string f_otherStatus
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyStructXXX, StatusXXX, ScoreXXX} from './types';
+import {NOT_ELIGIBLEXXX, STATUS_ELIGIBLE_LITERALXXX, MIN_SCOREXXX, MAX_SCOREXXX} from './types';
+
+function go(s : MyStructXXX): Array<string | number> {
+  const values = [s.f_status];
+
+  if (s.otherStatus) {
+    values.push(s.f_otherStatus);
+  }
+
+  if (s.f_score >= MIN_SCOREXXX && s.f_score < MAX_SCOREXXX) {
+    values.push(s.f_score);
+  }
+
+  return values;
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.deepEqual(r.errors, []);
+      t.end();
+    }
+  )
+);
