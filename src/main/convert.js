@@ -30,7 +30,7 @@ import prettier from 'prettier';
 import path from 'path';
 
 import type {Base} from 'bufrw';
-import type {Struct, Field, Enum, Typedef, FunctionDefinition, Service} from 'thriftrw/ast';
+import type {Struct, Field, Enum, Typedef, FunctionDefinition, Service, Const} from 'thriftrw/ast';
 
 const thriftOptions = {
   strict: false,
@@ -82,6 +82,8 @@ export class ThriftFileConverter {
         return this.generateTypedef(def);
       case 'Service':
         return this.generateService(def);
+      case 'Const':
+        return this.generateConst(def);
       default:
         console.warn(
           `${path.basename(this.thriftPath)}: Skipping ${def.type} ${def.id ? def.id.name : '?'}`
@@ -119,6 +121,12 @@ export class ThriftFileConverter {
     )};
       export type ${this.transformName(def.id.name)} = ${this.generateEnumKeys(def)};`;
   };
+
+  generateConst = (def: Const) => {
+    // string values need to be in quotes
+    const value = typeof def.value.value === 'string' ? `'${def.value.value}'` : def.value.value;
+    return `export const ${this.transformName(def.id.name)}: ${this.types.convert(def.fieldType)} = ${value};`;
+  }
 
   generateStruct = ({id: {name}, fields}: Struct) =>
     `export type ${this.transformName(name)} = ${this.generateStructContents(fields)};`;

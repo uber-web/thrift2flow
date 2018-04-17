@@ -4,3 +4,6 @@
 /dist-test
 /.idea
 /coverage
+/.vscode
+yarn-error.log
+yarn.lock
