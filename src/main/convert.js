@@ -125,7 +125,7 @@ export class ThriftFileConverter {
   generateConst = (def: Const) => {
     // string values need to be in quotes
     const value = typeof def.value.value === 'string' ? `'${def.value.value}'` : def.value.value;
-    return `export const ${this.transformName(def.id.name)}: ${this.types.convert(def.fieldType)} = ${value};`;
+    return `export const ${def.id.name}: ${this.types.convert(def.fieldType)} = ${value};`;
   }
 
   generateStruct = ({id: {name}, fields}: Struct) =>
