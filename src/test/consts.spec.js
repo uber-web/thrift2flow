@@ -54,16 +54,16 @@ struct MyStruct {
       'index.js': `
 // @flow
 import type {MyStructXXX, StatusXXX, ScoreXXX} from './types';
-import {NOT_ELIGIBLEXXX, STATUS_ELIGIBLE_LITERALXXX, MIN_SCOREXXX, MAX_SCOREXXX} from './types';
+import {NOT_ELIGIBLE, STATUS_ELIGIBLE_LITERAL, MIN_SCORE, MAX_SCORE} from './types';
 
 function go(s : MyStructXXX): Array<string | number> {
   const values = [s.f_status];
 
-  if (s.otherStatus) {
+  if (s.f_otherStatus) {
     values.push(s.f_otherStatus);
   }
 
-  if (s.f_score >= MIN_SCOREXXX && s.f_score < MAX_SCOREXXX) {
+  if (s.f_score >= MIN_SCORE && s.f_score < MAX_SCORE) {
     values.push(s.f_score);
   }
 
