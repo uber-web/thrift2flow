@@ -122,14 +122,14 @@ export class ThriftFileConverter {
     if (this.enumvalues) {
       return `export type ${this.transformName(def.id.name)} = ${this.generateEnumValues(def)};
        export type ${this.transformName(def.id.name)}Keys = ${this.generateEnumKeys(def)};
-       export type ${this.transformName(def.id.name)}Map = ${this.generateEnumMap(def)};`;
+       export const ${this.transformName(def.id.name)}Map = ${this.generateEnumMap(def)};`;
     }
 
     return `export type ${this.transformName(def.id.name)}Values = ${this.generateEnumValues(
       def
     )};
       export type ${this.transformName(def.id.name)} = ${this.generateEnumKeys(def)};
-      export type ${this.transformName(def.id.name)}Map = ${this.generateEnumMap(def)};`;
+      export const ${this.transformName(def.id.name)}Map = ${this.generateEnumMap(def)};`;
   };
 
   generateConst = (def: Const) => {
