@@ -110,6 +110,14 @@ export class ThriftFileConverter {
 
   generateEnumKeys = (def: Enum) => `${def.definitions.map(d => `"${d.id.name}"`).join(' | ')};`;
 
+  generateEnumMap = (def: Enum) => {
+    const header = `{`;
+    const values = def.definitions.map((d, index) => `  "${d.id.name}": ${d.value ? d.value.value : index},`).join('\n');
+    const footer = `}`;
+
+    return [header,values,footer].join('\n');
+  };
+
   generateEnum = (def: Enum) => {
     if (this.enumvalues) {
       return `export type ${this.transformName(def.id.name)} = ${this.generateEnumValues(def)};
@@ -119,7 +127,8 @@ export class ThriftFileConverter {
     return `export type ${this.transformName(def.id.name)}Values = ${this.generateEnumValues(
       def
     )};
-      export type ${this.transformName(def.id.name)} = ${this.generateEnumKeys(def)};`;
+      export type ${this.transformName(def.id.name)} = ${this.generateEnumKeys(def)};
+      export type ${this.transformName(def.id.name)}Map = ${this.generateEnumMap(def)};`;
   };
 
   generateConst = (def: Const) => {
