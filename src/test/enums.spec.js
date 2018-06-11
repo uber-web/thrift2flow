@@ -103,3 +103,33 @@ function go(s : MyStructXXX, t: EnumTypedefXXX, k: MyEnumXXXKeys) {
     true
   )
 );
+
+test(
+  'enums map',
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+enum MyEnum {
+  OK = 1
+  ERROR = 2
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import {MyEnumXXXMap} from './types';
+
+function go() {
+  return [MyEnumXXXMap.OK];
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.deepEqual(r.errors, []);
+      t.end();
+    },
+    'XXX',
+    true
+  )
+);
