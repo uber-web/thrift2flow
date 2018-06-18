@@ -86,11 +86,12 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX,EnumTypedefXXX,MyEnumXXXKeys} from './types';
+import type {MyStructXXX,EnumTypedefXXX} from './types';
+import {MyEnumXXX} from './types';
 
-function go(s : MyStructXXX, t: EnumTypedefXXX, k: MyEnumXXXKeys) {
-  const values : number[] = [s.f_MyEnum, s.f_EnumTypedef, t];
-  const keys : MyEnumXXXKeys = 'OK';
+function go(s : MyStructXXX, t: $Values<typeof MyEnumXXX>, k: $Keys<typeof MyEnumXXX>) {
+  const values : number[] = [MyEnumXXX[s.f_MyEnum], MyEnumXXX[s.f_EnumTypedef], t];
+  const keys : $Keys<typeof MyEnumXXX> = 'OK';
   return [values, keys];
 }
 `
@@ -118,10 +119,10 @@ enum MyEnum {
       // language=JavaScript
       'index.js': `
 // @flow
-import {MyEnumXXXMap} from './types';
+import {MyEnumXXX} from './types';
 
 function go() {
-  return [MyEnumXXXMap.OK];
+  return [MyEnumXXX.OK];
 }
 `
     },

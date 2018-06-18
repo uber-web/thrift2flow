@@ -1,6 +1,6 @@
 {
   "name": "thrift2flow",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "description": "Convert Thrift definitions to Flowtype declarations",
   "homepage": "https://github.com/uber-node/thrift2flow",
   "bugs": {
@@ -59,7 +59,7 @@
     "eslint-plugin-babel": "^4.1.1",
     "eslint-plugin-flowtype": "^2.32.1",
     "eslint-plugin-you-dont-need-lodash-underscore": "^6.2.1",
-    "flow-bin": "^0.46.0",
+    "flow-bin": "^0.65.0",
     "fs-extra": "^4.0.3",
     "tape": "^4.6.3",
     "tmp": "0.0.31"
