@@ -63,7 +63,7 @@ export class ThriftFileConverter {
           this.withsource ? `\n// Source: ${this.thriftPath}` : ''
         }`,
         this.generateImports(),
-        ...this.thriftAstDefinitions.map(value => this.convertDefinitionToCode(value))
+        ...this.thriftAstDefinitions.map(this.convertDefinitionToCode)
       ]
         .filter(Boolean)
         .join('\n\n'),
@@ -95,7 +95,7 @@ export class ThriftFileConverter {
 
   generateService = (def: Service) =>
     `export type ${this.transformName(def.id.name)} = {\n${def.functions
-      .map(value => this.generateFunction(value))
+      .map(this.generateFunction)
       .join(',')}};`;
 
   generateFunction = (fn: FunctionDefinition) =>
