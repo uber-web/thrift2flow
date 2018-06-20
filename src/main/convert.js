@@ -44,12 +44,14 @@ export class ThriftFileConverter {
   types: TypeConverter;
   transformName: string => string;
   withsource: boolean;
+  thriftAstDefinitions: Array<any>;
 
   constructor(thriftPath: string, transformName: string => string, withsource: boolean) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
+    this.thriftAstDefinitions = this.thrift.asts[this.thrift.filename].definitions;
     this.transformName = transformName;
-    this.types = new TypeConverter(transformName);
+    this.types = new TypeConverter(transformName, this.thriftAstDefinitions);
     this.withsource = withsource;
   }
 
@@ -61,30 +63,28 @@ export class ThriftFileConverter {
           this.withsource ? `\n// Source: ${this.thriftPath}` : ''
         }`,
         this.generateImports(),
-        ...this.thrift.asts[this.thrift.filename].definitions.map((value, index, array) =>
-          this.convertDefinitionToCode(value, array)
-        )
+        ...this.thriftAstDefinitions.map(value => this.convertDefinitionToCode(value))
       ]
         .filter(Boolean)
         .join('\n\n'),
       {parser: 'flow'}
     );
 
-  convertDefinitionToCode = (def: any, allDefinitions: Array<any>) => {
+  convertDefinitionToCode = (def: any) => {
     switch (def.type) {
       case 'Struct':
       case 'Exception':
-        return this.generateStruct(def, allDefinitions);
+        return this.generateStruct(def);
       case 'Union':
-        return this.generateUnion(def, allDefinitions);
+        return this.generateUnion(def);
       case 'Enum':
         return this.generateEnum(def);
       case 'Typedef':
-        return this.generateTypedef(def, allDefinitions);
+        return this.generateTypedef(def);
       case 'Service':
-        return this.generateService(def, allDefinitions);
+        return this.generateService(def);
       case 'Const':
-        return this.generateConst(def, allDefinitions);
+        return this.generateConst(def);
       default:
         console.warn(
           `${path.basename(this.thriftPath)}: Skipping ${def.type} ${def.id ? def.id.name : '?'}`
@@ -93,21 +93,18 @@ export class ThriftFileConverter {
     }
   };
 
-  generateService = (def: Service, allDefinitions: Array<any>) =>
+  generateService = (def: Service) =>
     `export type ${this.transformName(def.id.name)} = {\n${def.functions
-      .map((value) => this.generateFunction(value, allDefinitions))
+      .map(value => this.generateFunction(value))
       .join(',')}};`;
 
-  generateFunction = (fn: FunctionDefinition, allDefinitions: Array<any>) =>
+  generateFunction = (fn: FunctionDefinition) =>
     `${fn.id.name}: (${
-      fn.fields.length ? this.generateStructContents([...fn.fields], allDefinitions) : ''
-    }) => ${this.types.convert(fn.returns, allDefinitions)}`;
+      fn.fields.length ? this.generateStructContents([...fn.fields]) : ''
+    }) => ${this.types.convert(fn.returns)}`;
 
-  generateTypedef = (def: Typedef, allDefinitions: Array<any>) =>
-    `export type ${this.transformName(def.id.name)} = ${this.types.convert(
-      def.valueType,
-      allDefinitions
-    )};`;
+  generateTypedef = (def: Typedef) =>
+    `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
 
   generateEnumMap = (def: Enum) => {
     const header = `{`;
@@ -123,39 +120,33 @@ export class ThriftFileConverter {
     return `export const ${this.transformName(def.id.name)} = ${this.generateEnumMap(def)};`;
   };
 
-  generateConst = (def: Const, allDefinitions: Array<any>) => {
+  generateConst = (def: Const) => {
     // string values need to be in quotes
     const value = typeof def.value.value === 'string' ? `'${def.value.value}'` : def.value.value;
-    return `export const ${def.id.name}: ${this.types.convert(def.fieldType, allDefinitions)} = ${value};`;
+    return `export const ${def.id.name}: ${this.types.convert(def.fieldType)} = ${value};`;
   };
 
-  generateStruct = ({id: {name}, fields}: Struct, allDefinitions: Array<any>) =>
-    `export type ${this.transformName(name)} = ${this.generateStructContents(
-      fields,
-      allDefinitions
-    )};`;
+  generateStruct = ({id: {name}, fields}: Struct) =>
+    `export type ${this.transformName(name)} = ${this.generateStructContents(fields)};`;
 
-  generateStructContents = (fields: Object, allDefinitions: Array<any>) =>
+  generateStructContents = (fields: Object) =>
     `{|${Object.values(fields)
       .map(
         (f: Base) =>
-          `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(
-            f.valueType,
-            allDefinitions
-          )};`
+          `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(f.valueType)};`
       )
       .join('\n')}|}`;
 
-  generateUnion = ({id: {name}, fields}: Struct, allDefinitions: Array<any>) =>
-    `export type ${this.transformName(name)} = ${this.generateUnionContents(fields, allDefinitions)};`;
+  generateUnion = ({id: {name}, fields}: Struct) =>
+    `export type ${this.transformName(name)} = ${this.generateUnionContents(fields)};`;
 
-  generateUnionContents = (fields: Object, allDefinitions: Array<any>) => {
+  generateUnionContents = (fields: Object) => {
     if (!fields.length) {
       return '{||}';
     }
     return Object.values(fields)
       .map((f: Base) => {
-        return `{|${f.name}: ${this.types.convert(f.valueType, allDefinitions)}|}`;
+        return `{|${f.name}: ${this.types.convert(f.valueType)}|}`;
       })
       .join(' | ');
   };
