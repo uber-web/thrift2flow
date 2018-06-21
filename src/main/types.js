@@ -24,7 +24,7 @@
 
 // @flow
 
-import {BaseType, ListType, MapType, SetType} from 'thriftrw/ast';
+import {BaseType, Enum, ListType, MapType, SetType} from 'thriftrw/ast';
 
 export class TypeConverter {
   static primitives = {
@@ -46,9 +46,11 @@ export class TypeConverter {
   };
 
   transformName: string => string;
+  thriftAstDefinitions: Array<any>;
 
-  constructor(transformName: string => string) {
+  constructor(transformName: string => string, thriftAstDefinitions: Array<any>) {
     this.transformName = transformName;
+    this.thriftAstDefinitions = thriftAstDefinitions;
   }
 
   annotation(t: BaseType): string {
@@ -62,10 +64,14 @@ export class TypeConverter {
 
   convert = (t: BaseType): string =>
     this.arrayType(t) ||
+    this.enumType(t) ||
     this.mapType(t) ||
     this.annotation(t) ||
     TypeConverter.primitives[t.baseType] ||
     this.transformName(t.name);
+
+  enumType = (thriftValueType: BaseType) =>
+    this.isEnum(thriftValueType) && `$Keys<typeof ${this.transformName(thriftValueType.name)}>`;
 
   arrayType = (thriftValueType: BaseType) =>
     (thriftValueType instanceof ListType || thriftValueType instanceof SetType) &&
@@ -78,5 +84,15 @@ export class TypeConverter {
       return `{[${ktype}]: ${vtype}}`;
     }
     return null;
+  }
+
+  isEnum(def: BaseType) {
+    // Enums export const, not type
+    let defName = def.name;
+    let defValueType = this.thriftAstDefinitions.find(value => {
+      return value.id.name === defName;
+    });
+
+    return defValueType && defValueType instanceof Enum;
   }
 }
