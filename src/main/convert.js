@@ -166,13 +166,28 @@ export class ThriftFileConverter {
       .map(relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`);
 
       if (this.isLongDefined()) {
-        generatedImports.push('import {default as Long} from \'long\';')
+        generatedImports.push('import Long from \'long\'')
       }
       return generatedImports.join('\n');
     }
   getImportAbsPaths = () => Object.keys(this.thrift.idls).map(p => path.resolve(p));
 
   isLongDefined = () => {
-    return JSON.stringify(this.thriftAstDefinitions).indexOf('"js.type":"Long"') !== -1;
+    for (let struct of this.thriftAstDefinitions) {
+      if (struct.type !== "Struct") {
+        continue;
+      }
+      for (let field of struct.fields) {
+        if (field.valueType == null || field.valueType.annotations == null) {
+          continue;
+        }
+
+        if (field.valueType.annotations["js.type"] === "Long") {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

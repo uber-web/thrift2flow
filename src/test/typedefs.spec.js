@@ -105,7 +105,7 @@ struct UserActivitiesRequest {
           true
         ).generateFlowFile();
 
-        let longIndex = output.indexOf('default as Long');
+        let longIndex = output.indexOf('import Long');
 
         t.notEqual(longIndex, -1, "Expected long definition but did not find one");
         t.end();
