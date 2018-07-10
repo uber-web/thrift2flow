@@ -153,8 +153,8 @@ export class ThriftFileConverter {
 
   isOptional = (field: Field) => field.optional;
 
-  generateImports = () =>
-    this.getImportAbsPaths()
+  generateImports = () => {
+    let generatedImports = this.getImportAbsPaths()
       .filter(p => p !== this.thriftPath)
       .map(p =>
         path.join(
@@ -163,8 +163,16 @@ export class ThriftFileConverter {
         )
       )
       .map(p => (p.indexOf('/') === -1 ? `./${p}` : p))
-      .map(relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`)
-      .join('\n');
+      .map(relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`);
 
+      if (this.isLongDefined()) {
+        generatedImports.push('import {default as Long} from \'long\';')
+      }
+      return generatedImports.join('\n');
+    }
   getImportAbsPaths = () => Object.keys(this.thrift.idls).map(p => path.resolve(p));
+
+  isLongDefined = () => {
+    return JSON.stringify(this.thriftAstDefinitions).indexOf('"js.type":"Long"') !== -1;
+  }
 }

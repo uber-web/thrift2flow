@@ -29,8 +29,13 @@ import type {Test} from 'tape';
 
 import {flowResultTest} from './util';
 
+import {ThriftFileConverter} from '../main/convert';
+import path from 'path';
+import fs from 'fs-extra';
+import tmp from 'tmp';
+
 test(
-  'typedefs',
+  'typedef Date',
   flowResultTest(
     {
       // language=thrift
@@ -38,14 +43,10 @@ test(
 typedef byte MyByte
 typedef MyByte TransitiveTypedef
 typedef i64 (js.type = 'Date') Timestamp
-typedef i64 (js.type = 'Long') TimeDelta
-typedef i64 (js.type = 'Long') Long
 
 struct OtherStruct {
     1: i32 num
     2: Timestamp ts
-    3: TimeDelta td
-    4: Long long
 }
 
 struct MyStruct {
@@ -61,18 +62,14 @@ import type {
     MyStructXXX,
     OtherStructXXX,
     TimestampXXX,
-    TimeDeltaXXX,
-    LongXXX
 } from './types';
 
 function go(s : MyStructXXX) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
   const structs : OtherStructXXX[] = [s.f_OtherStruct];
   const timestamps : TimestampXXX[] = [new Date(), s.f_OtherStruct.ts];
-  const longs : LongXXX[] = [new Long(), s.f_OtherStruct.long];
-  const tds : TimeDeltaXXX[] = [new Long(), s.f_OtherStruct.td];
 
-  return [numbers, structs, timestamps, longs, tds];
+  return [numbers, structs, timestamps];
 }
           `
     },
@@ -82,3 +79,36 @@ function go(s : MyStructXXX) {
     }
   )
 );
+
+test("typedef long", (t: Test) => {
+  let files = {
+    // language=thrift
+    "types.thrift": `
+struct UserActivitiesRequest {
+  10: required string userUUID
+  20: optional list<string> workflowUUIDs
+  30: optional i64(js.type = "Long") fromTimestampNano
+  40: optional i64(js.type = "Long") toTimestampNano
+}
+`
+  };
+  const root = tmp.dirSync().name;
+  const paths = Object.keys(files);
+  paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
+  paths
+    .filter(p => p.endsWith(".thrift"))
+    .map(p => path.resolve(root, p))
+    .forEach(p => {
+        let output = new ThriftFileConverter(
+          p,
+          name => name,
+          true
+        ).generateFlowFile();
+
+        let longIndex = output.indexOf('default as Long');
+
+        t.notEqual(longIndex, -1, "Expected long definition but did not find one");
+        t.end();
+      }
+    );
+});
