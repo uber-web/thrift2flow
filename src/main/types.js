@@ -42,7 +42,7 @@ export class TypeConverter {
 
   static i64Mappings = {
     Long: 'Long',
-    Date: 'Date'
+    Date: 'string'
   };
 
   transformName: string => string;
