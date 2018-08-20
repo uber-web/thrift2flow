@@ -174,15 +174,18 @@ export class ThriftFileConverter {
 
   isLongDefined = () => {
     for (let struct of this.thriftAstDefinitions) {
-      if (struct.type !== "Struct") {
-        continue;
-      }
-      for (let field of struct.fields) {
-        if (field.valueType == null || field.valueType.annotations == null) {
-          continue;
-        }
+      if (struct.type === "Struct") {
+        for (let field of struct.fields) {
+          if (field.valueType == null || field.valueType.annotations == null) {
+            continue;
+          }
 
-        if (field.valueType.annotations["js.type"] === "Long") {
+          if (field.valueType.annotations["js.type"] === "Long") {
+            return true;
+          }
+        }
+      } else if (struct.type === "Typedef") {
+        if (struct.valueType.annotations["js.type"] === "Long") {
           return true;
         }
       }
