@@ -173,16 +173,23 @@ export class ThriftFileConverter {
   getImportAbsPaths = () => Object.keys(this.thrift.idls).map(p => path.resolve(p));
 
   isLongDefined = () => {
-    for (let struct of this.thriftAstDefinitions) {
-      if (struct.type !== "Struct") {
-        continue;
-      }
-      for (let field of struct.fields) {
-        if (field.valueType == null || field.valueType.annotations == null) {
+    for (let astNode of this.thriftAstDefinitions) {
+      if (astNode.type === "Struct") {
+        for (let field of astNode.fields) {
+          if (field.valueType == null || field.valueType.annotations == null) {
+            continue;
+          }
+
+          if (field.valueType.annotations["js.type"] === "Long") {
+            return true;
+          }
+        }
+      } else if (astNode.type === "Typedef") {
+        if (astNode.valueType == null || astNode.valueType.annotations == null) {
           continue;
         }
 
-        if (field.valueType.annotations["js.type"] === "Long") {
+        if (astNode.valueType.annotations["js.type"] === "Long") {
           return true;
         }
       }

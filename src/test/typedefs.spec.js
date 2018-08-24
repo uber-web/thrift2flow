@@ -67,7 +67,7 @@ import type {
 function go(s : MyStructXXX) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
   const structs : OtherStructXXX[] = [s.f_OtherStruct];
-  const timestamps : TimestampXXX[] = [new Date(), s.f_OtherStruct.ts];
+  const timestamps : TimestampXXX[] = ["string", s.f_OtherStruct.ts];
 
   return [numbers, structs, timestamps];
 }
@@ -80,7 +80,7 @@ function go(s : MyStructXXX) {
   )
 );
 
-test("typedef long", (t: Test) => {
+test("typedef long in struct", (t: Test) => {
   let files = {
     // language=thrift
     "types.thrift": `
@@ -90,6 +90,34 @@ struct UserActivitiesRequest {
   30: optional i64(js.type = "Long") fromTimestampNano
   40: optional i64(js.type = "Long") toTimestampNano
 }
+`
+  };
+  const root = tmp.dirSync().name;
+  const paths = Object.keys(files);
+  paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
+  paths
+    .filter(p => p.endsWith(".thrift"))
+    .map(p => path.resolve(root, p))
+    .forEach(p => {
+        let output = new ThriftFileConverter(
+          p,
+          name => name,
+          true
+        ).generateFlowFile();
+
+        let longIndex = output.indexOf('import Long');
+
+        t.notEqual(longIndex, -1, "Expected long definition but did not find one");
+        t.end();
+      }
+    );
+});
+
+test("typedef long in global scope", (t: Test) => {
+  let files = {
+    // language=thrift
+    "types.thrift": `
+typedef i64 (js.type = "Long") Points
 `
   };
   const root = tmp.dirSync().name;

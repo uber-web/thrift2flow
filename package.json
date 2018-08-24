@@ -1,6 +1,6 @@
 {
   "name": "thrift2flow",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "description": "Convert Thrift definitions to Flowtype declarations",
   "homepage": "https://github.com/uber-node/thrift2flow",
   "bugs": {
@@ -24,13 +24,15 @@
     "thrift2flow": "lib/index.js"
   },
   "scripts": {
-    "build": "babel src/main -d lib --source-maps",
     "build-test": "babel src -d dist-test --source-maps",
-    "test": "npm run build-test && node dist-test/test/index.spec.js",
+    "build": "babel src/main -d lib --source-maps",
     "check": "npm run prettier && npm run lint && npm run test",
-    "prettier": "prettier --single-quote --bracket-spacing false --parser flow --tab-width 2 --print-width 100 --write \"{src,test}/**/*.js\"",
+    "debug": "node --nolazy --inspect-brk=9229 lib/index.js",
+    "download-typedefs": "mkdir -p typedefs && curl -o typedefs/flowResult.js https://raw.githubusercontent.com/facebook/flow/master/tsrc/flowResult.js",
     "lint": "flow check && eslint src",
-    "download-typedefs": "mkdir -p typedefs && curl -o typedefs/flowResult.js https://raw.githubusercontent.com/facebook/flow/master/tsrc/flowResult.js"
+    "prepare": "npm run build",
+    "prettier": "prettier --single-quote --bracket-spacing false --parser flow --tab-width 2 --print-width 100 --write \"{src,test}/**/*.js\"",
+    "test": "npm run build-test && node dist-test/test/index.spec.js"
   },
   "engines": {
     "node": ">=6.10",
