@@ -71,7 +71,7 @@ export class TypeConverter {
     this.transformName(t.name);
 
   enumType = (thriftValueType: BaseType) =>
-    this.isEnum(thriftValueType) && `$Keys<typeof ${this.transformName(thriftValueType.name)}>`;
+    this.isEnum(thriftValueType) && `$Keys<${this.transformName(thriftValueType.name)}>`;
 
   arrayType = (thriftValueType: BaseType) =>
     (thriftValueType instanceof ListType || thriftValueType instanceof SetType) &&
@@ -88,8 +88,8 @@ export class TypeConverter {
 
   isEnum(def: BaseType) {
     // Enums export const, not type
-    let defName = def.name;
-    let defValueType = this.thriftAstDefinitions.find(value => {
+    const defName = def.name;
+    const defValueType = this.thriftAstDefinitions.find(value => {
       return value.id.name === defName;
     });
 

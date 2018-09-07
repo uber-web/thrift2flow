@@ -41,7 +41,7 @@ export const flowResultTest = (
   suffix: string = 'XXX',
   withsource: boolean = true
 ) => (t: Test) => {
-  const root = tmp.dirSync().name;
+  const root = tmp.dirSync({unsafeCleanup: true}).name;
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
   paths
