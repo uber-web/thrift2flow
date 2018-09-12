@@ -50,6 +50,7 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
+import {MyEnumValueMap} from './types';
 import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
 
 const ok: MyEnumXXX = 'OK';
@@ -59,6 +60,9 @@ const struct: MyStructXXX = {
   f_MyEnum: ok,
   f_EnumTypedef: error,
 }
+
+const okFromMap: 1 = MyEnumValueMap.OK;
+const errorFromMap: 2 = MyEnumValueMap.ERROR;
 
 const t: EnumTypedefXXX = ok;
 `
