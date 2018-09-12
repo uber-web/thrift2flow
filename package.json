@@ -34,7 +34,7 @@
     "prepare": "npm run build",
     "prettier": "prettier --single-quote --bracket-spacing false --parser flow --tab-width 2 --print-width 100 --write \"{src,test}/**/*.js\"",
     "test": "npm run build-test && node dist-test/test/index.spec.js",
-    "test-keep-output": "KEEP_TEST_OUTPUT=true npm run build-test && node dist-test/test/index.spec.js"
+    "test-keep-output": "npm run build-test && KEEP_TEST_OUTPUT=true node dist-test/test/index.spec.js"
   },
   "engines": {
     "node": ">=6.10",

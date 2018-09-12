@@ -70,7 +70,7 @@ const t: EnumTypedefXXX = ok;
   )
 );
 
-test.only('enums with errors', flowResultTest(
+test('enums with errors', flowResultTest(
     {
       // language=thrift
       'types.thrift': `
