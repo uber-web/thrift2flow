@@ -7,3 +7,4 @@
 /.vscode
 yarn-error.log
 yarn.lock
+src/test-output/**/*

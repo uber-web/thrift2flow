@@ -30,10 +30,10 @@ import fs from 'fs-extra';
 
 import {exec} from 'child_process';
 import type {Test} from 'tape';
-
-import tmp from 'tmp';
+import uuid from 'uuid/v4';
 
 import {ThriftFileConverter} from '../main/convert';
+
 
 export const flowResultTest = (
   files: {[string]: string},
@@ -41,7 +41,8 @@ export const flowResultTest = (
   suffix: string = 'XXX',
   withsource: boolean = true
 ) => (t: Test) => {
-  const root = tmp.dirSync({unsafeCleanup: true}).name;
+  const root = path.resolve('src/test-output/', uuid());
+  fs.mkdirSync(root);
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
   paths
@@ -59,7 +60,13 @@ export const flowResultTest = (
 ./typedefs`
   );
   fs.copy('./typedefs/', path.resolve(root, 'typedefs'));
-  exec('flow check --json', {cwd: root}, (err, stdout, stderr) =>
-    testFn(t, JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString()))
-  );
+  exec('flow check --json', {cwd: root}, (err, stdout, stderr) => {
+    testFn(t, JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString()));
+    // This can be useful when debugging generated code
+    // Run `npm run clean-test-output` to clean up latter
+    // eslint-disable-next-line no-process-env
+    if (!process.env.KEEP_TEST_OUTPUT) {
+      fs.removeSync(root);
+    }
+  });
 };

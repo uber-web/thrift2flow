@@ -50,12 +50,17 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX,EnumTypedefXXX} from './types';
+import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
 
-function go(s : MyStructXXX, t: EnumTypedefXXX) {
-  const values : string[] = [s.f_MyEnum, s.f_EnumTypedef, t];
-  return [values];
+const ok: MyEnumXXX = 'OK';
+const error: MyEnumXXX = 'ERROR';
+
+const struct: MyStructXXX = {
+  f_MyEnum: ok,
+  f_EnumTypedef: error,
 }
+
+const t: EnumTypedefXXX = ok;
 `
     },
     (t: Test, r: FlowResult) => {
@@ -64,3 +69,43 @@ function go(s : MyStructXXX, t: EnumTypedefXXX) {
     }
   )
 );
+
+test.only('enums with errors', flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+typedef MyEnum EnumTypedef
+
+enum MyEnum {
+  OK = 1
+  ERROR = 2
+}
+
+struct MyStruct {
+  1: MyEnum f_MyEnum
+  2: EnumTypedef f_EnumTypedef
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+
+const ok: MyEnumXXX = 'NOT CORRECT';
+const error: MyEnumXXX = null;
+
+const struct: MyStructXXX = {
+  f_MyEnum: 'NOT CORRECT',
+  f_EnumTypedef: null,
+}
+
+const t: EnumTypedefXXX = 'NOT CORRECT';
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 5);
+      t.end();
+    }
+  )
+)
+;
