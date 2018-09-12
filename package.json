@@ -24,7 +24,7 @@
     "thrift2flow": "lib/index.js"
   },
   "scripts": {
-    "clean-test-output": "git clean -Xdf src/test-output",
+    "clean-test-output": "git clean -Xdf test-output/",
     "build-test": "babel src -d dist-test --source-maps",
     "build": "babel src/main -d lib --source-maps",
     "check": "npm run prettier && npm run lint && npm run test",

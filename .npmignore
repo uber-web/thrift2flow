@@ -3,4 +3,4 @@
 /typedefs
 /.idea
 /coverage
-src/test-output/*.js
+test-output/**/*

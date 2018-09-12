@@ -41,7 +41,7 @@ export const flowResultTest = (
   suffix: string = 'XXX',
   withsource: boolean = true
 ) => (t: Test) => {
-  const root = path.resolve('src/test-output/', uuid());
+  const root = path.resolve('test-output/', uuid());
   fs.mkdirSync(root);
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
