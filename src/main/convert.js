@@ -106,18 +106,28 @@ export class ThriftFileConverter {
   generateTypedef = (def: Typedef) =>
     `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
 
+  generateEnumUnion = (def: Enum) => {
+    return def.definitions
+      .map((d, index) => `"${d.id.name}"`).join(' | ');
+  };
+
+  generateEnumType = (def: Enum) => {
+    return `export type ${this.transformName(def.id.name)} = ${this.generateEnumUnion(def)};`;
+  };
+
   generateEnumMap = (def: Enum) => {
-    const header = `{`;
+    const header = '{';
     const values = def.definitions
       .map((d, index) => `  "${d.id.name}": ${d.value ? d.value.value : index},`)
       .join('\n');
-    const footer = `}`;
+    const footer = '}';
 
-    return [header, values, footer].join('\n');
+    const mapDefinition = [header, values, footer].join('\n');
+    return `export const ${def.id.name}ValueMap = ${mapDefinition};`;
   };
 
   generateEnum = (def: Enum) => {
-    return `export const ${this.transformName(def.id.name)} = ${this.generateEnumMap(def)};`;
+    return `${this.generateEnumType(def)}\n${this.generateEnumMap(def)}`;
   };
 
   generateConst = (def: Const) => {
@@ -154,7 +164,7 @@ export class ThriftFileConverter {
   isOptional = (field: Field) => field.optional;
 
   generateImports = () => {
-    let generatedImports = this.getImportAbsPaths()
+    const generatedImports = this.getImportAbsPaths()
       .filter(p => p !== this.thriftPath)
       .map(p =>
         path.join(
@@ -166,30 +176,30 @@ export class ThriftFileConverter {
       .map(relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`);
 
       if (this.isLongDefined()) {
-        generatedImports.push('import Long from \'long\'')
+        generatedImports.push('import Long from \'long\'');
       }
       return generatedImports.join('\n');
     }
   getImportAbsPaths = () => Object.keys(this.thrift.idls).map(p => path.resolve(p));
 
   isLongDefined = () => {
-    for (let astNode of this.thriftAstDefinitions) {
-      if (astNode.type === "Struct") {
-        for (let field of astNode.fields) {
+    for (const astNode of this.thriftAstDefinitions) {
+      if (astNode.type === 'Struct') {
+        for (const field of astNode.fields) {
           if (field.valueType == null || field.valueType.annotations == null) {
             continue;
           }
 
-          if (field.valueType.annotations["js.type"] === "Long") {
+          if (field.valueType.annotations['js.type'] === 'Long') {
             return true;
           }
         }
-      } else if (astNode.type === "Typedef") {
+      } else if (astNode.type === 'Typedef') {
         if (astNode.valueType == null || astNode.valueType.annotations == null) {
           continue;
         }
 
-        if (astNode.valueType.annotations["js.type"] === "Long") {
+        if (astNode.valueType.annotations['js.type'] === 'Long') {
           return true;
         }
       }
