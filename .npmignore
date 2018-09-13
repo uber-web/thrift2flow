@@ -3,4 +3,4 @@
 /typedefs
 /.idea
 /coverage
-test-output/**/*
+/test-output
