@@ -50,21 +50,12 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import {MyEnumValueMap} from './types';
-import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+import type {MyStructXXX,EnumTypedefXXX} from './types';
 
-const ok: MyEnumXXX = 'OK';
-const error: MyEnumXXX = 'ERROR';
-
-const struct: MyStructXXX = {
-  f_MyEnum: ok,
-  f_EnumTypedef: error,
+function go(s : MyStructXXX, t: EnumTypedefXXX) {
+  const values : string[] = [s.f_MyEnum, s.f_EnumTypedef, t];
+  return [values];
 }
-
-const okFromMap: 1 = MyEnumValueMap.OK;
-const errorFromMap: 2 = MyEnumValueMap.ERROR;
-
-const t: EnumTypedefXXX = ok;
 `
     },
     (t: Test, r: FlowResult) => {
@@ -74,7 +65,9 @@ const t: EnumTypedefXXX = ok;
   )
 );
 
-test('enums with errors', flowResultTest(
+test(
+  'enums values',
+  flowResultTest(
     {
       // language=thrift
       'types.thrift': `
@@ -93,23 +86,51 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+import type {MyStructXXX,EnumTypedefXXX} from './types';
+import {MyEnumXXX} from './types';
 
-const ok: MyEnumXXX = 'NOT CORRECT';
-const error: MyEnumXXX = null;
-
-const struct: MyStructXXX = {
-  f_MyEnum: 'NOT CORRECT',
-  f_EnumTypedef: null,
+function go(s : MyStructXXX, t: $Values<typeof MyEnumXXX>, k: $Keys<typeof MyEnumXXX>) {
+  const values : number[] = [MyEnumXXX[s.f_MyEnum], MyEnumXXX[s.f_EnumTypedef], t];
+  const keys : $Keys<typeof MyEnumXXX> = 'OK';
+  return [values, keys];
 }
-
-const t: EnumTypedefXXX = 'NOT CORRECT';
 `
     },
     (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 5);
+      t.deepEqual(r.errors, []);
       t.end();
-    }
+    },
+    'XXX',
+    true
   )
-)
-;
+);
+
+test(
+  'enums map',
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+enum MyEnum {
+  OK = 1
+  ERROR = 2
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import {MyEnumXXX} from './types';
+
+function go() {
+  return [MyEnumXXX.OK];
+}
+`
+    },
+    (t: Test, r: FlowResult) => {
+      t.deepEqual(r.errors, []);
+      t.end();
+    },
+    'XXX',
+    true
+  )
+);

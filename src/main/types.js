@@ -71,7 +71,7 @@ export class TypeConverter {
     this.transformName(t.name);
 
   enumType = (thriftValueType: BaseType) =>
-    this.isEnum(thriftValueType) && this.transformName(thriftValueType.name);
+    this.isEnum(thriftValueType) && `$Keys<typeof ${this.transformName(thriftValueType.name)}>`;
 
   arrayType = (thriftValueType: BaseType) =>
     (thriftValueType instanceof ListType || thriftValueType instanceof SetType) &&
