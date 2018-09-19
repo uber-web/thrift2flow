@@ -131,8 +131,20 @@ export class ThriftFileConverter {
   };
 
   generateConst = (def: Const) => {
-    // string values need to be in quotes
-    const value = typeof def.value.value === 'string' ? `'${def.value.value}'` : def.value.value;
+    let value;
+    if (def.value.type === 'ConstList') {
+      value = `[${def.value.values.map(val => {
+        if (val.type === 'Identifier') {
+          return val.name;
+        }
+        if (typeof val.value === 'string') {
+          return `'${val.value}'`;
+        }
+        return val.value;
+      }).join(',')}]`;
+    } else {
+      value = typeof def.value.value === 'string' ? `'${def.value.value}'` : def.value.value;
+    }
     return `export const ${def.id.name}: ${this.types.convert(def.fieldType)} = ${value};`;
   };
 

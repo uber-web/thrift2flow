@@ -36,6 +36,8 @@ test(
       // language=thrift
       'types.thrift': `
 typedef byte MyByte
+typedef string State
+typedef i32 Num
 
 struct OtherStruct {
   1: i32 num
@@ -47,6 +49,18 @@ struct MyStruct {
   3: list<OtherStruct> f_OtherStruct
   4: set<i32> f_numbersSet
 }
+const State STATE_LOADING = "LOADING"
+const State STATE_COMPLETE = "COMPLETE"
+const set<State> STATES = [
+  STATE_LOADING,
+  STATE_COMPLETE,
+  "ERROR"
+]
+const Num ZERO = 0
+const set<Num> NUMS = [
+  ZERO,
+  5
+]
 `,
       // language=JavaScript
       'index.js': `
