@@ -72,7 +72,7 @@ function go(s : MyStructXXX): Array<string | number> {
 `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )

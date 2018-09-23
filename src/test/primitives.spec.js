@@ -67,7 +67,7 @@ function go(s : PrimitivesXXX) {
 `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )
