@@ -37,18 +37,21 @@ export class TypeConverter {
     i64: 'Buffer',
     double: 'number',
     string: 'string',
-    void: 'void'
+    void: 'void',
   };
 
   static i64Mappings = {
     Long: 'Long',
-    Date: 'string'
+    Date: 'string',
   };
 
   transformName: string => string;
   thriftAstDefinitions: Array<any>;
 
-  constructor(transformName: string => string, thriftAstDefinitions: Array<any>) {
+  constructor(
+    transformName: string => string,
+    thriftAstDefinitions: Array<any>
+  ) {
     this.transformName = transformName;
     this.thriftAstDefinitions = thriftAstDefinitions;
   }
@@ -74,7 +77,8 @@ export class TypeConverter {
     this.isEnum(thriftValueType) && this.transformName(thriftValueType.name);
 
   arrayType = (thriftValueType: BaseType) =>
-    (thriftValueType instanceof ListType || thriftValueType instanceof SetType) &&
+    (thriftValueType instanceof ListType ||
+      thriftValueType instanceof SetType) &&
     `${this.convert(thriftValueType.valueType)}[]`;
 
   mapType(t: BaseType) {

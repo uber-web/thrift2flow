@@ -64,7 +64,7 @@ function go(s : PrimitivesXXX) {
   const strings : string[] = [s.f_string];
   return [numbers, booleans, strings, buffers];
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);
@@ -88,7 +88,7 @@ function go(s : PrimitivesXXX) {
   const booleans : boolean[] = [s.f_byte];
   return [numbers, booleans];
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.equal(r.errors.length, 2);
@@ -118,7 +118,7 @@ function go(s : PrimitivesXXX) {
       s.f_default.length
   ];
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.equal(r.errors.length, 2);
@@ -148,7 +148,7 @@ import type {OptionalsXXX} from './types';
 function go() : OptionalsXXX {
   return {f_byte: 0, notActualField: true};
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.equal(r.errors.length, 1);

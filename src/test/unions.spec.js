@@ -67,7 +67,7 @@ function go(s : MyStructXXX, u: UnionTypedefXXX, eu: EmptyUnionTypedefXXX) {
   const numbers: number[] = [s.f_MyUnion.size || -1];
   return [unions,unions,unionDefs,emptyunionDefs,strings,numbers];
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);

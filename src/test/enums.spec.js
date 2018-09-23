@@ -65,7 +65,7 @@ const okFromMap: 1 = MyEnumValueMap.OK;
 const errorFromMap: 2 = MyEnumValueMap.ERROR;
 
 const t: EnumTypedefXXX = ok;
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);
@@ -74,7 +74,9 @@ const t: EnumTypedefXXX = ok;
   )
 );
 
-test('enums with errors', flowResultTest(
+test(
+  'enums with errors',
+  flowResultTest(
     {
       // language=thrift
       'types.thrift': `
@@ -104,12 +106,11 @@ const struct: MyStructXXX = {
 }
 
 const t: EnumTypedefXXX = 'NOT CORRECT';
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.equal(r.errors.length, 5);
       t.end();
     }
   )
-)
-;
+);

@@ -69,7 +69,7 @@ function go(s : MyStructXXX): Array<string | number> {
 
   return values;
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);

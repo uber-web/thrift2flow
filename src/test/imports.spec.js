@@ -63,7 +63,7 @@ struct MyStruct {
               const numbers : number[] = [s.f_OtherStruct.num];
               return [numbers];
             }
-          `
+          `,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);

@@ -74,7 +74,7 @@ function go(s : MyStructXXX) {
   const structs : OtherStructXXX[] = [s.f_OtherStruct[0]];
   return [numbers, structs];
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);
@@ -113,7 +113,7 @@ function go(s : MyStructXXX) {
   const structs : OtherStructXXX[] = [s.f_OtherStruct['hello']];
   return [numbers, structs];
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
       t.deepEqual(r.errors, []);

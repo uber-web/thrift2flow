@@ -39,8 +39,14 @@ import {ThriftFileConverter} from './convert';
 
 const argv = yargs
   .usage('Usage: $0 [options] <thrift files..>')
-  .option('suffix', {describe: 'appended to generated type names', default: 'Type'})
-  .option('withsource', {describe: 'prepend the source path of the thrift file', default: false})
+  .option('suffix', {
+    describe: 'appended to generated type names',
+    default: 'Type',
+  })
+  .option('withsource', {
+    describe: 'prepend the source path of the thrift file',
+    default: false,
+  })
   .help('h')
   .alias('h', 'help').argv;
 
@@ -76,6 +82,8 @@ for (const thriftPath in allOutput) {
     `${path.basename(thriftPath, '.thrift')}.js`
   );
   mkdirp(path.dirname(jsFilename), () =>
-    fs.writeFile(jsFilename, allOutput[thriftPath], () => console.log(`Wrote ${jsFilename}`))
+    fs.writeFile(jsFilename, allOutput[thriftPath], () =>
+      console.log(`Wrote ${jsFilename}`)
+    )
   );
 }

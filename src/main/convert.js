@@ -30,12 +30,20 @@ import prettier from 'prettier';
 import path from 'path';
 
 import type {Base} from 'bufrw';
-import type {Struct, Field, Enum, Typedef, FunctionDefinition, Service, Const} from 'thriftrw/ast';
+import type {
+  Struct,
+  Field,
+  Enum,
+  Typedef,
+  FunctionDefinition,
+  Service,
+  Const,
+} from 'thriftrw/ast';
 
 const thriftOptions = {
   strict: false,
   allowFilesystemAccess: true,
-  allowOptionalArguments: true
+  allowOptionalArguments: true,
 };
 
 export class ThriftFileConverter {
@@ -46,10 +54,16 @@ export class ThriftFileConverter {
   withsource: boolean;
   thriftAstDefinitions: Array<any>;
 
-  constructor(thriftPath: string, transformName: string => string, withsource: boolean) {
+  constructor(
+    thriftPath: string,
+    transformName: string => string,
+    withsource: boolean
+  ) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
-    this.thriftAstDefinitions = this.thrift.asts[this.thrift.filename].definitions;
+    this.thriftAstDefinitions = this.thrift.asts[
+      this.thrift.filename
+    ].definitions;
     this.transformName = transformName;
     this.types = new TypeConverter(transformName, this.thriftAstDefinitions);
     this.withsource = withsource;
@@ -63,7 +77,7 @@ export class ThriftFileConverter {
           this.withsource ? `\n// Source: ${this.thriftPath}` : ''
         }`,
         this.generateImports(),
-        ...this.thriftAstDefinitions.map(this.convertDefinitionToCode)
+        ...this.thriftAstDefinitions.map(this.convertDefinitionToCode),
       ]
         .filter(Boolean)
         .join('\n\n'),
@@ -87,7 +101,9 @@ export class ThriftFileConverter {
         return this.generateConst(def);
       default:
         console.warn(
-          `${path.basename(this.thriftPath)}: Skipping ${def.type} ${def.id ? def.id.name : '?'}`
+          `${path.basename(this.thriftPath)}: Skipping ${def.type} ${
+            def.id ? def.id.name : '?'
+          }`
         );
         return null;
     }
@@ -104,21 +120,26 @@ export class ThriftFileConverter {
     }) => ${this.types.convert(fn.returns)}`;
 
   generateTypedef = (def: Typedef) =>
-    `export type ${this.transformName(def.id.name)} = ${this.types.convert(def.valueType)};`;
+    `export type ${this.transformName(def.id.name)} = ${this.types.convert(
+      def.valueType
+    )};`;
 
   generateEnumUnion = (def: Enum) => {
-    return def.definitions
-      .map((d, index) => `"${d.id.name}"`).join(' | ');
+    return def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ');
   };
 
   generateEnumType = (def: Enum) => {
-    return `export type ${this.transformName(def.id.name)} = ${this.generateEnumUnion(def)};`;
+    return `export type ${this.transformName(
+      def.id.name
+    )} = ${this.generateEnumUnion(def)};`;
   };
 
   generateEnumMap = (def: Enum) => {
     const header = '{';
     const values = def.definitions
-      .map((d, index) => `  "${d.id.name}": ${d.value ? d.value.value : index},`)
+      .map(
+        (d, index) => `  "${d.id.name}": ${d.value ? d.value.value : index},`
+      )
       .join('\n');
     const footer = '}';
 
@@ -133,34 +154,47 @@ export class ThriftFileConverter {
   generateConst = (def: Const) => {
     let value;
     if (def.value.type === 'ConstList') {
-      value = `[${def.value.values.map(val => {
-        if (val.type === 'Identifier') {
-          return val.name;
-        }
-        if (typeof val.value === 'string') {
-          return `'${val.value}'`;
-        }
-        return val.value;
-      }).join(',')}]`;
+      value = `[${def.value.values
+        .map(val => {
+          if (val.type === 'Identifier') {
+            return val.name;
+          }
+          if (typeof val.value === 'string') {
+            return `'${val.value}'`;
+          }
+          return val.value;
+        })
+        .join(',')}]`;
     } else {
-      value = typeof def.value.value === 'string' ? `'${def.value.value}'` : def.value.value;
+      value =
+        typeof def.value.value === 'string'
+          ? `'${def.value.value}'`
+          : def.value.value;
     }
-    return `export const ${def.id.name}: ${this.types.convert(def.fieldType)} = ${value};`;
+    return `export const ${def.id.name}: ${this.types.convert(
+      def.fieldType
+    )} = ${value};`;
   };
 
   generateStruct = ({id: {name}, fields}: Struct) =>
-    `export type ${this.transformName(name)} = ${this.generateStructContents(fields)};`;
+    `export type ${this.transformName(name)} = ${this.generateStructContents(
+      fields
+    )};`;
 
   generateStructContents = (fields: Object) =>
     `{|${Object.values(fields)
       .map(
         (f: Base) =>
-          `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(f.valueType)};`
+          `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(
+            f.valueType
+          )};`
       )
       .join('\n')}|}`;
 
   generateUnion = ({id: {name}, fields}: Struct) =>
-    `export type ${this.transformName(name)} = ${this.generateUnionContents(fields)};`;
+    `export type ${this.transformName(name)} = ${this.generateUnionContents(
+      fields
+    )};`;
 
   generateUnionContents = (fields: Object) => {
     if (!fields.length) {
@@ -185,14 +219,17 @@ export class ThriftFileConverter {
         )
       )
       .map(p => (p.indexOf('/') === -1 ? `./${p}` : p))
-      .map(relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`);
+      .map(
+        relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`
+      );
 
-      if (this.isLongDefined()) {
-        generatedImports.push('import Long from \'long\'');
-      }
-      return generatedImports.join('\n');
+    if (this.isLongDefined()) {
+      generatedImports.push("import Long from 'long'");
     }
-  getImportAbsPaths = () => Object.keys(this.thrift.idls).map(p => path.resolve(p));
+    return generatedImports.join('\n');
+  };
+  getImportAbsPaths = () =>
+    Object.keys(this.thrift.idls).map(p => path.resolve(p));
 
   isLongDefined = () => {
     for (const astNode of this.thriftAstDefinitions) {
@@ -207,7 +244,10 @@ export class ThriftFileConverter {
           }
         }
       } else if (astNode.type === 'Typedef') {
-        if (astNode.valueType == null || astNode.valueType.annotations == null) {
+        if (
+          astNode.valueType == null ||
+          astNode.valueType.annotations == null
+        ) {
           continue;
         }
 
@@ -218,5 +258,5 @@ export class ThriftFileConverter {
     }
 
     return false;
-  }
+  };
 }
