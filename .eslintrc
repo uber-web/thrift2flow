@@ -1,22 +1,9 @@
 {
-  "parser": "babel-eslint",
   "env": {
     "node": true
   },
-  "extends": ["eslint-config-uber-es2015"],
-  "plugins": ["flowtype", "babel"],
+  "extends": ["eslint-config-fusion"],
   "rules": {
-    "flowtype/define-flow-type": 1,
-    "indent": 0,
-    "strict": 0,
-    "no-console": 0,
-    "guard-for-in": 0,
-    "operator-linebreak": 0,
-    "no-invalid-this": 0,
-    "babel/no-invalid-this": 2,
-    "max-len": 0,
-    "no-irregular-whitespace": 0,
-    "no-multiple-empty-lines": 0,
-    "no-inline-comments": 0
+    "no-console": 0
   }
 }

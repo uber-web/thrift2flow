@@ -34,7 +34,6 @@ import uuid from 'uuid/v4';
 
 import {ThriftFileConverter} from '../main/convert';
 
-
 export const flowResultTest = (
   files: {[string]: string},
   testFn: (Function, FlowResult) => void,
@@ -51,7 +50,11 @@ export const flowResultTest = (
     .forEach(p =>
       fs.writeFileSync(
         p.replace(/\.thrift$/, '.js'),
-        new ThriftFileConverter(p, name => name + suffix, withsource).generateFlowFile()
+        new ThriftFileConverter(
+          p,
+          name => name + suffix,
+          withsource
+        ).generateFlowFile()
       )
     );
   fs.writeFileSync(
@@ -61,7 +64,10 @@ export const flowResultTest = (
   );
   fs.copy('./typedefs/', path.resolve(root, 'typedefs'));
   exec('flow check --json', {cwd: root}, (err, stdout, stderr) => {
-    testFn(t, JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString()));
+    testFn(
+      t,
+      JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString())
+    );
     // This can be useful when debugging generated code
     // Run `npm run clean-test-output` to clean up latter
     // eslint-disable-next-line no-process-env

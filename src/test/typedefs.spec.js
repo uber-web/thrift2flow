@@ -71,72 +71,78 @@ function go(s : MyStructXXX) {
 
   return [numbers, structs, timestamps];
 }
-          `
+          `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )
 );
 
-test("typedef long in struct", (t: Test) => {
+test('typedef long in struct', (t: Test) => {
   let files = {
     // language=thrift
-    "types.thrift": `
+    'types.thrift': `
 struct UserActivitiesRequest {
   10: required string userUUID
   20: optional list<string> workflowUUIDs
   30: optional i64(js.type = "Long") fromTimestampNano
   40: optional i64(js.type = "Long") toTimestampNano
 }
-`
+`,
   };
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
   paths
-    .filter(p => p.endsWith(".thrift"))
+    .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p => {
-        let output = new ThriftFileConverter(
-          p,
-          name => name,
-          true
-        ).generateFlowFile();
+      let output = new ThriftFileConverter(
+        p,
+        name => name,
+        true
+      ).generateFlowFile();
 
-        let longIndex = output.indexOf('import Long');
+      let longIndex = output.indexOf('import Long');
 
-        t.notEqual(longIndex, -1, "Expected long definition but did not find one");
-        t.end();
-      }
-    );
+      t.notEqual(
+        longIndex,
+        -1,
+        'Expected long definition but did not find one'
+      );
+      t.end();
+    });
 });
 
-test("typedef long in global scope", (t: Test) => {
+test('typedef long in global scope', (t: Test) => {
   let files = {
     // language=thrift
-    "types.thrift": `
+    'types.thrift': `
 typedef i64 (js.type = "Long") Points
-`
+`,
   };
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
   paths
-    .filter(p => p.endsWith(".thrift"))
+    .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p => {
-        let output = new ThriftFileConverter(
-          p,
-          name => name,
-          true
-        ).generateFlowFile();
+      let output = new ThriftFileConverter(
+        p,
+        name => name,
+        true
+      ).generateFlowFile();
 
-        let longIndex = output.indexOf('import Long');
+      let longIndex = output.indexOf('import Long');
 
-        t.notEqual(longIndex, -1, "Expected long definition but did not find one");
-        t.end();
-      }
-    );
+      t.notEqual(
+        longIndex,
+        -1,
+        'Expected long definition but did not find one'
+      );
+      t.end();
+    });
 });

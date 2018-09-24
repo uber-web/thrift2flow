@@ -60,10 +60,10 @@ function checkVoids(s : MyServiceXXX) {
 function ensureVoid(f : any => void) {
     f(0);
 }
-`
+`,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )
