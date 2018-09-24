@@ -1,6 +1,8 @@
 # thrift2flow
 
-Automagically converts [Apache Thrift](https://thrift.apache.org/) specs to 
+[![Build status](https://badge.buildkite.com/56a997e5c7caeaa4969da9add5c6435a1d00381d4aee1edf6f.svg?branch=master)](https://buildkite.com/uberopensource/thrift2flow)
+
+Automagically converts [Apache Thrift](https://thrift.apache.org/) specs to
 [Flowtype](https://flow.org/) type definition files!
 
 Example:
@@ -17,6 +19,7 @@ struct Customer {
 ```
 
 Output:
+
 ```js
 export type UUID = string;
 
@@ -24,7 +27,7 @@ export type Customer = {
   id: UUID,
   name: string,
   age: number,
-  tags: string[]
+  tags: string[],
 };
 ```
 
@@ -37,7 +40,7 @@ thrift2flow my/service.thrift
 
 ## Contributing
 
-We'd love for you to contribute to this project. Before we can accept your contributions, we kindly 
+We'd love for you to contribute to this project. Before we can accept your contributions, we kindly
 ask you to sign our [Uber Contributor License Agreement](https://docs.google.com/a/uber.com/forms/d/1pAwS_-dA1KhPlfxzYLBqK6rsSWwRwH95OCCZrcsY5rk/viewform).
 
 - If you **find a bug**, please open an issue, or submit a fix via a pull request
