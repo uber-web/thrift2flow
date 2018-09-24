@@ -70,7 +70,7 @@ function go(s : MyStructXXX, u: UnionTypedefXXX, eu: EmptyUnionTypedefXXX) {
 `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )

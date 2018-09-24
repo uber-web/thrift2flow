@@ -77,7 +77,7 @@ function go(s : MyStructXXX) {
 `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )
@@ -116,7 +116,7 @@ function go(s : MyStructXXX) {
 `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )

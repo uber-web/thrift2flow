@@ -68,7 +68,7 @@ const t: EnumTypedefXXX = ok;
 `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )

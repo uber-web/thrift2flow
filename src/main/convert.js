@@ -52,6 +52,7 @@ export class ThriftFileConverter {
   types: TypeConverter;
   transformName: string => string;
   withsource: boolean;
+  ast: any;
   thriftAstDefinitions: Array<any>;
 
   constructor(
@@ -61,9 +62,8 @@ export class ThriftFileConverter {
   ) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
-    this.thriftAstDefinitions = this.thrift.asts[
-      this.thrift.filename
-    ].definitions;
+    this.ast = this.thrift.asts[this.thrift.filename];
+    this.thriftAstDefinitions = this.ast.definitions;
     this.transformName = transformName;
     this.types = new TypeConverter(transformName, this.thriftAstDefinitions);
     this.withsource = withsource;
@@ -210,18 +210,27 @@ export class ThriftFileConverter {
   isOptional = (field: Field) => field.optional;
 
   generateImports = () => {
-    const generatedImports = this.getImportAbsPaths()
-      .filter(p => p !== this.thriftPath)
-      .map(p =>
-        path.join(
-          path.dirname(path.relative(path.dirname(this.thriftPath), p)),
-          path.basename(p, '.thrift')
-        )
-      )
-      .map(p => (p.indexOf('/') === -1 ? `./${p}` : p))
-      .map(
-        relpath => `import * as ${path.basename(relpath)} from '${relpath}.js';`
-      );
+    const includes = this.ast.headers.filter(f => f.type === 'Include');
+    const relativePaths = includes
+      .map(i => path.parse(i.id))
+      .map(parsed => path.join(parsed.dir, parsed.name))
+      .map(p => (p.indexOf('/') === -1 ? `./${p}` : p));
+    const generatedImports = relativePaths.map((relpath, index) => {
+      let baseName = path.basename(relpath);
+      let hasConflictingImport = true;
+      while (hasConflictingImport) {
+        hasConflictingImport = relativePaths.some((rel, nextIndex) => {
+          if (nextIndex > index && path.basename(rel) === baseName) {
+            return true;
+          }
+          return false;
+        });
+        if (hasConflictingImport) {
+          baseName = `_${baseName}`;
+        }
+      }
+      return `import * as ${baseName} from '${relpath}';`;
+    });
 
     if (this.isLongDefined()) {
       generatedImports.push("import Long from 'long'");

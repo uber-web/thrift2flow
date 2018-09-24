@@ -30,13 +30,21 @@ import type {Test} from 'tape';
 import {flowResultTest} from './util';
 
 // TODO: test relative paths
-
 test(
   'imports in same folder',
   flowResultTest(
     {
       // language=thrift
+      'other.thrift': `
+        typedef i32 Thing 
+      `,
+      // language=thrift
       'shared.thrift': `
+include "./other.thrift"
+
+struct ThingStruct {
+    1: other.Thing thing
+}
 struct OtherStruct {
     1: i32 num
 }
@@ -66,7 +74,7 @@ struct MyStruct {
           `,
     },
     (t: Test, r: FlowResult) => {
-      t.deepEqual(r.errors, []);
+      t.equal(r.errors.length, 0);
       t.end();
     }
   )
