@@ -214,7 +214,7 @@ export class ThriftFileConverter {
     const relativePaths = includes
       .map(i => path.parse(i.id))
       .map(parsed => path.join(parsed.dir, parsed.name))
-      .map(p => (p.indexOf('/') === -1 ? `./${p}` : p));
+      .map(p => (p.startsWith('.') ? p : `./${p}`));
     const generatedImports = relativePaths.map((relpath, index) => {
       let baseName = path.basename(relpath);
       let hasConflictingImport = true;

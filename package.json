@@ -45,7 +45,6 @@
   "dependencies": {
     "babel-polyfill": "^6.23.0",
     "common-path-prefix": "^1.0.0",
-    "mkdirp": "^0.5.1",
     "prettier": "^1.14.2",
     "source-map-support": "^0.4.15",
     "thriftrw": "^3.11.0",
