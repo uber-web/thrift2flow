@@ -29,7 +29,6 @@ import type {Test} from 'tape';
 
 import {flowResultTest} from './util';
 
-// TODO: test relative paths
 test(
   'imports in same folder',
   flowResultTest(
@@ -53,6 +52,56 @@ typedef i32 OtherStructTypedef
       // language=thrift
       'types.thrift': `
 include "./shared.thrift"
+
+typedef shared.OtherStruct MyOtherStruct
+
+struct MyStruct {
+  1: shared.OtherStruct f_OtherStruct
+  2: MyOtherStruct f_MyOtherStruct
+  3: shared.OtherStructTypedef f_OtherStructTypedef
+}
+`,
+      // language=JavaScript
+      'index.js': `
+            // @flow
+            import type {MyStructXXX} from './types';
+
+            function go(s : MyStructXXX) {
+              const numbers : number[] = [s.f_OtherStruct.num];
+              return [numbers];
+            }
+          `,
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 0);
+      t.end();
+    }
+  )
+);
+
+test(
+  'imports in sub directory',
+  flowResultTest(
+    {
+      // language=thrift
+      'subdir/other.thrift': `
+        typedef i32 Thing 
+      `,
+      // language=thrift
+      'subdir/shared.thrift': `
+include "./other.thrift"
+
+struct ThingStruct {
+    1: other.Thing thing
+}
+struct OtherStruct {
+    1: i32 num
+}
+typedef i32 OtherStructTypedef
+`,
+      // language=thrift
+      'types.thrift': `
+include "./subdir/shared.thrift"
 
 typedef shared.OtherStruct MyOtherStruct
 

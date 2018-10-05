@@ -43,20 +43,26 @@ export const flowResultTest = (
   const root = path.resolve('test-output/', uuid());
   fs.mkdirSync(root);
   const paths = Object.keys(files);
-  paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
+  paths.forEach(p => {
+    const resolvedPath = path.resolve(root, p);
+    fs.ensureDirSync(path.dirname(resolvedPath));
+    fs.writeFileSync(resolvedPath, files[p]);
+  });
   paths
     .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
-    .forEach(p =>
+    .forEach(p => {
+      const jsPath = p.replace(/\.thrift$/, '.js');
+      fs.ensureDirSync(path.dirname(jsPath));
       fs.writeFileSync(
-        p.replace(/\.thrift$/, '.js'),
+        jsPath,
         new ThriftFileConverter(
           p,
           name => name + suffix,
           withsource
         ).generateFlowFile()
-      )
-    );
+      );
+    });
   fs.writeFileSync(
     path.resolve(root, '.flowconfig'),
     `[libs]
