@@ -29,7 +29,6 @@ import type {Test} from 'tape';
 
 import {flowResultTest} from './util';
 
-// TODO: test relative paths
 test(
   'imports in same folder',
   flowResultTest(
