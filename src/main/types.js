@@ -25,6 +25,7 @@
 // @flow
 
 import {BaseType, Enum, ListType, MapType, SetType} from 'thriftrw/ast';
+import {id} from './identifier';
 
 export class TypeConverter {
   static primitives = {
@@ -65,13 +66,16 @@ export class TypeConverter {
     return '';
   }
 
-  convert = (t: BaseType): string =>
-    this.arrayType(t) ||
-    this.enumType(t) ||
-    this.mapType(t) ||
-    this.annotation(t) ||
-    TypeConverter.primitives[t.baseType] ||
-    this.transformName(t.name);
+  convert = (t: BaseType): string => {
+    return (
+      this.arrayType(t) ||
+      this.enumType(t) ||
+      this.mapType(t) ||
+      this.annotation(t) ||
+      TypeConverter.primitives[t.baseType] ||
+      this.transformName(id(t.name))
+    );
+  };
 
   enumType = (thriftValueType: BaseType) =>
     this.isEnum(thriftValueType) && this.transformName(thriftValueType.name);
