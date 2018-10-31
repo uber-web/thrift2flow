@@ -80,6 +80,48 @@ struct MyStruct {
 );
 
 test(
+  'imports with special type file names',
+  flowResultTest(
+    {
+      // language=thrift
+      'any.thrift': `
+        typedef i32 Thing 
+      `,
+      // language=thrift
+      'shared.thrift': `
+include "./any.thrift"
+struct MyStruct {
+    1: any.Thing a
+    2: map<string, any.Thing> b
+    3: map<any.Thing, string> c
+}
+typedef any.Thing MyTypedef
+const any.Thing MyConst = 10;
+const set<any.Thing> MySet = [0];
+union MyUnion {
+  1: any.Thing a
+  2: i32 b
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyStructXXX} from './shared';
+
+function go(s : MyStructXXX) {
+  const numbers : number[] = [s.a];
+  return [numbers];
+}
+    `,
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 0);
+      t.end();
+    }
+  )
+);
+
+test(
   'imports in sub directory',
   flowResultTest(
     {
