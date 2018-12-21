@@ -43,6 +43,9 @@ const argv = yargs
     describe: 'appended to generated type names',
     default: 'Type',
   })
+  .option('path', {
+    describe: 'Path used for generated code',
+  })
   .option('withsource', {
     describe: 'prepend the source path of the thrift file',
     default: false,
@@ -72,7 +75,7 @@ for (const thriftPath of thriftPaths) {
   allOutput[converter.thriftPath] = converter.generateFlowFile();
 }
 
-const root = commonPathPrefix(Object.keys(allOutput));
+const root = argv.path || commonPathPrefix(Object.keys(allOutput));
 
 for (const thriftPath in allOutput) {
   const relativeThriftPath = path.dirname(path.relative(root, thriftPath));
