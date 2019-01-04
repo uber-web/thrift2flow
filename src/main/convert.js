@@ -123,9 +123,10 @@ export class ThriftFileConverter {
       def.valueType
     )};`;
 
-  generateEnumUnion = (def: Enum) => {
-    return def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ');
-  };
+  generateEnumUnion = (def: Enum) =>
+    !def.definitions.length
+      ? 'null'
+      : def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ');
 
   generateEnumType = (def: Enum) => {
     return `export type ${this.transformName(
@@ -142,13 +143,14 @@ export class ThriftFileConverter {
       .join('\n');
     const footer = '}';
 
-    const mapDefinition = [header, values, footer].join('\n');
+    const mapDefinition = def.definitions.length
+      ? [header, values, footer].join('\n')
+      : '{}';
     return `export const ${def.id.name}ValueMap = ${mapDefinition};`;
   };
 
-  generateEnum = (def: Enum) => {
-    return `${this.generateEnumType(def)}\n${this.generateEnumMap(def)}`;
-  };
+  generateEnum = (def: Enum) =>
+    `${this.generateEnumType(def)}\n${this.generateEnumMap(def)}`;
 
   generateConst = (def: Const) => {
     let value;

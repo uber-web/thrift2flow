@@ -75,6 +75,33 @@ const t: EnumTypedefXXX = ok;
 );
 
 test(
+  'enums with no values',
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+typedef MyEnum EnumTypedef
+
+enum MyEnum {}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {EnumTypedefXXX,MyEnumXXX} from './types';
+
+const ok: MyEnumXXX = null;
+
+const t: EnumTypedefXXX = null;
+`,
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 0);
+      t.end();
+    }
+  )
+);
+
+test(
   'enums with errors',
   flowResultTest(
     {
