@@ -35,3 +35,4 @@ import './services.spec';
 import './enums.spec';
 import './unions.spec';
 import './consts.spec';
+import './flags.spec';

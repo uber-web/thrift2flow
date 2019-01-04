@@ -50,6 +50,10 @@ const argv = yargs
     describe: 'prepend the source path of the thrift file',
     default: false,
   })
+  .option('excludeservice', {
+    describe: 'exclude service definitions',
+    default: false,
+  })
   .help('h')
   .alias('h', 'help').argv;
 
@@ -66,7 +70,8 @@ for (const thriftPath of thriftPaths) {
   const converter = new ThriftFileConverter(
     thriftPath,
     name => name + argv.suffix,
-    argv.withsource
+    argv.withsource,
+    argv.excludeservice,
   );
   converter
     .getImportAbsPaths()
