@@ -59,14 +59,13 @@ export class ThriftFileConverter {
     thriftPath: string,
     transformName: string => string,
     withsource: boolean,
-    includetypes: string,
+    excludeservice: boolean,
   ) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
     this.ast = this.thrift.asts[this.thrift.filename];
-    this.types = includetypes.split(',');
-    this.thriftAstDefinitions = this.types.length
-      ? this.ast.definitions.filter(def => this.types.indexOf(def.type) !== -1)
+    this.thriftAstDefinitions = excludeservice
+      ? this.ast.definitions.filter(def => def.type !== 'Service')
       : this.ast.definitions;
     this.transformName = transformName;
     this.types = new TypeConverter(transformName, this.thriftAstDefinitions);

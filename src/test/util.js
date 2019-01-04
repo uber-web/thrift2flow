@@ -39,7 +39,7 @@ export const flowResultTest = (
   testFn: (Function, FlowResult) => void,
   suffix: string = 'XXX',
   withsource: boolean = true,
-  includetypes: string = '',
+  excludeservice: boolean = false
 ) => (t: Test) => {
   const root = path.resolve('test-output/', uuid());
   fs.mkdirSync(root);
@@ -61,7 +61,7 @@ export const flowResultTest = (
           p,
           name => name + suffix,
           withsource,
-          includetypes,
+          excludeservice,
         ).generateFlowFile()
       );
     });

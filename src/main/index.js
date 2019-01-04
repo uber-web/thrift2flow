@@ -50,10 +50,14 @@ const argv = yargs
     describe: 'prepend the source path of the thrift file',
     default: false,
   })
-  .option('includetypes', {
-    describe: 'only include given types (in comma separated list). if flag not used, then all types are generated. ' +
-      'options are: Struct, Exception, Union, Enum, Typedef, Service. ex: Struct,Exception,Union',
-    default: '',
+  // .option('includetypes', {
+  //   describe: 'only include given types (in comma separated list). if flag not used, then all types are generated. ' +
+  //     'options are: Struct, Exception, Union, Enum, Typedef, Service. ex: Struct,Exception,Union',
+  //   default: '',
+  // })
+  .option('excludeservice', {
+    describe: 'exclude service definitions',
+    default: false,
   })
   .help('h')
   .alias('h', 'help').argv;
@@ -72,7 +76,7 @@ for (const thriftPath of thriftPaths) {
     thriftPath,
     name => name + argv.suffix,
     argv.withsource,
-    argv.includetypes,
+    argv.excludeservice,
   );
   converter
     .getImportAbsPaths()

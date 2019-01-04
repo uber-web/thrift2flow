@@ -102,7 +102,8 @@ struct UserActivitiesRequest {
       let output = new ThriftFileConverter(
         p,
         name => name,
-        true
+        true,
+        false,
       ).generateFlowFile();
 
       let longIndex = output.indexOf('import Long');
@@ -133,7 +134,8 @@ typedef i64 (js.type = "Long") Points
       let output = new ThriftFileConverter(
         p,
         name => name,
-        true
+        true,
+        false,
       ).generateFlowFile();
 
       let longIndex = output.indexOf('import Long');

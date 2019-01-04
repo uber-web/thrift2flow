@@ -31,21 +31,27 @@ import {flowResultTest} from './util';
 
 // language=thrift
 const testThriftFile = `
-typedef MyEnum EnumTypedef
-
-enum MyEnum {
-  OK = 1
-  ERROR = 2
-}
-
-struct MyStruct {
-  1: MyEnum f_MyEnum
-  2: EnumTypedef f_EnumTypedef
-}
+  typedef MyEnum EnumTypedef
+  
+  enum MyEnum {
+    OK = 1
+    ERROR = 2
+  }
+  
+  struct MyStruct {
+    1: MyEnum f_MyEnum
+    2: EnumTypedef f_EnumTypedef
+  }
+  
+  service MyService {
+    i32 getNumber(1: string a, 2: bool what)
+    void aVoid(1: i32 a)
+    void nothing()
+  }
 `;
 
 test(
-  'enums',
+  'excludeservice=true excludes service',
   flowResultTest(
     {
       'types.thrift': testThriftFile,
@@ -75,6 +81,54 @@ const t: EnumTypedefXXX = ok;
     },
     'XXX',
     true,
-    'Enum',
+    true,
+  )
+);
+
+test(
+  "excludeservice=false doesn't exclude service",
+  flowResultTest(
+    {
+      'types.thrift': testThriftFile,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import {MyEnumValueMap} from './types';
+import type {MyServiceXXX, MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+
+const ok: MyEnumXXX = 'OK';
+const error: MyEnumXXX = 'ERROR';
+
+const struct: MyStructXXX = {
+  f_MyEnum: ok,
+  f_EnumTypedef: error,
+}
+
+const okFromMap: 1 = MyEnumValueMap.OK;
+const errorFromMap: 2 = MyEnumValueMap.ERROR;
+
+const t: EnumTypedefXXX = ok;
+
+function go(s : MyServiceXXX) {
+  return s.getNumber({a: 'hello', what: true}) / 4;
+}
+
+function checkVoids(s : MyServiceXXX) {
+    ensureVoid(s.aVoid);
+    s.nothing();
+}
+
+function ensureVoid(f : any => void) {
+    f(0);
+}
+`,
+    },
+    (t: Test, r: FlowResult) => {
+      t.equal(r.errors.length, 0);
+      t.end();
+    },
+    'XXX',
+    true,
+    false,
   )
 );
