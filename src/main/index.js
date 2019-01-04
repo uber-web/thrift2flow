@@ -50,6 +50,11 @@ const argv = yargs
     describe: 'prepend the source path of the thrift file',
     default: false,
   })
+  .option('includetypes', {
+    describe: 'only include given types (in comma separated list). if flag not used, then all types are generated. ' +
+      'options are: Struct, Exception, Union, Enum, Typedef, Service. ex: Struct,Exception,Union',
+    default: '',
+  })
   .help('h')
   .alias('h', 'help').argv;
 
@@ -66,7 +71,8 @@ for (const thriftPath of thriftPaths) {
   const converter = new ThriftFileConverter(
     thriftPath,
     name => name + argv.suffix,
-    argv.withsource
+    argv.withsource,
+    argv.includetypes,
   );
   converter
     .getImportAbsPaths()

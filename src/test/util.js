@@ -38,7 +38,8 @@ export const flowResultTest = (
   files: {[string]: string},
   testFn: (Function, FlowResult) => void,
   suffix: string = 'XXX',
-  withsource: boolean = true
+  withsource: boolean = true,
+  includetypes: string = '',
 ) => (t: Test) => {
   const root = path.resolve('test-output/', uuid());
   fs.mkdirSync(root);
@@ -59,7 +60,8 @@ export const flowResultTest = (
         new ThriftFileConverter(
           p,
           name => name + suffix,
-          withsource
+          withsource,
+          includetypes,
         ).generateFlowFile()
       );
     });
