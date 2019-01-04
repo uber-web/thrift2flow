@@ -124,9 +124,9 @@ export class ThriftFileConverter {
     )};`;
 
   generateEnumUnion = (def: Enum) =>
-    !def.definitions.length
-      ? 'null'
-      : def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ');
+    def.definitions.length
+      ? def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ')
+      : 'null';
 
   generateEnumType = (def: Enum) => {
     return `export type ${this.transformName(
