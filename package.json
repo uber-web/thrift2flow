@@ -21,7 +21,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "bin": {
-    "thrift2flow": "lib/index.js"
+    "thrift2flow": "lib/cli.js"
   },
   "scripts": {
     "clean-test-output": "git clean -Xdf test-output/",
