@@ -49,6 +49,10 @@ const argv = yargs
     describe: 'prepend the source path of the thrift file',
     default: false,
   })
+  .option('outputdir', {
+    describe: 'name of the directory for generated files',
+    default: 'flow-output',
+  })
   .help('h')
   .alias('h', 'help').argv;
 
@@ -63,6 +67,7 @@ const options = {
   suffix: argv.suffix,
   withSource: argv.withsource,
   commonPath: argv.path,
+  outputDir: argv.outputdir,
 };
 
 const allOutput = convert(thriftPaths, options);
