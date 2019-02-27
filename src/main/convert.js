@@ -241,7 +241,7 @@ export class ThriftFileConverter {
 
   isLongDefined = () => {
     for (const astNode of this.thriftAstDefinitions) {
-      if (astNode.type === 'Struct') {
+      if (astNode.type === 'Struct' || astNode.type === 'Union') {
         for (const field of astNode.fields) {
           if (field.valueType == null || field.valueType.annotations == null) {
             continue;
