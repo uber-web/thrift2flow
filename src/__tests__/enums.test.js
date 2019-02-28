@@ -24,6 +24,17 @@
  */
 
 import {flowResultTest} from './util';
+import {ThriftFileConverter} from '../main/convert';
+
+test('enum to JS', () => {
+  const converter = new ThriftFileConverter(
+    'src/__tests__/fixtures/my-enum.thrift',
+    name => name,
+    false
+  );
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchSnapshot();
+});
 
 test('enums', done => {
   flowResultTest(

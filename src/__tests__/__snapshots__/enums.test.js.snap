@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`enum to JS 1`] = `
+"// @flow
+
+export type MyEnum = \\"OK\\" | \\"ERROR\\";
+export const MyEnumValueMap = {
+  OK: 1,
+  ERROR: 2
+};
+"
+`;
