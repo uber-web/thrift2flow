@@ -236,7 +236,7 @@ export class ThriftFileConverter {
     }
     return generatedImports.join('\n');
   };
-  getImportAbsPaths = () =>
+  getImportAbsPaths: () => Array<string> = () =>
     Object.keys(this.thrift.idls).map(p => path.resolve(p));
 
   isLongDefined = () => {
