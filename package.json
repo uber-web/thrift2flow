@@ -69,7 +69,7 @@
     "eslint-plugin-jest": "^21.22.1",
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.11.1",
-    "flow-bin": "^0.65.0",
+    "flow-bin": "^0.93.0",
     "fs-extra": "^4.0.3",
     "tape": "^4.6.3",
     "tmp": "^0.0.33"
