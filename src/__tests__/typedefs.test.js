@@ -1,3 +1,4 @@
+// @flow
 /*
  * MIT License
  *
@@ -22,11 +23,6 @@
  * SOFTWARE.
  */
 
-// @flow
-
-import test from 'tape';
-import type {Test} from 'tape';
-
 import {flowResultTest} from './util';
 
 import {ThriftFileConverter} from '../main/convert';
@@ -34,8 +30,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import tmp from 'tmp';
 
-test(
-  'typedef Date',
+test('typedef Date', done => {
   flowResultTest(
     {
       // language=thrift
@@ -73,14 +68,14 @@ function go(s : MyStructXXX) {
 }
           `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(0);
+      done();
     }
-  )
-);
+  );
+});
 
-test('typedef long in struct', (t: Test) => {
+test('typedef long in struct', () => {
   let files = {
     // language=thrift
     'types.thrift': `
@@ -104,19 +99,12 @@ struct UserActivitiesRequest {
         name => name,
         true
       ).generateFlowFile();
-
       let longIndex = output.indexOf('import Long');
-
-      t.notEqual(
-        longIndex,
-        -1,
-        'Expected long definition but did not find one'
-      );
-      t.end();
+      expect(longIndex).not.toBe(-1);
     });
 });
 
-test('typedef long in global scope', (t: Test) => {
+test('typedef long in global scope', () => {
   let files = {
     // language=thrift
     'types.thrift': `
@@ -135,14 +123,8 @@ typedef i64 (js.type = "Long") Points
         name => name,
         true
       ).generateFlowFile();
-
       let longIndex = output.indexOf('import Long');
-
-      t.notEqual(
-        longIndex,
-        -1,
-        'Expected long definition but did not find one'
-      );
-      t.end();
+      // Expected long definition but did not find one
+      expect(longIndex).not.toBe(-1);
     });
 });

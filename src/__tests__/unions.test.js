@@ -1,3 +1,4 @@
+// @flow
 /*
  * MIT License
  *
@@ -22,49 +23,50 @@
  * SOFTWARE.
  */
 
-// @flow
-
-import test from 'tape';
-import type {Test} from 'tape';
-
 import {flowResultTest} from './util';
 
-// language=thrift
-const thrift = `
-  service MyService {
-   i32 getNumber(1: string a, 2: bool what)
-   void aVoid(1: i32 a)
-   void nothing()
-  }
-`;
-
-test(
-  'services happy path',
+test('unions', done => {
   flowResultTest(
     {
-      'types.thrift': thrift,
+      // language=thrift
+      'types.thrift': `
+typedef MyUnion UnionTypedef
+typedef MyEmptyUnion EmptyUnionTypedef
+
+union MyUnion {
+  1: string name
+  2: i32 size
+}
+
+union MyEmptyUnion {
+}
+
+struct MyStruct {
+  1: MyUnion f_MyUnion
+  2: MyEmptyUnion f_MyEmptyUnion
+  3: UnionTypedef f_UnionTypedef
+  4: EmptyUnionTypedef f_EmptyUnionTypedef
+}
+`,
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyServiceXXX} from './types';
+import type {MyStructXXX,UnionTypedefXXX,EmptyUnionTypedefXXX} from './types';
 
-function go(s : MyServiceXXX) {
-  return s.getNumber({a: 'hello', what: true}) / 4;
-}
-
-function checkVoids(s : MyServiceXXX) {
-    ensureVoid(s.aVoid);
-    s.nothing();
-}
-
-function ensureVoid(f : any => void) {
-    f(0);
+function go(s : MyStructXXX, u: UnionTypedefXXX, eu: EmptyUnionTypedefXXX) {
+  const unions : UnionTypedefXXX[] = [s.f_MyUnion];
+  const emptyunions : EmptyUnionTypedefXXX[] = [s.f_MyEmptyUnion];
+  const unionDefs: UnionTypedefXXX[] = [s.f_UnionTypedef];
+  const emptyunionDefs: EmptyUnionTypedefXXX[] = [s.f_EmptyUnionTypedef];
+  const strings: string[] = [s.f_MyUnion.name || ''];
+  const numbers: number[] = [s.f_MyUnion.size || -1];
+  return [unions,unions,unionDefs,emptyunionDefs,strings,numbers];
 }
 `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(0);
+      done();
     }
-  )
-);
+  );
+});

@@ -1,3 +1,4 @@
+// @flow
 /*
  * MIT License
  *
@@ -22,20 +23,14 @@
  * SOFTWARE.
  */
 
-// @flow
-
-import test from 'tape';
-import type {Test} from 'tape';
-
 import {flowResultTest} from './util';
 
-test(
-  'imports in same folder',
+test('imports in same folder', done => {
   flowResultTest(
     {
       // language=thrift
       'other.thrift': `
-        typedef i32 Thing 
+        typedef i32 Thing
       `,
       // language=thrift
       'shared.thrift': `
@@ -72,20 +67,19 @@ struct MyStruct {
             }
           `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(0);
+      done();
     }
-  )
-);
+  );
+});
 
-test(
-  'imports with special type file names',
+test('imports with special type file names', done => {
   flowResultTest(
     {
       // language=thrift
       'any.thrift': `
-        typedef i32 Thing 
+        typedef i32 Thing
       `,
       // language=thrift
       'shared.thrift': `
@@ -114,20 +108,19 @@ function go(s : MyStructXXX) {
 }
     `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(0);
+      done();
     }
-  )
-);
+  );
+});
 
-test(
-  'imports in sub directory',
+test('imports in sub directory', done => {
   flowResultTest(
     {
       // language=thrift
       'subdir/other.thrift': `
-        typedef i32 Thing 
+        typedef i32 Thing
       `,
       // language=thrift
       'subdir/shared.thrift': `
@@ -164,9 +157,9 @@ struct MyStruct {
             }
           `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(0);
+      done(0);
     }
-  )
-);
+  );
+});

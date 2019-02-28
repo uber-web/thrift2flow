@@ -1,3 +1,5 @@
+// @flow
+
 /*
  * MIT License
  *
@@ -22,11 +24,6 @@
  * SOFTWARE.
  */
 
-// @flow
-
-import test from 'tape';
-import type {Test} from 'tape';
-
 import {flowResultTest} from './util';
 
 // language=thrift
@@ -46,8 +43,7 @@ const primitiveStruct = `
   }
 `;
 
-test(
-  'primitives happy path',
+test('primitives happy path', done => {
   flowResultTest(
     {
       'types.thrift': primitiveStruct,
@@ -66,15 +62,14 @@ function go(s : PrimitivesXXX) {
 }
 `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(0);
+      done();
     }
-  )
-);
+  );
+});
 
-test(
-  'primitives sad path',
+test('primitives sad path', done => {
   flowResultTest(
     {
       'types.thrift': primitiveStruct,
@@ -90,19 +85,18 @@ function go(s : PrimitivesXXX) {
 }
 `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 2);
-      t.equal(r.errors[0].level, 'error');
-      t.equal(r.errors[1].level, 'error');
-      t.equal((r.errors[0].message[0]: any).line, 6);
-      t.equal((r.errors[1].message[0]: any).line, 7);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(2);
+      expect(r.errors[0].level).toBe('error');
+      expect(r.errors[1].level).toBe('error');
+      expect((r.errors[0].message[0]: any).line).toBe(6);
+      expect((r.errors[1].message[0]: any).line).toBe(7);
+      done();
     }
-  )
-);
+  );
+});
 
-test(
-  'primitives optional',
+test('primitives optional', done => {
   flowResultTest(
     {
       'types.thrift': primitiveStruct,
@@ -120,19 +114,19 @@ function go(s : PrimitivesXXX) {
 }
 `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 2);
-      t.equal(r.errors[0].level, 'error');
-      t.equal(r.errors[1].level, 'error');
-      t.equal((r.errors[0].message[0]: any).line, 8);
-      t.equal((r.errors[1].message[0]: any).line, 9);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(2);
+      expect(r.errors.length).toBe(2);
+      expect(r.errors[0].level).toBe('error');
+      expect(r.errors[1].level).toBe('error');
+      expect((r.errors[0].message[0]: any).line).toBe(8);
+      expect((r.errors[1].message[0]: any).line).toBe(9);
+      done();
     }
-  )
-);
+  );
+});
 
-test(
-  'primitives exact types',
+test('primitives exact types', done => {
   flowResultTest(
     {
       'types.thrift': `
@@ -150,11 +144,11 @@ function go() : OptionalsXXX {
 }
 `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 1);
-      t.equal(r.errors[0].level, 'error');
-      t.equal((r.errors[0].message[0]: any).line, 6);
-      t.end();
+    r => {
+      expect(r.errors.length).toBe(1);
+      expect(r.errors[0].level).toBe('error');
+      expect((r.errors[0].message[0]: any).line).toBe(6);
+      done();
     }
-  )
-);
+  );
+});

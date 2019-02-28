@@ -1,3 +1,4 @@
+// @flow
 /*
  * MIT License
  *
@@ -22,58 +23,88 @@
  * SOFTWARE.
  */
 
-// @flow
-
-import test from 'tape';
-import type {Test} from 'tape';
-
 import {flowResultTest} from './util';
 
-test(
-  'consts',
+test('enums', done => {
   flowResultTest(
     {
       // language=thrift
       'types.thrift': `
-typedef string Status
-typedef double Score
+typedef MyEnum EnumTypedef
 
-const Status NOT_ELIGIBLE = "not_eligible"
-const string STATUS_ELIGIBLE_LITERAL = "eligible"
-
-const Score MIN_SCORE = 3.24
-const double MAX_SCORE = 4.00
+enum MyEnum {
+  OK = 1
+  ERROR = 2
+}
 
 struct MyStruct {
-  1: required Status f_status
-  2: required Score f_score
-  2: optional string f_otherStatus
+  1: MyEnum f_MyEnum
+  2: EnumTypedef f_EnumTypedef
 }
 `,
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX, StatusXXX, ScoreXXX} from './types';
-import {NOT_ELIGIBLE, STATUS_ELIGIBLE_LITERAL, MIN_SCORE, MAX_SCORE} from './types';
+import {MyEnumValueMap} from './types';
+import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
 
-function go(s : MyStructXXX): Array<string | number> {
-  const values = [s.f_status];
+const ok: MyEnumXXX = 'OK';
+const error: MyEnumXXX = 'ERROR';
 
-  if (s.f_otherStatus) {
-    values.push(s.f_otherStatus);
-  }
-
-  if (s.f_score >= MIN_SCORE && s.f_score < MAX_SCORE) {
-    values.push(s.f_score);
-  }
-
-  return values;
+const struct: MyStructXXX = {
+  f_MyEnum: ok,
+  f_EnumTypedef: error,
 }
+
+const okFromMap: 1 = MyEnumValueMap.OK;
+const errorFromMap: 2 = MyEnumValueMap.ERROR;
+
+const t: EnumTypedefXXX = ok;
 `,
     },
-    (t: Test, r: FlowResult) => {
-      t.equal(r.errors.length, 0);
-      t.end();
+    (r: FlowResult) => {
+      expect(r.errors.length).toBe(0);
+      done();
     }
-  )
-);
+  );
+});
+
+test('enums with errors', done => {
+  flowResultTest(
+    {
+      // language=thrift
+      'types.thrift': `
+typedef MyEnum EnumTypedef
+
+enum MyEnum {
+  OK = 1
+  ERROR = 2
+}
+
+struct MyStruct {
+  1: MyEnum f_MyEnum
+  2: EnumTypedef f_EnumTypedef
+}
+`,
+      // language=JavaScript
+      'index.js': `
+// @flow
+import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+
+const ok: MyEnumXXX = 'NOT CORRECT';
+const error: MyEnumXXX = null;
+
+const struct: MyStructXXX = {
+  f_MyEnum: 'NOT CORRECT',
+  f_EnumTypedef: null,
+}
+
+const t: EnumTypedefXXX = 'NOT CORRECT';
+`,
+    },
+    (r: FlowResult) => {
+      expect(r.errors.length).toEqual(5);
+      done();
+    }
+  );
+});

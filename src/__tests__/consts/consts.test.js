@@ -1,3 +1,5 @@
+// @flow
+
 /*
  * MIT License
  *
@@ -22,16 +24,20 @@
  * SOFTWARE.
  */
 
-// @flow
+import {flowResultTest} from '../util';
+import fs from 'fs';
 
-import 'source-map-support/register';
-import 'babel-polyfill';
-
-import './primitives.spec';
-import './collections.spec';
-import './imports.spec';
-import './typedefs.spec';
-import './services.spec';
-import './enums.spec';
-import './unions.spec';
-import './consts.spec';
+test('consts', done => {
+  flowResultTest(
+    {
+      'types.thrift': fs
+        .readFileSync(`${__dirname}/types.thrift.fixture`)
+        .toString(),
+      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
+    },
+    result => {
+      expect(result.errors.length).toEqual(0);
+      done();
+    }
+  );
+});
