@@ -24,8 +24,6 @@
     "thrift2flow": "lib/cli.js"
   },
   "scripts": {
-    "clean-test-output": "git clean -Xdf test-output/",
-    "build-test": "babel src -d dist-test --source-maps",
     "build": "babel src/main -d lib --source-maps",
     "watch": "babel src/main -d lib --source-maps --watch",
     "check": "npm run prettier && npm run lint && npm run test",
@@ -35,8 +33,7 @@
     "lint": "eslint src",
     "prepare": "npm run build",
     "prettier": "prettier --single-quote --bracket-spacing false --parser flow --tab-width 2 --print-width 100 --write \"{src,test}/**/*.js\"",
-    "test": "npm run build-test && node dist-test/test/index.spec.js",
-    "test-keep-output": "npm run build-test && KEEP_TEST_OUTPUT=true node dist-test/test/index.spec.js"
+    "test": "rm -rf .tmp && yarn jest .test.js"
   },
   "engines": {
     "node": ">=6.10",
@@ -65,12 +62,12 @@
     "eslint-plugin-cup": "^2.0.0",
     "eslint-plugin-flowtype": "^2.50.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jest": "^21.22.1",
+    "eslint-plugin-jest": "^22.3.0",
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.11.1",
     "flow-bin": "^0.93.0",
     "fs-extra": "^4.0.3",
-    "tape": "^4.6.3",
+    "jest": "^24.1.0",
     "tmp": "^0.0.33"
   }
 }

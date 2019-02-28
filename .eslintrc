@@ -3,6 +3,7 @@
     "node": true
   },
   "extends": ["eslint-config-fusion"],
+  "plugins": ["jest"],
   "rules": {
     "no-console": 0
   }

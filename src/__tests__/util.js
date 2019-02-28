@@ -26,34 +26,42 @@
 /* eslint-disable handle-callback-err */
 
 import path from 'path';
-import fs from 'fs-extra';
-
 import {exec} from 'child_process';
-import type {Test} from 'tape';
+import fs from 'fs';
+import fsExtra from 'fs-extra';
 import uuid from 'uuid/v4';
 
 import {ThriftFileConverter} from '../main/convert';
 
 export const flowResultTest = (
   files: {[string]: string},
-  testFn: (Function, FlowResult) => void,
+  testFn: ({|errors: Array<string>|}) => void,
   suffix: string = 'XXX',
   withsource: boolean = true
-) => (t: Test) => {
-  const root = path.resolve('test-output/', uuid());
+) => {
+  if (!fs.existsSync('.tmp')) {
+    fs.mkdirSync('.tmp');
+  }
+  const root = `.tmp/${uuid()}`;
   fs.mkdirSync(root);
-  const paths = Object.keys(files);
+  const paths: Array<string> = Object.keys(files);
   paths.forEach(p => {
     const resolvedPath = path.resolve(root, p);
-    fs.ensureDirSync(path.dirname(resolvedPath));
+    const dir = path.dirname(resolvedPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
     fs.writeFileSync(resolvedPath, files[p]);
   });
   paths
     .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
-    .forEach(p => {
-      const jsPath = p.replace(/\.thrift$/, '.js');
-      fs.ensureDirSync(path.dirname(jsPath));
+    .forEach((p: string) => {
+      const jsPath: string = p.replace(/\.thrift$/, '.js');
+      const dir = path.dirname(jsPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
       fs.writeFileSync(
         jsPath,
         new ThriftFileConverter(
@@ -68,17 +76,8 @@ export const flowResultTest = (
     `[libs]
 ./typedefs`
   );
-  fs.copy('./typedefs/', path.resolve(root, 'typedefs'));
+  fsExtra.copy('./typedefs/', path.resolve(root, 'typedefs'));
   exec('flow check --json', {cwd: root}, (err, stdout, stderr) => {
-    testFn(
-      t,
-      JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString())
-    );
-    // This can be useful when debugging generated code
-    // Run `npm run clean-test-output` to clean up latter
-    // eslint-disable-next-line no-process-env
-    if (!process.env.KEEP_TEST_OUTPUT) {
-      fs.removeSync(root);
-    }
+    testFn(JSON.parse(typeof stdout === 'string' ? stdout : stdout.toString()));
   });
 };
