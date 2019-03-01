@@ -272,11 +272,16 @@ export class ThriftFileConverter {
       throw new Error(`Unable to find definition for identifier ${identifier}`);
     }
     if (kind === 'type') {
-      if (
-        def.type === 'Enum' ||
-        (def.type === 'Typedef' && def.valueType.type === 'Enum')
-      ) {
+      if (def.type === 'Enum') {
         return `$Values<typeof ${identifier}>`;
+      } else if (
+        def.type === 'Typedef' &&
+        def.valueType.type === 'Identifier'
+      ) {
+        const valueType = this.identifiersTable[def.valueType.name];
+        if (valueType.type === 'Enum') {
+          return `$Values<typeof ${identifier}>`;
+        }
       }
       if (
         def.type === 'Struct' ||

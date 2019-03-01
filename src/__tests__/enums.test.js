@@ -46,10 +46,42 @@ test('enums work with typedefs', () => {
   expect(jsContent).toMatchSnapshot();
 });
 
-test('enums without errors', done => {
+test('typedefs of enums can be referenced from structs', () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/enum-typedef-struct.thrift`,
+    name => name,
+    false
+  );
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+export const EnumTypedef: $ReadOnly<{|
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+|}> = Object.freeze({
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+});
+
+export const MyEnum: $ReadOnly<{|
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+|}> = Object.freeze({
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+});
+
+export type MyStruct = {|
+  f_MyEnum: $Values<typeof MyEnum>,
+  f_EnumTypedef: $Values<typeof EnumTypedef>
+|};
+"
+`);
+});
+
+test('enums with typedefs', done => {
   flowResultTest(
     {
-      // language=thrift
       'types.thrift': `
 typedef MyEnum EnumTypedef
 
@@ -63,10 +95,9 @@ struct MyStruct {
   2: EnumTypedef f_EnumTypedef
 }
 `,
-      // language=JavaScript
       'index.js': `
 // @flow
-import {MyEnum, type MyStruct, EnumTypedef} from './types';
+import { MyEnum, type MyStruct, EnumTypedef } from './types';
 
 const ok: $Values<typeof MyEnum> = 'OK';
 const error: $Values<typeof MyEnum> = 'ERROR';
@@ -83,7 +114,7 @@ const t: $Values<typeof EnumTypedef> = ok;
 `,
     },
     (r: FlowResult) => {
-      expect(r.errors.length).toBe(0);
+      expect(r.errors).toEqual([]);
       done();
     }
   );
