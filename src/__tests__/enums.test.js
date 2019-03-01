@@ -36,7 +36,17 @@ test('enum to JS', () => {
   expect(jsContent).toMatchSnapshot();
 });
 
-test('enums', done => {
+test('enums work with typedefs', () => {
+  const converter = new ThriftFileConverter(
+    'src/__tests__/fixtures/my-enum-with-typedef.thrift',
+    name => name,
+    false
+  );
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchSnapshot();
+});
+
+test('enums without errors', done => {
   flowResultTest(
     {
       // language=thrift
@@ -56,21 +66,20 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import {MyEnumValueMap} from './types';
-import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+import {MyEnum, type MyStruct, EnumTypedef} from './types';
 
-const ok: MyEnumXXX = 'OK';
-const error: MyEnumXXX = 'ERROR';
+const ok: $Values<typeof MyEnum> = 'OK';
+const error: $Values<typeof MyEnum> = 'ERROR';
 
-const struct: MyStructXXX = {
+const struct: MyStruct = {
   f_MyEnum: ok,
   f_EnumTypedef: error,
 }
 
-const okFromMap: 'OK' = MyEnumValueMap.OK;
-const errorFromMap: 'ERROR' = MyEnumValueMap.ERROR;
+const okFromMap: 'OK' = MyEnum.OK;
+const errorFromMap: 'ERROR' = MyEnum.ERROR;
 
-const t: EnumTypedefXXX = ok;
+const t: $Values<typeof EnumTypedef> = ok;
 `,
     },
     (r: FlowResult) => {
@@ -100,17 +109,17 @@ struct MyStruct {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX,EnumTypedefXXX,MyEnumXXX} from './types';
+import {type MyStruct, EnumTypedef, MyEnum} from './types';
 
-const ok: MyEnumXXX = 'NOT CORRECT';
-const error: MyEnumXXX = null;
+const ok: $Values<typeof MyEnum> = 'NOT CORRECT';
+const error: $Values<typeof MyEnum> = null;
 
-const struct: MyStructXXX = {
+const struct: MyStruct = {
   f_MyEnum: 'NOT CORRECT',
   f_EnumTypedef: null,
 }
 
-const t: EnumTypedefXXX = 'NOT CORRECT';
+const t: $Values<typeof EnumTypedef> = 'NOT CORRECT';
 `,
     },
     (r: FlowResult) => {

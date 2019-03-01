@@ -36,7 +36,6 @@ import {ThriftFileConverter} from '../main/convert';
 export const flowResultTest = (
   files: {[string]: string},
   testFn: ({|errors: Array<string>|}) => void,
-  suffix: string = 'XXX',
   withsource: boolean = true
 ) => {
   if (!fs.existsSync('.tmp')) {
@@ -64,11 +63,7 @@ export const flowResultTest = (
       }
       fs.writeFileSync(
         jsPath,
-        new ThriftFileConverter(
-          p,
-          name => name + suffix,
-          withsource
-        ).generateFlowFile()
+        new ThriftFileConverter(p, name => name, withsource).generateFlowFile()
       );
     });
   fs.writeFileSync(

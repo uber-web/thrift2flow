@@ -3,8 +3,28 @@
 exports[`enum to JS 1`] = `
 "// @flow
 
-export type MyEnum = \\"OK\\" | \\"ERROR\\";
-export const MyEnumValueMap: $ReadOnly<{|
+export const MyEnum: $ReadOnly<{|
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+|}> = Object.freeze({
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+});
+"
+`;
+
+exports[`enums work with typedefs 1`] = `
+"// @flow
+
+export const MyEnum: $ReadOnly<{|
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+|}> = Object.freeze({
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+});
+
+export const MyOtherEnum: $ReadOnly<{|
   OK: \\"OK\\",
   ERROR: \\"ERROR\\"
 |}> = Object.freeze({
