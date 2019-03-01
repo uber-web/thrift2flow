@@ -24,13 +24,15 @@
  */
 
 import {Thrift} from 'thriftrw';
-import {TypeConverter} from './types';
+import {TypeConverter} from './thrift-types';
 import prettier from 'prettier';
 import path from 'path';
 import {id} from './identifier';
 import type {Base} from 'bufrw';
 import type {
   Struct,
+  Union,
+  Exception,
   Field,
   Enum,
   Typedef,
@@ -39,7 +41,8 @@ import type {
   Const,
   ConstEntry,
   ConstMap,
-} from 'thriftrw/ast';
+  Definition,
+} from './ast-types';
 
 const thriftOptions = {
   strict: false,
@@ -63,7 +66,7 @@ export class ThriftFileConverter {
   withsource: boolean;
   ast: any;
   thriftAstDefinitions: Array<any>;
-  identifiersTable: {[key: string]: any};
+  identifiersTable: {[key: string]: Definition};
 
   constructor(
     thriftPath: string,
@@ -113,7 +116,7 @@ export class ThriftFileConverter {
     return prettier.format(result, {parser: 'flow'});
   };
 
-  convertDefinitionToCode = (def: any) => {
+  convertDefinitionToCode = (def: Definition) => {
     switch (def.type) {
       case 'Struct':
       case 'Exception':
@@ -176,25 +179,29 @@ export class ThriftFileConverter {
   };
 
   generateConst = (def: Const) => {
-    let value;
+    let value: ?string;
     if (def.value.type === 'ConstList') {
       value = `[${def.value.values
         .map(val => {
           if (val.type === 'Identifier') {
             return this.getIdentifier(val.name, 'value');
           }
-          if (typeof val.value === 'string') {
+          if (val.type === 'Literal' && typeof val.value === 'string') {
             return `'${val.value}'`;
           }
           return val.value;
         })
         .join(',')}]`;
     } else {
+      // TODO There may be other const cases we're missing here.
       value =
         typeof def.value.value === 'string'
           ? `'${def.value.value}'`
-          : def.value.value;
+          : // $FlowFixMe
+            def.value.value;
+      // $FlowFixMe
       if (def.fieldType.baseType === 'i64') {
+        // $FlowFixMe
         value = `Buffer.from([${value}])`;
       }
     }
@@ -206,7 +213,9 @@ export class ThriftFileConverter {
       }
     }
     return `export const ${def.id.name}: ${this.types.convert(
+      // $FlowFixMe TODO `fieldType` is missing in const?
       def.fieldType
+      // $FlowFixMe
     )} = ${value};`;
   };
 
@@ -245,7 +254,7 @@ export class ThriftFileConverter {
     } `;
   };
 
-  generateStruct = ({id: {name}, fields}: Struct) =>
+  generateStruct = ({id: {name}, fields}: Struct | Exception) =>
     `export type ${this.transformName(name)} = ${this.generateStructContents(
       fields
     )};`;
@@ -261,12 +270,12 @@ export class ThriftFileConverter {
       })
       .join('\n')}|}`;
 
-  generateUnion = ({id: {name}, fields}: Struct) =>
+  generateUnion = ({id: {name}, fields}: Union) =>
     `export type ${this.transformName(name)} = ${this.generateUnionContents(
       fields
     )};`;
 
-  generateUnionContents = (fields: Object) => {
+  generateUnionContents = (fields: Array<Field>) => {
     if (!fields.length) {
       return '{||}';
     }
@@ -341,6 +350,10 @@ export class ThriftFileConverter {
     if (kind === 'value') {
       // It's okay to refernce an enum definition from a value position.
       if (def.type === 'EnumDefinition') {
+        return id(identifier);
+      }
+      // Same for other other constants.
+      if (def.type === 'Const') {
         return id(identifier);
       }
     }
