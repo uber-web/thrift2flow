@@ -1,10 +1,10 @@
 // @flow
-import type {MyStructXXX,OtherStructXXX} from './types';
+import type { MyStruct, OtherStruct } from './types';
 
-function go(s : MyStructXXX) {
+function go(s : MyStruct) {
   const numbers : number[] = [
       s.f_numbers[0], s.f_MyByte[0], s.f_OtherStruct[0].num, s.f_numbersSet[0]
   ];
-  const structs : OtherStructXXX[] = [s.f_OtherStruct[0]];
+  const structs : OtherStruct[] = [s.f_OtherStruct[0]];
   return [numbers, structs];
 }

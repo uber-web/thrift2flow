@@ -24,20 +24,25 @@
  */
 
 import {Thrift} from 'thriftrw';
-import {TypeConverter} from './types';
+import {TypeConverter} from './thrift-types';
 import prettier from 'prettier';
 import path from 'path';
 import {id} from './identifier';
 import type {Base} from 'bufrw';
 import type {
   Struct,
+  Union,
+  Exception,
   Field,
   Enum,
   Typedef,
   FunctionDefinition,
   Service,
   Const,
-} from 'thriftrw/ast';
+  ConstEntry,
+  ConstMap,
+  Definition,
+} from './ast-types';
 
 const thriftOptions = {
   strict: false,
@@ -45,27 +50,52 @@ const thriftOptions = {
   allowOptionalArguments: true,
 };
 
+function includeIdentifierOfFilename(filename: string): string {
+  const match = filename.match(/([^/]+).thrift$/);
+  if (!match) {
+    throw new Error(`Unable to determine identifier for filename ${filename}`);
+  }
+  return match[1];
+}
+
 export class ThriftFileConverter {
   thriftPath: string;
   thrift: Thrift;
   types: TypeConverter;
-  transformName: string => string;
   withsource: boolean;
   ast: any;
   thriftAstDefinitions: Array<any>;
+  identifiersTable: {[key: string]: Definition};
 
-  constructor(
-    thriftPath: string,
-    transformName: string => string,
-    withsource: boolean
-  ) {
+  constructor(thriftPath: string, withsource: boolean) {
     this.thriftPath = path.resolve(thriftPath);
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
     this.ast = this.thrift.asts[this.thrift.filename];
+    this.initIdentifiersTable();
     this.thriftAstDefinitions = this.ast.definitions;
-    this.transformName = transformName;
-    this.types = new TypeConverter(transformName, this.thriftAstDefinitions);
+    this.types = new TypeConverter(this.thriftAstDefinitions);
     this.withsource = withsource;
+  }
+
+  initIdentifiersTable() {
+    this.identifiersTable = {};
+    Object.keys(this.thrift.asts).forEach((filename: string) => {
+      const includeIdentifier = includeIdentifierOfFilename(filename);
+      const includePrefix =
+        filename !== this.thrift.filename ? `${includeIdentifier}.` : '';
+      this.thrift.asts[filename].definitions.forEach(definition => {
+        this.identifiersTable[
+          `${includePrefix}${definition.id.name}`
+        ] = definition;
+        if (definition.type === 'Enum') {
+          definition.definitions.forEach(enumDefinition => {
+            this.identifiersTable[
+              `${includePrefix}${definition.id.name}.${enumDefinition.id.name}`
+            ] = enumDefinition;
+          });
+        }
+      });
+    });
   }
 
   generateFlowFile: () => string = () => {
@@ -80,7 +110,7 @@ export class ThriftFileConverter {
     return prettier.format(result, {parser: 'flow'});
   };
 
-  convertDefinitionToCode = (def: any) => {
+  convertDefinitionToCode = (def: Definition) => {
     switch (def.type) {
       case 'Struct':
       case 'Exception':
@@ -106,7 +136,7 @@ export class ThriftFileConverter {
   };
 
   generateService = (def: Service) =>
-    `export type ${this.transformName(def.id.name)} = {\n${def.functions
+    `export type ${def.id.name} = {\n${def.functions
       .map(this.generateFunction)
       .join(',')}};`;
 
@@ -115,84 +145,125 @@ export class ThriftFileConverter {
       fn.fields.length ? this.generateStructContents([...fn.fields]) : ''
     }) => ${this.types.convert(fn.returns)}`;
 
-  generateTypedef = (def: Typedef) =>
-    `export type ${this.transformName(def.id.name)} = ${this.types.convert(
-      def.valueType
-    )};`;
+  generateTypedef = (def: Typedef) => {
+    if (def.valueType.type === 'Identifier') {
+      const otherDef = this.identifiersTable[def.valueType.name];
+      if (otherDef.type === 'Enum') {
+        return this.generateEnum(otherDef, def.id.name);
+      }
+    }
+    return `export type ${def.id.name} = ${this.types.convert(def.valueType)};`;
+  };
 
   generateEnumUnion = (def: Enum) => {
     return def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ');
   };
 
-  generateEnumType = (def: Enum) => {
-    return `export type ${this.transformName(
-      def.id.name
-    )} = ${this.generateEnumUnion(def)};`;
-  };
-
-  generateEnumMap = (def: Enum) => {
-    const header = '{';
+  generateEnum = (def: Enum, otherName?: string) => {
     const values = def.definitions
-      .map(
-        (d, index) => `  "${d.id.name}": ${d.value ? d.value.value : index},`
-      )
+      .map((d, index) => `'${d.id.name}': '${d.id.name}',`)
       .join('\n');
-    const footer = '}';
-
-    const mapDefinition = [header, values, footer].join('\n');
-    return `export const ${def.id.name}ValueMap = ${mapDefinition};`;
-  };
-
-  generateEnum = (def: Enum) => {
-    return `${this.generateEnumType(def)}\n${this.generateEnumMap(def)}`;
+    return `export const ${otherName || def.id.name}: $ReadOnly<{|
+  ${values}
+|}>  = Object.freeze({
+  ${values}
+});`;
   };
 
   generateConst = (def: Const) => {
-    let value;
+    let value: ?string;
     if (def.value.type === 'ConstList') {
       value = `[${def.value.values
         .map(val => {
           if (val.type === 'Identifier') {
-            return val.name;
+            return this.getIdentifier(val.name, 'value');
           }
-          if (typeof val.value === 'string') {
+          if (val.type === 'Literal' && typeof val.value === 'string') {
             return `'${val.value}'`;
           }
           return val.value;
         })
         .join(',')}]`;
     } else {
+      // There may be other const cases we're missing here.
       value =
         typeof def.value.value === 'string'
           ? `'${def.value.value}'`
-          : def.value.value;
+          : // $FlowFixMe
+            def.value.value;
+      // $FlowFixMe
+      if (def.fieldType.baseType === 'i64') {
+        // $FlowFixMe
+        value = `Buffer.from([${value}])`;
+      }
+    }
+    if (value === undefined) {
+      if (def.value.type === 'ConstMap') {
+        value = this.generateConstMap(def.value);
+      } else {
+        throw new Error(`value is undefined for ${def.id.name}`);
+      }
     }
     return `export const ${def.id.name}: ${this.types.convert(
+      // $FlowFixMe `fieldType` is missing in const?
       def.fieldType
+      // $FlowFixMe
     )} = ${value};`;
   };
 
-  generateStruct = ({id: {name}, fields}: Struct) =>
-    `export type ${this.transformName(name)} = ${this.generateStructContents(
-      fields
-    )};`;
+  generateConstEntry = (entry: ConstEntry) => {
+    let key;
+    let value;
+    if (entry.key.type === 'Literal') {
+      key = `'${entry.key.value}'`;
+    } else if (entry.key.type === 'Identifier') {
+      key = this.getIdentifier(entry.key.name, 'value');
+    } else {
+      throw new Error(`Unhandled entry.key.type ${entry.key.type}`);
+    }
+    if (entry.value.type === 'Literal') {
+      value = `'${entry.value.value}'`;
+    } else if (entry.value.type === 'Identifier') {
+      value = this.getIdentifier(entry.value.name, 'value');
+    } else if (entry.value.type === 'ConstMap') {
+      value = this.generateConstMap(entry.value);
+    } else {
+      throw new Error(`Unhandled entry.key.type ${entry.value.type}`);
+    }
+    if (key === undefined || value === undefined) {
+      console.log('key', key);
+      console.log('value', value);
+      console.log(entry);
+      throw new Error(`key or value is undefined`);
+    }
+    const result = `[${key}]: ${value},`;
+    return result;
+  };
+
+  generateConstMap = (def: ConstMap) => {
+    return `{
+      ${def.entries.map(entry => this.generateConstEntry(entry)).join('\n')}
+    } `;
+  };
+
+  generateStruct = ({id: {name}, fields}: Struct | Exception) =>
+    `export type ${name} = ${this.generateStructContents(fields)};`;
 
   generateStructContents = (fields: Object) =>
     `{|${Object.values(fields)
-      .map(
-        (f: Base) =>
-          `${f.name}${this.isOptional(f) ? '?' : ''}: ${this.types.convert(
-            f.valueType
-          )};`
-      )
+      .map((field: Base) => {
+        let value =
+          field.valueType.type === 'Identifier'
+            ? this.getIdentifier(field.valueType.name, 'type')
+            : this.types.convert(field.valueType);
+        return `${field.name}${this.isOptional(field) ? '?' : ''}: ${value};`;
+      })
       .join('\n')}|}`;
 
-  generateUnion = ({id: {name}, fields}: Struct) =>
-    `export type ${this.transformName(name)} = ${this.generateUnionContents(
-      fields
-    )};`;
+  generateUnion = ({id: {name}, fields}: Union) =>
+    `export type ${name} = ${this.generateUnionContents(fields)};`;
 
-  generateUnionContents = (fields: Object) => {
+  generateUnionContents = (fields: Array<Field>) => {
     if (!fields.length) {
       return '{||}';
     }
@@ -233,35 +304,72 @@ export class ThriftFileConverter {
     }
     return generatedImports.join('\n');
   };
+
   getImportAbsPaths: () => Array<string> = () =>
     Object.keys(this.thrift.idls).map(p => path.resolve(p));
 
-  isLongDefined = () => {
-    for (const astNode of this.thriftAstDefinitions) {
-      if (astNode.type === 'Struct') {
-        for (const field of astNode.fields) {
-          if (field.valueType == null || field.valueType.annotations == null) {
-            continue;
-          }
-
-          if (field.valueType.annotations['js.type'] === 'Long') {
-            return true;
-          }
-        }
-      } else if (astNode.type === 'Typedef') {
-        if (
-          astNode.valueType == null ||
-          astNode.valueType.annotations == null
-        ) {
-          continue;
-        }
-
-        if (astNode.valueType.annotations['js.type'] === 'Long') {
-          return true;
+  getIdentifier = (identifier: string, kind: 'type' | 'value'): string => {
+    // Enums in thrift are both a type and a value. For flow we need to slip
+    // this up.
+    const def = this.identifiersTable[identifier];
+    if (!def) {
+      throw new Error(`Unable to find definition for identifier ${identifier}`);
+    }
+    if (kind === 'type') {
+      if (def.type === 'Enum') {
+        return `$Values<typeof ${identifier}>`;
+      } else if (
+        def.type === 'Typedef' &&
+        def.valueType.type === 'Identifier'
+      ) {
+        const valueType = this.identifiersTable[def.valueType.name];
+        if (valueType.type === 'Enum') {
+          return `$Values<typeof ${identifier}>`;
         }
       }
+      if (
+        def.type === 'Struct' ||
+        def.type === 'Exception' ||
+        def.type === 'Typedef' ||
+        def.type === 'Union'
+      ) {
+        return id(identifier);
+      }
     }
+    if (kind === 'value') {
+      // It's okay to refernce an enum definition from a value position.
+      if (def.type === 'EnumDefinition') {
+        return id(identifier);
+      }
+      // Same for other other constants.
+      if (def.type === 'Const') {
+        return id(identifier);
+      }
+    }
+    console.log(def);
+    throw new Error(`Unknown identifier type ${def.type} for kind ${kind}`);
+  };
 
+  isLongDefined = () => {
+    const queue = this.thriftAstDefinitions.slice();
+    while (queue.length) {
+      const node = queue.shift();
+      if (
+        node.type === 'Struct' ||
+        node.type === 'Exception' ||
+        node.type === 'Union'
+      ) {
+        for (const field of node.fields) {
+          queue.push(field);
+        }
+      } else if (
+        node.valueType &&
+        node.valueType.annotations &&
+        node.valueType.annotations['js.type'] === 'Long'
+      ) {
+        return true;
+      }
+    }
     return false;
   };
 }

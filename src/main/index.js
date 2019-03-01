@@ -1,38 +1,29 @@
 // @flow
 
-import {ThriftFileConverter} from './convert';
-import commonPathPrefix from 'common-path-prefix';
+import {ThriftFileConverter as Converter} from './convert';
 import path from 'path';
 
-type OptionsType = {
-  suffix?: string,
+type OptionsType = {|
   withSource?: boolean,
-  commonPath?: string,
+  commonPath: string,
   outputDir?: string,
-};
+|};
+
+export const ThriftFileConverter = Converter;
 
 export default function convert(
   thriftPaths: Array<string>,
   options: OptionsType
 ) {
-  const {
-    suffix = 'Type',
-    withSource = false,
-    outputDir = 'flow-output',
-    commonPath,
-  } = options;
+  const {withSource = false, outputDir = 'flow-output', commonPath} = options;
   const allOutput = {};
   for (const thriftPath of thriftPaths) {
-    const converter = new ThriftFileConverter(
-      thriftPath,
-      name => name + suffix,
-      withSource
-    );
+    const converter = new ThriftFileConverter(thriftPath, withSource);
     converter
       .getImportAbsPaths()
       .filter(p => thriftPaths.indexOf(p) === -1)
       .forEach(p => thriftPaths.push(p));
-    const root = commonPath || commonPathPrefix(Object.keys(allOutput));
+    const root = commonPath;
     const relativeThriftPath = path.dirname(
       path.relative(root, converter.thriftPath)
     );

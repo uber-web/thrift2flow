@@ -1,8 +1,14 @@
 // @flow
-import type {MyStructXXX, StatusXXX, ScoreXXX} from './types';
-import {NOT_ELIGIBLE, STATUS_ELIGIBLE_LITERAL, MIN_SCORE, MAX_SCORE} from './types';
 
-function go(s : MyStructXXX): Array<string | number> {
+import type { MyStruct, Status, Score } from './types';
+import {
+  NOT_ELIGIBLE,
+  STATUS_ELIGIBLE_LITERAL,
+  MIN_SCORE,
+  MAX_SCORE
+} from './types';
+
+function go(s : MyStruct): Array<string | number> {
   const values = [s.f_status];
 
   if (s.f_otherStatus) {

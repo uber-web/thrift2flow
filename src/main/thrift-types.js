@@ -46,14 +46,9 @@ export class TypeConverter {
     Date: 'string',
   };
 
-  transformName: string => string;
   thriftAstDefinitions: Array<any>;
 
-  constructor(
-    transformName: string => string,
-    thriftAstDefinitions: Array<any>
-  ) {
-    this.transformName = transformName;
+  constructor(thriftAstDefinitions: Array<any>) {
     this.thriftAstDefinitions = thriftAstDefinitions;
   }
 
@@ -73,12 +68,19 @@ export class TypeConverter {
       this.mapType(t) ||
       this.annotation(t) ||
       TypeConverter.primitives[t.baseType] ||
-      this.transformName(id(t.name))
+      id(t.name)
     );
   };
 
-  enumType = (thriftValueType: BaseType) =>
-    this.isEnum(thriftValueType) && this.transformName(thriftValueType.name);
+  enumType = (thriftValueType: BaseType) => {
+    if (this.isEnum(thriftValueType)) {
+      const name = thriftValueType.name;
+      // Enums are values, not types. To refer to the type,
+      // we use $Values<...>.
+      return `$Values<typeof ${name}>`;
+    }
+    return null;
+  };
 
   arrayType = (thriftValueType: BaseType) =>
     (thriftValueType instanceof ListType ||

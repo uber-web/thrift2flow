@@ -28,11 +28,9 @@ import {flowResultTest} from './util';
 test('imports in same folder', done => {
   flowResultTest(
     {
-      // language=thrift
       'other.thrift': `
         typedef i32 Thing
       `,
-      // language=thrift
       'shared.thrift': `
 include "./other.thrift"
 
@@ -44,7 +42,6 @@ struct OtherStruct {
 }
 typedef i32 OtherStructTypedef
 `,
-      // language=thrift
       'types.thrift': `
 include "./shared.thrift"
 
@@ -56,19 +53,18 @@ struct MyStruct {
   3: shared.OtherStructTypedef f_OtherStructTypedef
 }
 `,
-      // language=JavaScript
       'index.js': `
             // @flow
-            import type {MyStructXXX} from './types';
+            import type { MyStruct } from './types';
 
-            function go(s : MyStructXXX) {
+            function go(s : MyStruct) {
               const numbers : number[] = [s.f_OtherStruct.num];
               return [numbers];
             }
           `,
     },
-    r => {
-      expect(r.errors.length).toBe(0);
+    ({errors}) => {
+      expect(errors).toEqual([]);
       done();
     }
   );
@@ -77,11 +73,9 @@ struct MyStruct {
 test('imports with special type file names', done => {
   flowResultTest(
     {
-      // language=thrift
       'any.thrift': `
         typedef i32 Thing
       `,
-      // language=thrift
       'shared.thrift': `
 include "./any.thrift"
 struct MyStruct {
@@ -97,19 +91,18 @@ union MyUnion {
   2: i32 b
 }
 `,
-      // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX} from './shared';
+import type {MyStruct} from './shared';
 
-function go(s : MyStructXXX) {
+function go(s : MyStruct) {
   const numbers : number[] = [s.a];
   return [numbers];
 }
     `,
     },
-    r => {
-      expect(r.errors.length).toBe(0);
+    ({errors}) => {
+      expect(errors).toEqual([]);
       done();
     }
   );
@@ -118,11 +111,9 @@ function go(s : MyStructXXX) {
 test('imports in sub directory', done => {
   flowResultTest(
     {
-      // language=thrift
       'subdir/other.thrift': `
         typedef i32 Thing
       `,
-      // language=thrift
       'subdir/shared.thrift': `
 include "./other.thrift"
 
@@ -134,7 +125,6 @@ struct OtherStruct {
 }
 typedef i32 OtherStructTypedef
 `,
-      // language=thrift
       'types.thrift': `
 include "./subdir/shared.thrift"
 
@@ -146,20 +136,19 @@ struct MyStruct {
   3: shared.OtherStructTypedef f_OtherStructTypedef
 }
 `,
-      // language=JavaScript
       'index.js': `
             // @flow
-            import type {MyStructXXX} from './types';
+            import type {MyStruct} from './types';
 
-            function go(s : MyStructXXX) {
+            function go(s : MyStruct) {
               const numbers : number[] = [s.f_OtherStruct.num];
               return [numbers];
             }
           `,
     },
-    r => {
-      expect(r.errors.length).toBe(0);
-      done(0);
+    ({errors}) => {
+      expect(errors).toEqual([]);
+      done();
     }
   );
 });

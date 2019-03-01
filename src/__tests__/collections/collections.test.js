@@ -38,7 +38,7 @@ test('arrays and sets', done => {
         .toString(),
     },
     r => {
-      expect(r.errors.length).toBe(0);
+      expect(r.errors).toEqual([]);
       done();
     }
   );
@@ -47,7 +47,6 @@ test('arrays and sets', done => {
 test('maps', done => {
   flowResultTest(
     {
-      // language=thrift
       'types.thrift': `
 typedef byte MyByte
 
@@ -61,22 +60,21 @@ struct MyStruct {
   3: map<string,OtherStruct> f_OtherStruct
 }
 `,
-      // language=JavaScript
       'index.js': `
 // @flow
-import type {MyStructXXX,OtherStructXXX} from './types';
+import type {MyStruct,OtherStruct} from './types';
 
-function go(s : MyStructXXX) {
+function go(s : MyStruct) {
   const numbers : number[] = [
       s.f_i32['ok'], s.f_MyByte[18], s.f_OtherStruct['hello'].num
   ];
-  const structs : OtherStructXXX[] = [s.f_OtherStruct['hello']];
+  const structs : OtherStruct[] = [s.f_OtherStruct['hello']];
   return [numbers, structs];
 }
 `,
     },
-    (r: FlowResult) => {
-      expect(r.errors.length).toBe(0);
+    r => {
+      expect(r.errors).toEqual([]);
       done();
     }
   );

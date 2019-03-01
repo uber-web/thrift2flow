@@ -54,15 +54,15 @@ struct MyStruct {
       'index.js': `
 // @flow
 import type {
-    MyStructXXX,
-    OtherStructXXX,
-    TimestampXXX,
+    MyStruct,
+    OtherStruct,
+    Timestamp,
 } from './types';
 
-function go(s : MyStructXXX) {
+function go(s : MyStruct) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
-  const structs : OtherStructXXX[] = [s.f_OtherStruct];
-  const timestamps : TimestampXXX[] = ["string", s.f_OtherStruct.ts];
+  const structs : OtherStruct[] = [s.f_OtherStruct];
+  const timestamps : Timestamp[] = ["string", s.f_OtherStruct.ts];
 
   return [numbers, structs, timestamps];
 }
@@ -94,11 +94,7 @@ struct UserActivitiesRequest {
     .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p => {
-      let output = new ThriftFileConverter(
-        p,
-        name => name,
-        true
-      ).generateFlowFile();
+      let output = new ThriftFileConverter(p, true).generateFlowFile();
       let longIndex = output.indexOf('import Long');
       expect(longIndex).not.toBe(-1);
     });
@@ -118,11 +114,7 @@ typedef i64 (js.type = "Long") Points
     .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p => {
-      let output = new ThriftFileConverter(
-        p,
-        name => name,
-        true
-      ).generateFlowFile();
+      let output = new ThriftFileConverter(p, true).generateFlowFile();
       let longIndex = output.indexOf('import Long');
       // Expected long definition but did not find one
       expect(longIndex).not.toBe(-1);
