@@ -185,7 +185,7 @@ export class ThriftFileConverter {
         })
         .join(',')}]`;
     } else {
-      // TODO There may be other const cases we're missing here.
+      // There may be other const cases we're missing here.
       value =
         typeof def.value.value === 'string'
           ? `'${def.value.value}'`
@@ -205,7 +205,7 @@ export class ThriftFileConverter {
       }
     }
     return `export const ${def.id.name}: ${this.types.convert(
-      // $FlowFixMe TODO `fieldType` is missing in const?
+      // $FlowFixMe `fieldType` is missing in const?
       def.fieldType
       // $FlowFixMe
     )} = ${value};`;
