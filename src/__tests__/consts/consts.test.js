@@ -26,6 +26,7 @@
 
 import {flowResultTest} from '../util';
 import fs from 'fs';
+import {ThriftFileConverter} from '../../main/convert';
 
 test('consts', done => {
   flowResultTest(
@@ -40,4 +41,30 @@ test('consts', done => {
       done();
     }
   );
+});
+
+test('constant maps', () => {
+  const converter = new ThriftFileConverter(
+    'src/__tests__/fixtures/const-enum-values.thrift',
+    name => name,
+    false
+  );
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchInlineSnapshot(`
+"// @flow
+
+export const PlaceType: $ReadOnly<{|
+  A: \\"A\\",
+  B: \\"B\\"
+|}> = Object.freeze({
+  A: \\"A\\",
+  B: \\"B\\"
+});
+
+export const UUID_TO_PLACE_TYPE: { [string]: PlaceType } = {
+  [\\"123\\"]: PlaceType.A,
+  [\\"456\\"]: PlaceType.B
+};
+"
+`);
 });

@@ -37,6 +37,8 @@ import type {
   FunctionDefinition,
   Service,
   Const,
+  ConstEntry,
+  ConstMap,
 } from 'thriftrw/ast';
 
 const thriftOptions = {
@@ -179,7 +181,7 @@ export class ThriftFileConverter {
       value = `[${def.value.values
         .map(val => {
           if (val.type === 'Identifier') {
-            return val.name;
+            return this.getIdentifier(val.name, 'value');
           }
           if (typeof val.value === 'string') {
             return `'${val.value}'`;
@@ -192,10 +194,55 @@ export class ThriftFileConverter {
         typeof def.value.value === 'string'
           ? `'${def.value.value}'`
           : def.value.value;
+      if (def.fieldType.baseType === 'i64') {
+        value = `Buffer.from([${value}])`;
+      }
+    }
+    if (value === undefined) {
+      if (def.value.type === 'ConstMap') {
+        value = this.generateConstMap(def.value);
+      } else {
+        throw new Error(`value is undefined for ${def.id.name}`);
+      }
     }
     return `export const ${def.id.name}: ${this.types.convert(
       def.fieldType
     )} = ${value};`;
+  };
+
+  generateConstEntry = (entry: ConstEntry) => {
+    let key;
+    let value;
+    if (entry.key.type === 'Literal') {
+      key = `'${entry.key.value}'`;
+    } else if (entry.key.type === 'Identifier') {
+      key = this.getIdentifier(entry.key.name, 'value');
+    } else {
+      throw new Error(`Unhandled entry.key.type ${entry.key.type}`);
+    }
+    if (entry.value.type === 'Literal') {
+      value = `'${entry.value.value}'`;
+    } else if (entry.value.type === 'Identifier') {
+      value = this.getIdentifier(entry.value.name, 'value');
+    } else if (entry.value.type === 'ConstMap') {
+      value = this.generateConstMap(entry.value);
+    } else {
+      throw new Error(`Unhandled entry.key.type ${entry.value.type}`);
+    }
+    if (key === undefined || value === undefined) {
+      console.log('key', key);
+      console.log('value', value);
+      console.log(entry);
+      throw new Error(`key or value is undefined`);
+    }
+    const result = `[${key}]: ${value},`;
+    return result;
+  };
+
+  generateConstMap = (def: ConstMap) => {
+    return `{
+      ${def.entries.map(entry => this.generateConstEntry(entry)).join('\n')}
+    } `;
   };
 
   generateStruct = ({id: {name}, fields}: Struct) =>
@@ -291,6 +338,13 @@ export class ThriftFileConverter {
         return id(identifier);
       }
     }
+    if (kind === 'value') {
+      // It's okay to refernce an enum definition from a value position.
+      if (def.type === 'EnumDefinition') {
+        return id(identifier);
+      }
+    }
+    console.log(def);
     throw new Error(`not implemented. def.type ${def.type}`);
   };
 

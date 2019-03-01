@@ -25,6 +25,16 @@
 
 import {flowResultTest} from './util';
 import {ThriftFileConverter} from '../main/convert';
+import {Thrift} from 'thriftrw';
+
+test('thriftrw enums are strings not numbers', () => {
+  const thrift = new Thrift({
+    entryPoint: 'src/__tests__/fixtures/my-enum.thrift',
+    allowFilesystemAccess: true,
+  });
+  expect(thrift.MyEnum.OK).toEqual('OK');
+  expect(thrift.MyEnum.ERROR).toEqual('ERROR');
+});
 
 test('enum to JS', () => {
   const converter = new ThriftFileConverter(
