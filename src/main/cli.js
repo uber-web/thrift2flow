@@ -39,7 +39,12 @@ import convert from './index';
 const argv = yargs
   .usage('Usage: $0 [options] <thrift files..>')
   .option('path', {
-    describe: 'Path used for generated code',
+    describe:
+      'common path used for generated code. In most projects this is likely just `idl`.',
+  })
+  .option('outputDir', {
+    describe: 'The root output directory for the generated code.',
+    default: 'flow-output',
   })
   .option('withsource', {
     describe: 'prepend the source path of the thrift file',
@@ -57,7 +62,8 @@ if (!thriftPaths.length) {
 
 const options = {
   withSource: argv.withsource,
-  commonPath: argv.path,
+  commonPath: path.resolve(process.cwd(), argv.path),
+  outputDir: argv.outputDir,
 };
 
 const allOutput = convert(thriftPaths, options);

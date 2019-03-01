@@ -1,12 +1,11 @@
 // @flow
 
 import {ThriftFileConverter} from './convert';
-import commonPathPrefix from 'common-path-prefix';
 import path from 'path';
 
 type OptionsType = {|
   withSource?: boolean,
-  commonPath?: string,
+  commonPath: string,
   outputDir?: string,
 |};
 
@@ -22,7 +21,7 @@ export default function convert(
       .getImportAbsPaths()
       .filter(p => thriftPaths.indexOf(p) === -1)
       .forEach(p => thriftPaths.push(p));
-    const root = commonPath || commonPathPrefix(Object.keys(allOutput));
+    const root = commonPath;
     const relativeThriftPath = path.dirname(
       path.relative(root, converter.thriftPath)
     );
