@@ -205,10 +205,12 @@ export class ThriftFileConverter {
   generateStructContents = (fields: Object) =>
     `{|${Object.values(fields)
       .map((field: Base) => {
-        console.log('field.valueType', field.valueType);
-        return `${field.name}${
-          this.isOptional(field) ? '?' : ''
-        }: ${this.getIdentifier(field.valueType.name, 'type')};`;
+        // console.log('field.valueType', field.valueType);
+        let value =
+          field.valueType.type === 'BaseType'
+            ? this.types.convert(field.valueType)
+            : this.getIdentifier(field.valueType.name, 'type');
+        return `${field.name}${this.isOptional(field) ? '?' : ''}: ${value};`;
       })
       .join('\n')}|}`;
 
@@ -277,7 +279,7 @@ export class ThriftFileConverter {
         return `$Values<typeof ${identifier}>`;
       }
     }
-    console.log('def.type', def.type);
+    // console.log('def.type', def.type);
     throw new Error('not implemented');
   };
 

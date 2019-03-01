@@ -50,9 +50,9 @@ test('primitives happy path', done => {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {PrimitivesXXX} from './types';
+import type {Primitives} from './types';
 
-function go(s : PrimitivesXXX) {
+function go(s : Primitives) {
   const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_double];
   const buffers : Buffer[] = [s.f_i64, s.f_binary];
 
@@ -76,9 +76,9 @@ test('primitives sad path', done => {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {PrimitivesXXX} from './types';
+import type {Primitives} from './types';
 
-function go(s : PrimitivesXXX) {
+function go(s : Primitives) {
   const numbers : number[] = [s.f_boolean];
   const booleans : boolean[] = [s.f_byte];
   return [numbers, booleans];
@@ -103,9 +103,9 @@ test('primitives optional', done => {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {PrimitivesXXX} from './types';
+import type {Primitives} from './types';
 
-function go(s : PrimitivesXXX) {
+function go(s : Primitives) {
   return [
       s.f_string.length,
       s.f_optional.length,
@@ -137,9 +137,9 @@ test('primitives exact types', done => {
       // language=JavaScript
       'index.js': `
 // @flow
-import type {OptionalsXXX} from './types';
+import type {Optionals} from './types';
 
-function go() : OptionalsXXX {
+function go() : Optionals {
   return {f_byte: 0, notActualField: true};
 }
 `,
