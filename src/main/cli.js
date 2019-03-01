@@ -38,10 +38,6 @@ import convert from './index';
 
 const argv = yargs
   .usage('Usage: $0 [options] <thrift files..>')
-  .option('suffix', {
-    describe: 'appended to generated type names',
-    default: 'Type',
-  })
   .option('path', {
     describe: 'Path used for generated code',
   })
@@ -60,7 +56,6 @@ if (!thriftPaths.length) {
 }
 
 const options = {
-  suffix: argv.suffix,
   withSource: argv.withsource,
   commonPath: argv.path,
 };

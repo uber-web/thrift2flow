@@ -46,7 +46,6 @@ test('consts', done => {
 test('constant maps', () => {
   const converter = new ThriftFileConverter(
     'src/__tests__/fixtures/const-enum-values.thrift',
-    name => name,
     false
   );
   const jsContent = converter.generateFlowFile();

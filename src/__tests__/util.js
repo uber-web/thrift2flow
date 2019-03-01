@@ -65,7 +65,7 @@ export const flowResultTest = (
       }
       fs.writeFileSync(
         jsPath,
-        new ThriftFileConverter(p, name => name, withsource).generateFlowFile()
+        new ThriftFileConverter(p, withsource).generateFlowFile()
       );
     });
   fs.writeFileSync(

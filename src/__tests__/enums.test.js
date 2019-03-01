@@ -39,7 +39,6 @@ test('thriftrw enums are strings not numbers', () => {
 test('enum to JS', () => {
   const converter = new ThriftFileConverter(
     'src/__tests__/fixtures/my-enum.thrift',
-    name => name,
     false
   );
   const jsContent = converter.generateFlowFile();
@@ -49,7 +48,6 @@ test('enum to JS', () => {
 test('enums work with typedefs', () => {
   const converter = new ThriftFileConverter(
     'src/__tests__/fixtures/my-enum-with-typedef.thrift',
-    name => name,
     false
   );
   const jsContent = converter.generateFlowFile();
@@ -59,7 +57,6 @@ test('enums work with typedefs', () => {
 test('typedefs of enums can be referenced from structs', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/enum-typedef-struct.thrift`,
-    name => name,
     false
   );
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
