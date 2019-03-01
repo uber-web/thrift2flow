@@ -36,7 +36,7 @@ test('consts', done => {
       'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
     },
     result => {
-      expect(result.errors.length).toEqual(0);
+      expect(result.errors).toEqual([]);
       done();
     }
   );
