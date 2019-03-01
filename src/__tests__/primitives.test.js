@@ -63,7 +63,7 @@ function go(s : Primitives) {
 `,
     },
     r => {
-      expect(r.errors.length).toBe(0);
+      expect(r.errors).toEqual([]);
       done();
     }
   );
@@ -73,7 +73,6 @@ test('primitives sad path', done => {
   flowResultTest(
     {
       'types.thrift': primitiveStruct,
-      // language=JavaScript
       'index.js': `
 // @flow
 import type {Primitives} from './types';

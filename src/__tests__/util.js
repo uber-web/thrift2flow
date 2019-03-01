@@ -35,7 +35,9 @@ import {ThriftFileConverter} from '../main/convert';
 
 export const flowResultTest = (
   files: {[string]: string},
-  testFn: ({|errors: Array<string>|}) => void,
+  testFn: ({|
+    errors: Array<{|level: string, message: Array<string>|}>,
+  |}) => void,
   withsource: boolean = true
 ) => {
   if (!fs.existsSync('.tmp')) {
