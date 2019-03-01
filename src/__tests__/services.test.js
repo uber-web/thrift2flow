@@ -25,29 +25,25 @@
 
 import {flowResultTest} from './util';
 
-// language=thrift
-const thrift = `
+test('services happy path', done => {
+  flowResultTest(
+    {
+      'types.thrift': `
   service MyService {
    i32 getNumber(1: string a, 2: bool what)
    void aVoid(1: i32 a)
    void nothing()
   }
-`;
-
-test('services happy path', done => {
-  flowResultTest(
-    {
-      'types.thrift': thrift,
-      // language=JavaScript
+`,
       'index.js': `
 // @flow
-import type {MyServiceXXX} from './types';
+import type {MyService} from './types';
 
-function go(s : MyServiceXXX) {
+function go(s : MyService) {
   return s.getNumber({a: 'hello', what: true}) / 4;
 }
 
-function checkVoids(s : MyServiceXXX) {
+function checkVoids(s : MyService) {
     ensureVoid(s.aVoid);
     s.nothing();
 }
@@ -58,7 +54,7 @@ function ensureVoid(f : any => void) {
 `,
     },
     r => {
-      expect(r.errors.length).toBe(0);
+      expect(r.errors).toEqual([]);
       done();
     }
   );
