@@ -77,8 +77,15 @@ export class TypeConverter {
     );
   };
 
-  enumType = (thriftValueType: BaseType) =>
-    this.isEnum(thriftValueType) && this.transformName(thriftValueType.name);
+  enumType = (thriftValueType: BaseType) => {
+    if (this.isEnum(thriftValueType)) {
+      const name = this.transformName(thriftValueType.name);
+      // Enums are values, not types. To refer to the type,
+      // we use $Values<...>.
+      return `$Values<typeof ${name}>`;
+    }
+    return null;
+  };
 
   arrayType = (thriftValueType: BaseType) =>
     (thriftValueType instanceof ListType ||

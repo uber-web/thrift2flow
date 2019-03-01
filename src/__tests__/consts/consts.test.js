@@ -61,7 +61,7 @@ export const PlaceType: $ReadOnly<{|
   B: \\"B\\"
 });
 
-export const UUID_TO_PLACE_TYPE: { [string]: PlaceType } = {
+export const UUID_TO_PLACE_TYPE: { [string]: $Values<typeof PlaceType> } = {
   [\\"123\\"]: PlaceType.A,
   [\\"456\\"]: PlaceType.B
 };
