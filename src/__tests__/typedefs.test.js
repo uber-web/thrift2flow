@@ -54,15 +54,15 @@ struct MyStruct {
       'index.js': `
 // @flow
 import type {
-    MyStructXXX,
-    OtherStructXXX,
-    TimestampXXX,
+    MyStruct,
+    OtherStruct,
+    Timestamp,
 } from './types';
 
-function go(s : MyStructXXX) {
+function go(s : MyStruct) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
-  const structs : OtherStructXXX[] = [s.f_OtherStruct];
-  const timestamps : TimestampXXX[] = ["string", s.f_OtherStruct.ts];
+  const structs : OtherStruct[] = [s.f_OtherStruct];
+  const timestamps : Timestamp[] = ["string", s.f_OtherStruct.ts];
 
   return [numbers, structs, timestamps];
 }

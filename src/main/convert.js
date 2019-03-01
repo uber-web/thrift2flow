@@ -147,14 +147,15 @@ export class ThriftFileConverter {
     }) => ${this.types.convert(fn.returns)}`;
 
   generateTypedef = (def: Typedef) => {
-    const otherDef = this.identifiersTable[def.valueType.name];
-    const reference = def.valueType;
-    if (otherDef.type === 'Enum') {
-      return this.generateEnum(otherDef, def.id.name);
+    if (def.valueType.type === 'Identifier') {
+      const otherDef = this.identifiersTable[def.valueType.name];
+      if (otherDef.type === 'Enum') {
+        return this.generateEnum(otherDef, def.id.name);
+      }
     }
     return `export type ${this.transformName(
       def.id.name
-    )} = ${this.types.convert(reference)};`;
+    )} = ${this.types.convert(def.valueType)};`;
   };
 
   generateEnumUnion = (def: Enum) => {
@@ -205,11 +206,10 @@ export class ThriftFileConverter {
   generateStructContents = (fields: Object) =>
     `{|${Object.values(fields)
       .map((field: Base) => {
-        // console.log('field.valueType', field.valueType);
         let value =
-          field.valueType.type === 'BaseType'
-            ? this.types.convert(field.valueType)
-            : this.getIdentifier(field.valueType.name, 'type');
+          field.valueType.type === 'Identifier'
+            ? this.getIdentifier(field.valueType.name, 'type')
+            : this.types.convert(field.valueType);
         return `${field.name}${this.isOptional(field) ? '?' : ''}: ${value};`;
       })
       .join('\n')}|}`;
@@ -272,14 +272,16 @@ export class ThriftFileConverter {
       throw new Error(`Unable to find definition for identifier ${identifier}`);
     }
     if (kind === 'type') {
-      if (def.type === 'Enum') {
+      if (
+        def.type === 'Enum' ||
+        (def.type === 'Typedef' && def.valueType.type === 'Enum')
+      ) {
         return `$Values<typeof ${identifier}>`;
       }
-      if (def.type === 'Typedef') {
-        return `$Values<typeof ${identifier}>`;
+      if (def.type === 'Struct' || def.type === 'Typedef') {
+        return identifier;
       }
     }
-    // console.log('def.type', def.type);
     throw new Error('not implemented');
   };
 
