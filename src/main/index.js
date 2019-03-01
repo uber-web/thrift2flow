@@ -1,6 +1,6 @@
 // @flow
 
-import {ThriftFileConverter} from './convert';
+import {ThriftFileConverter as Converter} from './convert';
 import path from 'path';
 
 type OptionsType = {|
@@ -8,6 +8,8 @@ type OptionsType = {|
   commonPath: string,
   outputDir?: string,
 |};
+
+export const ThriftFileConverter = Converter;
 
 export default function convert(
   thriftPaths: Array<string>,
