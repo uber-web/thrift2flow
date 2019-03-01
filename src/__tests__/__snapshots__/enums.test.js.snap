@@ -4,9 +4,12 @@ exports[`enum to JS 1`] = `
 "// @flow
 
 export type MyEnum = \\"OK\\" | \\"ERROR\\";
-export const MyEnumValueMap = {
-  OK: 1,
-  ERROR: 2
-};
+export const MyEnumValueMap: $ReadOnly<{|
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+|}> = Object.freeze({
+  OK: \\"OK\\",
+  ERROR: \\"ERROR\\"
+});
 "
 `;

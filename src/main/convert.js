@@ -39,6 +39,8 @@ import type {
   Const,
 } from 'thriftrw/ast';
 
+const ENUM_VALUE = 'ValueMap';
+
 const thriftOptions = {
   strict: false,
   allowFilesystemAccess: true,
@@ -131,16 +133,14 @@ export class ThriftFileConverter {
   };
 
   generateEnumMap = (def: Enum) => {
-    const header = '{';
     const values = def.definitions
-      .map(
-        (d, index) => `  "${d.id.name}": ${d.value ? d.value.value : index},`
-      )
+      .map((d, index) => `'${d.id.name}': '${d.id.name}',`)
       .join('\n');
-    const footer = '}';
-
-    const mapDefinition = [header, values, footer].join('\n');
-    return `export const ${def.id.name}ValueMap = ${mapDefinition};`;
+    return `export const ${def.id.name}${ENUM_VALUE}: $ReadOnly<{|
+  ${values}
+|}>  = Object.freeze({
+  ${values}
+});`;
   };
 
   generateEnum = (def: Enum) => {
