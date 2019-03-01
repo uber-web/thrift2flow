@@ -23,13 +23,35 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from './util';
+import { flowResultTest } from "./util";
+import { ThriftFileConverter } from "../main/convert";
 
-test('unions', done => {
+test("Long module is imported when needed", () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/union-long-import.thrift`,
+    false
+  );
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+import Long from \\"long\\";
+
+export type RawValue =
+  | {| binaryValue: Buffer |}
+  | {| boolValue: boolean |}
+  | {| doubleValue: number |}
+  | {| int32Value: number |}
+  | {| int64Value: Long |}
+  | {| stringValue: string |};
+"
+`);
+});
+
+test("unions", done => {
   flowResultTest(
     {
       // language=thrift
-      'types.thrift': `
+      "types.thrift": `
 typedef MyUnion UnionTypedef
 typedef MyEmptyUnion EmptyUnionTypedef
 
@@ -49,7 +71,7 @@ struct MyStruct {
 }
 `,
       // language=JavaScript
-      'index.js': `
+      "index.js": `
 // @flow
 import type { MyStruct, UnionTypedef, EmptyUnionTypedef } from './types';
 
@@ -62,7 +84,7 @@ function go(s : MyStruct, u: UnionTypedef, eu: EmptyUnionTypedef) {
   const numbers: number[] = [s.f_MyUnion.size || -1];
   return [unions,unions,unionDefs,emptyunionDefs,strings,numbers];
 }
-`,
+`
     },
     r => {
       expect(r.errors.length).toBe(0);

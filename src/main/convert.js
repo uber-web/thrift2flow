@@ -351,31 +351,25 @@ export class ThriftFileConverter {
   };
 
   isLongDefined = () => {
-    for (const astNode of this.thriftAstDefinitions) {
-      if (astNode.type === 'Struct') {
-        for (const field of astNode.fields) {
-          if (field.valueType == null || field.valueType.annotations == null) {
-            continue;
-          }
-
-          if (field.valueType.annotations['js.type'] === 'Long') {
-            return true;
-          }
+    const queue = this.thriftAstDefinitions.slice();
+    while (queue.length) {
+      const node = queue.shift();
+      if (
+        node.type === 'Struct' ||
+        node.type === 'Exception' ||
+        node.type === 'Union'
+      ) {
+        for (const field of node.fields) {
+          queue.push(field);
         }
-      } else if (astNode.type === 'Typedef') {
-        if (
-          astNode.valueType == null ||
-          astNode.valueType.annotations == null
-        ) {
-          continue;
-        }
-
-        if (astNode.valueType.annotations['js.type'] === 'Long') {
-          return true;
-        }
+      } else if (
+        node.valueType &&
+        node.valueType.annotations &&
+        node.valueType.annotations['js.type'] === 'Long'
+      ) {
+        return true;
       }
     }
-
     return false;
   };
 }
