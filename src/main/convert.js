@@ -278,10 +278,15 @@ export class ThriftFileConverter {
       ) {
         return `$Values<typeof ${identifier}>`;
       }
-      if (def.type === 'Struct' || def.type === 'Typedef') {
+      if (
+        def.type === 'Struct' ||
+        def.type === 'Typedef' ||
+        def.type === 'Union'
+      ) {
         return identifier;
       }
     }
+    console.log(def.type);
     throw new Error('not implemented');
   };
 
