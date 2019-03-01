@@ -283,11 +283,10 @@ export class ThriftFileConverter {
         def.type === 'Typedef' ||
         def.type === 'Union'
       ) {
-        return identifier;
+        return id(identifier);
       }
     }
-    console.log(def.type);
-    throw new Error('not implemented');
+    throw new Error(`not implemented. def.type ${def.type}`);
   };
 
   isLongDefined = () => {
