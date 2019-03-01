@@ -67,8 +67,8 @@ const struct: MyStructXXX = {
   f_EnumTypedef: error,
 }
 
-const okFromMap: 1 = MyEnumValueMap.OK;
-const errorFromMap: 2 = MyEnumValueMap.ERROR;
+const okFromMap: 'OK' = MyEnumValueMap.OK;
+const errorFromMap: 'ERROR' = MyEnumValueMap.ERROR;
 
 const t: EnumTypedefXXX = ok;
 `,
