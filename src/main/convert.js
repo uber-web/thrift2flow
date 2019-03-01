@@ -329,6 +329,7 @@ export class ThriftFileConverter {
       }
       if (
         def.type === 'Struct' ||
+        def.type === 'Exception' ||
         def.type === 'Typedef' ||
         def.type === 'Union'
       ) {
@@ -346,7 +347,7 @@ export class ThriftFileConverter {
       }
     }
     console.log(def);
-    throw new Error(`not implemented. def.type ${def.type}`);
+    throw new Error(`Unknown identifier type ${def.type} for kind ${kind}`);
   };
 
   isLongDefined = () => {
