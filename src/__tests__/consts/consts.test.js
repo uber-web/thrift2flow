@@ -43,6 +43,36 @@ test('consts', done => {
   );
 });
 
+test.only('const map values are numbers', () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/const-map-literal-type.thrift`,
+    false
+  );
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchInlineSnapshot(`
+"// @flow
+
+export const ShieldType: $ReadOnly<{|
+  O: \\"O\\",
+  U: \\"U\\"
+|}> = Object.freeze({
+  O: \\"O\\",
+  U: \\"U\\"
+});
+
+export const PRIORITIES: { [$Values<typeof ShieldType>]: number } = {
+  [ShieldType.O]: 2,
+  [ShieldType.U]: 10
+};
+
+export const LABELS: { [$Values<typeof ShieldType>]: string } = {
+  [ShieldType.O]: \\"ooooooo\\",
+  [ShieldType.U]: \\"uuuuuuu\\"
+};
+"
+`);
+});
+
 test('constant maps', () => {
   const converter = new ThriftFileConverter(
     'src/__tests__/fixtures/const-enum-values.thrift',

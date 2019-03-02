@@ -225,7 +225,15 @@ export class ThriftFileConverter {
       throw new Error(`Unhandled entry.key.type ${entry.key.type}`);
     }
     if (entry.value.type === 'Literal') {
-      value = `'${entry.value.value}'`;
+      console.log('entry.value', entry.value);
+      if (typeof entry.value.value === 'number') {
+        value = `${entry.value.value}`;
+      } else if (typeof entry.value.value === 'string') {
+        value = `'${entry.value.value}'`;
+      } else {
+        console.error(entry.value);
+        throw new Error(`Unhandled const map entry type`);
+      }
     } else if (entry.value.type === 'Identifier') {
       value = this.getIdentifier(entry.value.name, 'value');
     } else if (entry.value.type === 'ConstMap') {
