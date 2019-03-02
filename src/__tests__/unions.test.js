@@ -34,14 +34,14 @@ test("Long module is imported when needed", () => {
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow
 
-import Long from \\"long\\";
+import thrift2flow$Long from \\"long\\";
 
 export type RawValue =
   | {| binaryValue: Buffer |}
   | {| boolValue: boolean |}
   | {| doubleValue: number |}
   | {| int32Value: number |}
-  | {| int64Value: Long |}
+  | {| int64Value: thrift2flow$Long |}
   | {| stringValue: string |};
 "
 `);

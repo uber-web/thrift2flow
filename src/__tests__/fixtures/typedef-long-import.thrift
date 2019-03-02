@@ -1,0 +1,1 @@
+typedef i64 (js.type = 'Long') Long

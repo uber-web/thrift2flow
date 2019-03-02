@@ -26,6 +26,7 @@
 
 import {BaseType, Enum, ListType, MapType, SetType} from 'thriftrw/ast';
 import {id} from './identifier';
+import {type Definition} from './ast-types';
 
 export class TypeConverter {
   static primitives = {
@@ -42,14 +43,19 @@ export class TypeConverter {
   };
 
   static i64Mappings = {
-    Long: 'Long',
+    Long: 'thrift2flow$Long',
     Date: 'string',
   };
 
   thriftAstDefinitions: Array<any>;
+  identifiersTable: $ReadOnly<{[key: string]: Definition}>;
 
-  constructor(thriftAstDefinitions: Array<any>) {
+  constructor(
+    thriftAstDefinitions: Array<any>,
+    identifiersTable: $ReadOnly<{[key: string]: Definition}>
+  ) {
     this.thriftAstDefinitions = thriftAstDefinitions;
+    this.identifiersTable = identifiersTable;
   }
 
   annotation(t: BaseType): string {
@@ -62,10 +68,13 @@ export class TypeConverter {
   }
 
   convert = (t: BaseType): string => {
+    if (!t) {
+      throw new Error(`Assertion failed. t is not defined`);
+    }
     return (
       this.arrayType(t) ||
-      this.enumType(t) ||
       this.mapType(t) ||
+      this.enumType(t) ||
       this.annotation(t) ||
       TypeConverter.primitives[t.baseType] ||
       id(t.name)
@@ -74,10 +83,9 @@ export class TypeConverter {
 
   enumType = (thriftValueType: BaseType) => {
     if (this.isEnum(thriftValueType)) {
-      const name = thriftValueType.name;
       // Enums are values, not types. To refer to the type,
       // we use $Values<...>.
-      return `$Values<typeof ${name}>`;
+      return `$Values<typeof ${thriftValueType.name}>`;
     }
     return null;
   };
@@ -98,11 +106,9 @@ export class TypeConverter {
 
   isEnum(def: BaseType) {
     // Enums export const, not type
-    let defName = def.name;
-    let defValueType = this.thriftAstDefinitions.find(value => {
-      return value.id.name === defName;
-    });
-
-    return defValueType && defValueType instanceof Enum;
+    if (!def.name) {
+      return undefined;
+    }
+    return this.identifiersTable[def.name].type === 'Enum';
   }
 }

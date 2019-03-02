@@ -73,7 +73,10 @@ export class ThriftFileConverter {
     this.ast = this.thrift.asts[this.thrift.filename];
     this.initIdentifiersTable();
     this.thriftAstDefinitions = this.ast.definitions;
-    this.types = new TypeConverter(this.thriftAstDefinitions);
+    this.types = new TypeConverter(
+      this.thriftAstDefinitions,
+      this.identifiersTable
+    );
     this.withsource = withsource;
   }
 
@@ -300,7 +303,7 @@ export class ThriftFileConverter {
     });
 
     if (this.isLongDefined()) {
-      generatedImports.push("import Long from 'long'");
+      generatedImports.push("import thrift2flow$Long from 'long'");
     }
     return generatedImports.join('\n');
   };
