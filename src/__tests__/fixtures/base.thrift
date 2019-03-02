@@ -1,3 +1,9 @@
+
+enum EntityType {
+    A = 0,
+    B  = 1,
+}
+
 enum Weekday {
     UNKNOWN   = 0
     SUNDAY    = 1

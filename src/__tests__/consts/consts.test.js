@@ -43,7 +43,7 @@ test('consts', done => {
   );
 });
 
-test.only('const map values are numbers', () => {
+test('const map values are numbers', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/const-map-literal-type.thrift`,
     false

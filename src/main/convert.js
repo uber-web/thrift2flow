@@ -82,23 +82,37 @@ export class ThriftFileConverter {
 
   initIdentifiersTable() {
     this.identifiersTable = {};
-    Object.keys(this.thrift.asts).forEach((filename: string) => {
-      const includeIdentifier = includeIdentifierOfFilename(filename);
-      const includePrefix =
-        filename !== this.thrift.filename ? `${includeIdentifier}.` : '';
-      this.thrift.asts[filename].definitions.forEach(definition => {
-        this.identifiersTable[
-          `${includePrefix}${definition.id.name}`
-        ] = definition;
-        if (definition.type === 'Enum') {
-          definition.definitions.forEach(enumDefinition => {
-            this.identifiersTable[
-              `${includePrefix}${definition.id.name}.${enumDefinition.id.name}`
-            ] = enumDefinition;
-          });
-        }
+    const includes = this.ast.headers.filter(f => f.type === 'Include');
+    includes
+      .map(({id}) => {
+        const filename = path.resolve(path.dirname(this.thrift.filename), id);
+        const includeIdentifier = includeIdentifierOfFilename(filename);
+        return {
+          filename: filename,
+          includePrefix: `${includeIdentifier}.`,
+        };
+      })
+      .concat([
+        {
+          filename: this.thrift.filename,
+          includePrefix: '',
+        },
+      ])
+      .map(({filename, includePrefix}) => {
+        this.thrift.asts[filename].definitions.forEach(definition => {
+          const identifier = `${includePrefix}${definition.id.name}`;
+          this.identifiersTable[identifier] = definition;
+          if (definition.type === 'Enum') {
+            definition.definitions.forEach(enumDefinition => {
+              this.identifiersTable[
+                `${includePrefix}${definition.id.name}.${
+                  enumDefinition.id.name
+                }`
+              ] = enumDefinition;
+            });
+          }
+        });
       });
-    });
   }
 
   generateFlowFile: () => string = () => {
@@ -225,7 +239,6 @@ export class ThriftFileConverter {
       throw new Error(`Unhandled entry.key.type ${entry.key.type}`);
     }
     if (entry.value.type === 'Literal') {
-      console.log('entry.value', entry.value);
       if (typeof entry.value.value === 'number') {
         value = `${entry.value.value}`;
       } else if (typeof entry.value.value === 'string') {
