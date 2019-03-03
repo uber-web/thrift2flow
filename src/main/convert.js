@@ -24,7 +24,6 @@
  */
 
 import {Thrift} from 'thriftrw';
-import {TypeConverter} from './thrift-types';
 import prettier from 'prettier';
 import path from 'path';
 import {id} from './identifier';
@@ -72,6 +71,24 @@ function includeIdentifierOfFilename(filename: string): string {
   return match[1];
 }
 
+const primitives = {
+  binary: 'Buffer',
+  bool: 'boolean',
+  byte: 'number',
+  i8: 'number',
+  i16: 'number',
+  i32: 'number',
+  i64: 'Buffer',
+  double: 'number',
+  string: 'string',
+  void: 'void',
+};
+
+const i64Mappings = {
+  Long: 'thrift2flow$Long',
+  Date: 'string',
+};
+
 export class ThriftFileConverter {
   thriftPath: string;
   thrift: {|
@@ -79,10 +96,8 @@ export class ThriftFileConverter {
     filename: string,
     idls: {[filename: string]: {||}},
   |};
-  types: TypeConverter;
   withsource: boolean;
   ast: Ast;
-  thriftAstDefinitions: Array<Definition>;
   identifiersTable: {[key: string]: AstNode};
 
   constructor(thriftPath: string, withsource: boolean) {
@@ -90,11 +105,6 @@ export class ThriftFileConverter {
     this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
     this.ast = this.thrift.asts[this.thrift.filename];
     this.initIdentifiersTable();
-    this.thriftAstDefinitions = this.ast.definitions;
-    this.types = new TypeConverter(
-      this.thriftAstDefinitions,
-      this.identifiersTable
-    );
     this.withsource = withsource;
   }
 
@@ -146,7 +156,7 @@ export class ThriftFileConverter {
       '// @flow',
       this.withsource && `// Source: ${this.thriftPath}`,
       this.generateImports(),
-      ...this.thriftAstDefinitions.map(this.convertDefinitionToCode),
+      ...this.ast.definitions.map(this.convertDefinitionToCode),
     ]
       .filter(Boolean)
       .join('\n\n');
@@ -185,7 +195,7 @@ export class ThriftFileConverter {
   generateFunction = (fn: FunctionDefinition) =>
     `${fn.id.name}: (${
       fn.fields.length ? this.generateStructContents([...fn.fields]) : ''
-    }) => ${this.types.convert(fn.returns)}`;
+    }) => ${this.convertType(fn.returns)}`;
 
   generateTypedef = (def: Typedef) => {
     if (def.valueType.type === 'Identifier') {
@@ -194,7 +204,7 @@ export class ThriftFileConverter {
         return this.generateEnum(otherDef, def.id.name);
       }
     }
-    return `export type ${def.id.name} = ${this.types.convert(def.valueType)};`;
+    return `export type ${def.id.name} = ${this.convertType(def.valueType)};`;
   };
 
   generateEnumUnion = (def: Enum) => {
@@ -266,12 +276,7 @@ export class ThriftFileConverter {
         throw new Error(`value is undefined for ${def.id.name}`);
       }
     }
-    const fieldType =
-      enumType ||
-      this.types.convert(
-        // $FlowFixMe `fieldType` is missing in const?
-        def.fieldType
-      );
+    const fieldType = enumType || this.convertType(def.fieldType);
     // $FlowFixMe
     return `export const ${def.id.name}: ${fieldType} = ${value};`;
   };
@@ -328,7 +333,7 @@ export class ThriftFileConverter {
         let value =
           valueType.type === 'Identifier'
             ? this.getIdentifier(valueType.name, 'type')
-            : this.types.convert(valueType);
+            : this.convertType(valueType);
         return `${field.name}${this.isOptional(field) ? '?' : ''}: ${value};`;
       })
       .join('\n')}|}`;
@@ -341,7 +346,7 @@ export class ThriftFileConverter {
       return '{||}';
     }
     return fields
-      .map((f: Field) => `{|${f.name}: ${this.types.convert(f.valueType)}|}`)
+      .map((f: Field) => `{|${f.name}: ${this.convertType(f.valueType)}|}`)
       .join(' | ');
   };
 
@@ -478,7 +483,7 @@ export class ThriftFileConverter {
   };
 
   isLongDefined = () => {
-    let queue: $ReadOnlyArray<AstNode> = this.thriftAstDefinitions.slice();
+    let queue: $ReadOnlyArray<AstNode> = this.ast.definitions.slice();
     while (queue.length) {
       let [node, ...newQueue] = queue;
       queue = newQueue;
@@ -500,4 +505,73 @@ export class ThriftFileConverter {
     }
     return false;
   };
+
+  convertBaseType(t: AstNode): string | void {
+    if (t.type !== 'BaseType') {
+      return undefined;
+    }
+    if (t.baseType === 'i64') {
+      const jsType = t.annotations['js.type'];
+      if (jsType !== undefined) {
+        return i64Mappings[jsType];
+      }
+    }
+    return primitives[t.baseType];
+  }
+
+  convertEnumType(thriftValueType: AstNode): string | void {
+    if (this.isEnumIdentifier(thriftValueType)) {
+      // Enums are values, not types. To refer to the type,
+      // we use $Values<...>.
+      if (thriftValueType.type !== 'Identifier') {
+        throw new Error(
+          'Assertion failure. Enum reference has to be an identifier'
+        );
+      }
+      return `$Values<typeof ${thriftValueType.name}>`;
+    }
+    return undefined;
+  }
+
+  convertMapType(t: AstNode): string | void {
+    if (t.type === 'Map') {
+      const keyType = this.convertType(t.keyType);
+      const valueType = this.convertType(t.valueType);
+      return `{[${keyType}]: ${valueType}}`;
+    }
+    return undefined;
+  }
+
+  isEnumIdentifier(def: AstNode) {
+    // Enums export const, not type
+    if (!def.name) {
+      return undefined;
+    }
+    return this.identifiersTable[def.name].type === 'Enum';
+  }
+
+  convertType(t: AstNode): string {
+    if (!t) {
+      throw new Error(`Assertion failed. t is not defined.`);
+    }
+    let type =
+      this.convertArrayType(t) ||
+      this.convertMapType(t) ||
+      this.convertEnumType(t) ||
+      this.convertBaseType(t);
+    if (type) {
+      return type;
+    }
+    if (t.type === 'Identifier') {
+      return id(t.name);
+    }
+    throw new Error(`Unhandled convertion for node ${JSON.stringify(t)}`);
+  }
+
+  convertArrayType(node: AstNode) {
+    if (node.type === 'List' || node.type === 'Set') {
+      return `${this.convertType(node.valueType)}[]`;
+    }
+    return undefined;
+  }
 }

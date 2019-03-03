@@ -65,7 +65,7 @@ export type Field = {|
 export type EnumDefinition = {|
   type: 'EnumDefinition',
   id: Identifier,
-  fieldType: {||},
+  fieldType: Identifier | Literal,
   value: Literal,
   annotations: Annotations,
 |};
@@ -98,6 +98,7 @@ export type Service = {|
 export type Const = {|
   id: Identifier,
   type: 'Const',
+  fieldType: Identifier | Literal,
   value: ConstList | ConstEntry | ConstMap,
 |};
 
@@ -157,6 +158,7 @@ export type Definition =
 export type AstNode =
   | Definition
   | Identifier
+  | Literal
   | BaseType
   | List
   | Map
