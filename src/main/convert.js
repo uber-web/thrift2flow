@@ -215,7 +215,7 @@ export class ThriftFileConverter {
   };
 
   generateConst = (def: Const) => {
-    let value: ?string;
+    let value: string | void;
     let enumType: ?string;
     if (def.value.type === 'ConstList') {
       value = `[${def.value.values
@@ -249,17 +249,20 @@ export class ThriftFileConverter {
         })
         .join(',')}]`;
     } else {
-      // There may be other const cases we're missing here...
-      // $FlowFixMe
-      const defValueValue = def.value && def.value.value;
-      value =
-        typeof defValueValue === 'string'
-          ? `'${defValueValue}'`
-          : // $FlowFixMe
-            defValueValue;
-      // $FlowFixMe
-      if (def.fieldType.baseType === 'i64' && value !== undefined) {
-        // $FlowFixMe
+      if (def.value.type === 'Literal') {
+        if (typeof def.value.value === 'string') {
+          // String
+          value = `'${def.value.value}'`;
+        } else {
+          // Number
+          value = String(def.value.value);
+        }
+      }
+      if (
+        def.fieldType.type === 'BaseType' &&
+        def.fieldType.baseType === 'i64' &&
+        value !== undefined
+      ) {
         value = `Buffer.from([${value}])`;
       }
     }
@@ -271,7 +274,6 @@ export class ThriftFileConverter {
       }
     }
     const fieldType = enumType || this.convertType(def.fieldType);
-    // $FlowFixMe
     return `export const ${def.id.name}: ${fieldType} = ${value};`;
   };
 

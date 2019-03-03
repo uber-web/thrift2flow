@@ -98,8 +98,8 @@ export type Service = {|
 export type Const = {|
   id: Identifier,
   type: 'Const',
-  fieldType: Identifier | Literal,
-  value: ConstList | ConstEntry | ConstMap,
+  fieldType: Identifier | Literal | BaseType,
+  value: ConstList | ConstEntry | ConstMap | Literal,
 |};
 
 export type Literal = {|
