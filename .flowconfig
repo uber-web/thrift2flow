@@ -14,3 +14,5 @@ unclear-type=error
 sketchy-null=error
 untyped-type-import=error
 untyped-import=error
+unsafe-getters-setters=error
+unnecessary-invariant=error
