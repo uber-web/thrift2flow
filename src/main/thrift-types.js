@@ -24,9 +24,9 @@
 
 // @flow
 
-import {BaseType, Enum, ListType, MapType, SetType} from 'thriftrw/ast';
+import {BaseType, ListType, MapType, SetType} from 'thriftrw/ast';
 import {id} from './identifier';
-import {type Definition} from './ast-types';
+import {type AstNode} from './ast-types';
 
 export class TypeConverter {
   static primitives = {
@@ -48,11 +48,11 @@ export class TypeConverter {
   };
 
   thriftAstDefinitions: Array<any>;
-  identifiersTable: $ReadOnly<{[key: string]: Definition}>;
+  identifiersTable: $ReadOnly<{[key: string]: AstNode}>;
 
   constructor(
     thriftAstDefinitions: Array<any>,
-    identifiersTable: $ReadOnly<{[key: string]: Definition}>
+    identifiersTable: $ReadOnly<{[key: string]: AstNode}>
   ) {
     this.thriftAstDefinitions = thriftAstDefinitions;
     this.identifiersTable = identifiersTable;

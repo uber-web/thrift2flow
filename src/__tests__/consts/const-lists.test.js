@@ -1,4 +1,5 @@
 // @flow
+
 /*
  * MIT License
  *
@@ -23,37 +24,40 @@
  * SOFTWARE.
  */
 
-import { ThriftFileConverter } from "../main/convert";
+import {Thrift} from 'thriftrw';
+import {ThriftFileConverter} from '../../main/convert';
 
-test("structs and have enum properties", () => {
-  const converter = new ThriftFileConverter(
-    `src/__tests__/fixtures/duplicate-file-names/entry.thrift`,
-    false
-  );
-  const jsContent = converter.generateFlowFile();
-  expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
-
-import * as common from \\"./a/common\\";
-import * as unrelated from \\"./unrelated\\";
-
-export type Foo = {| propA?: $Values<typeof common.EntityTypeA> |};
-"
-`);
+test('thriftrw parses enum i32 const array as strings', () => {
+  const thrift = new Thrift({
+    entryPoint: 'src/__tests__/fixtures/const-list.thrift',
+    allowFilesystemAccess: true,
+  });
+  expect(thrift.DIRECTIONS).toEqual(['LEFT', 'RIGHT', 'LEFT', 'RIGHT']);
 });
 
-test("unions in typedefs from transitive dependencies are referenced as types", () => {
+test('const map values are numbers', () => {
   const converter = new ThriftFileConverter(
-    `src/__tests__/fixtures/typedef-include/entry.thrift`,
+    `src/__tests__/fixtures/const-list.thrift`,
     false
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
 "// @flow
 
-import * as fileb from \\"./fileb\\";
+export const Direction: $ReadOnly<{|
+  LEFT: \\"LEFT\\",
+  RIGHT: \\"RIGHT\\"
+|}> = Object.freeze({
+  LEFT: \\"LEFT\\",
+  RIGHT: \\"RIGHT\\"
+});
 
-export type AStruct = {| prop?: $Values<typeof fileb.ShadowEnum> |};
+export const DIRECTIONS: Array<$Values<typeof Direction>> = [
+  Direction.LEFT,
+  Direction.RIGHT,
+  Direction.LEFT,
+  Direction.RIGHT
+];
 "
 `);
 });
