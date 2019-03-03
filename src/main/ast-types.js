@@ -168,3 +168,15 @@ export type AstNode =
   | Union
   | ConstEntry
   | ConstMap;
+
+export type Ast = {|
+  definitions: Array<Definition>,
+  headers: $ReadOnlyArray<{|
+    type: 'Include',
+    // ie., foo.thrift
+    id: string,
+    namespace: string | null,
+    line: number,
+    column: number,
+  |}>,
+|};

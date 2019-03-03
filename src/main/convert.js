@@ -23,12 +23,12 @@
  * SOFTWARE.
  */
 
-// flowlint-next-line untyped-import:off
-import {Thrift} from 'thriftrw';
+import thrift from './thriftrw';
 import prettier from 'prettier';
 import path from 'path';
 import {id} from './identifier';
 import type {
+  Ast,
   Struct,
   Union,
   Exception,
@@ -51,18 +51,6 @@ const thriftOptions = {
   allowFilesystemAccess: true,
   allowOptionalArguments: true,
 };
-
-type Ast = {|
-  definitions: Array<Definition>,
-  headers: $ReadOnlyArray<{|
-    type: 'Include',
-    // ie., foo.thrift
-    id: string,
-    namespace: string | null,
-    line: number,
-    column: number,
-  |}>,
-|};
 
 function includeIdentifierOfFilename(filename: string): string {
   const match = filename.match(/([^/]+).thrift$/);
@@ -103,7 +91,7 @@ export class ThriftFileConverter {
 
   constructor(thriftPath: string, withsource: boolean) {
     this.thriftPath = path.resolve(thriftPath);
-    this.thrift = new Thrift({...thriftOptions, entryPoint: thriftPath});
+    this.thrift = thrift({...thriftOptions, entryPoint: thriftPath});
     this.ast = this.thrift.asts[this.thrift.filename];
     this.initIdentifiersTable();
     this.withsource = withsource;
@@ -165,6 +153,7 @@ export class ThriftFileConverter {
   };
 
   convertDefinitionToCode = (def: Definition) => {
+    const defType = def.type;
     switch (def.type) {
       case 'Struct':
       case 'Exception':
@@ -181,7 +170,7 @@ export class ThriftFileConverter {
         return this.generateConst(def);
       default:
         throw new Error(
-          `Unknown definition type ${def.type} found in ${path.basename(
+          `Unknown definition type ${defType} found in ${path.basename(
             this.thriftPath
           )}`
         );
@@ -261,13 +250,15 @@ export class ThriftFileConverter {
         .join(',')}]`;
     } else {
       // There may be other const cases we're missing here...
-      value =
-        typeof def.value.value === 'string'
-          ? `'${def.value.value}'`
-          : // $FlowFixMe
-            def.value.value;
       // $FlowFixMe
-      if (def.fieldType.baseType === 'i64') {
+      const defValueValue = def.value && def.value.value;
+      value =
+        typeof defValueValue === 'string'
+          ? `'${defValueValue}'`
+          : // $FlowFixMe
+            defValueValue;
+      // $FlowFixMe
+      if (def.fieldType.baseType === 'i64' && value !== undefined) {
         // $FlowFixMe
         value = `Buffer.from([${value}])`;
       }
@@ -287,12 +278,14 @@ export class ThriftFileConverter {
   generateConstEntry = (entry: ConstEntry) => {
     let key;
     let value;
+    const entryValueType = entry.value.type;
+    const entryKeyType = entry.key.type;
     if (entry.key.type === 'Literal') {
       key = `'${entry.key.value}'`;
     } else if (entry.key.type === 'Identifier') {
       key = this.getIdentifier(entry.key.name, 'value');
     } else {
-      throw new Error(`Unhandled entry.key.type ${entry.key.type}`);
+      throw new Error(`Unhandled entry.key.type ${entryKeyType}`);
     }
     if (entry.value.type === 'Literal') {
       if (typeof entry.value.value === 'number') {
@@ -308,7 +301,7 @@ export class ThriftFileConverter {
     } else if (entry.value.type === 'ConstMap') {
       value = this.generateConstMap(entry.value);
     } else {
-      throw new Error(`Unhandled entry.key.type ${entry.value.type}`);
+      throw new Error(`Unhandled entry.key.type ${entryValueType}`);
     }
     if (key === undefined || value === undefined) {
       console.error('key', key);
