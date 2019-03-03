@@ -27,7 +27,9 @@ import {flowResultTest} from './util';
 
 import {ThriftFileConverter} from '../main/convert';
 import path from 'path';
+// flowlint-next-line untyped-import:off
 import fs from 'fs-extra';
+// flowlint-next-line untyped-import:off
 import tmp from 'tmp';
 
 test('Long module is imported when needed', () => {

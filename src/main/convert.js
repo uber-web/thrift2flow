@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+// flowlint-next-line untyped-import:off
 import {Thrift} from 'thriftrw';
 import prettier from 'prettier';
 import path from 'path';

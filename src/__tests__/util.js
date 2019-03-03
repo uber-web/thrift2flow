@@ -27,6 +27,7 @@
 import path from 'path';
 import {exec} from 'child_process';
 import fs from 'fs';
+// flowlint-next-line untyped-import:off
 import fsExtra from 'fs-extra';
 import uuid from 'uuid/v4';
 

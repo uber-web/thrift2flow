@@ -24,6 +24,7 @@
  * SOFTWARE.
  */
 
+// flowlint-next-line untyped-import:off
 import {Thrift} from 'thriftrw';
 import {ThriftFileConverter} from '../../main/convert';
 

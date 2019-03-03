@@ -25,6 +25,7 @@
 
 import {flowResultTest} from './util';
 import {ThriftFileConverter} from '../main/convert';
+// flowlint-next-line untyped-import:off
 import {Thrift} from 'thriftrw';
 
 test('thriftrw enums are strings not numbers', () => {
