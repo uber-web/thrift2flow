@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 
-import { ThriftFileConverter } from "../main/convert";
+import {ThriftFileConverter} from '../main/convert';
 
-test("structs and have enum properties", () => {
+test('structs and have enum properties', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/duplicate-file-names/entry.thrift`,
     false
@@ -42,7 +42,7 @@ export type Foo = {| propA?: $Values<typeof common.EntityTypeA> |};
 `);
 });
 
-test("unions in typedefs from transitive dependencies are referenced as types", () => {
+test('unions in typedefs from transitive dependencies are referenced as types', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/typedef-include/entry.thrift`,
     false

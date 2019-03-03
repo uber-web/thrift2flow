@@ -64,7 +64,6 @@ export type TimeRangeByDayOfWeek = {
 test('typedef Date', done => {
   flowResultTest(
     {
-      // language=thrift
       'types.thrift': `
 typedef byte MyByte
 typedef MyByte TransitiveTypedef
@@ -81,7 +80,6 @@ struct MyStruct {
   3: OtherStruct f_OtherStruct
 }
 `,
-      // language=JavaScript
       'index.js': `
 // @flow
 import type {

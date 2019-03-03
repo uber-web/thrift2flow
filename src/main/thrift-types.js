@@ -27,25 +27,25 @@
 import {id} from './identifier';
 import type {AstNode} from './ast-types';
 
+const primitives = {
+  binary: 'Buffer',
+  bool: 'boolean',
+  byte: 'number',
+  i8: 'number',
+  i16: 'number',
+  i32: 'number',
+  i64: 'Buffer',
+  double: 'number',
+  string: 'string',
+  void: 'void',
+};
+
+const i64Mappings = {
+  Long: 'thrift2flow$Long',
+  Date: 'string',
+};
+
 export class TypeConverter {
-  static primitives = {
-    binary: 'Buffer',
-    bool: 'boolean',
-    byte: 'number',
-    i8: 'number',
-    i16: 'number',
-    i32: 'number',
-    i64: 'Buffer',
-    double: 'number',
-    string: 'string',
-    void: 'void',
-  };
-
-  static i64Mappings = {
-    Long: 'thrift2flow$Long',
-    Date: 'string',
-  };
-
   thriftAstDefinitions: Array<any>;
   identifiersTable: $ReadOnly<{[key: string]: AstNode}>;
 
@@ -64,10 +64,10 @@ export class TypeConverter {
     if (t.baseType === 'i64') {
       const jsType = t.annotations['js.type'];
       if (jsType !== undefined) {
-        return TypeConverter.i64Mappings[jsType];
+        return i64Mappings[jsType];
       }
     }
-    return TypeConverter.primitives[t.baseType];
+    return primitives[t.baseType];
   }
 
   convert = (t: AstNode): string => {

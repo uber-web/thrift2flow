@@ -88,8 +88,8 @@ function go(s : Primitives) {
       expect(r.errors.length).toBe(2);
       expect(r.errors[0].level).toBe('error');
       expect(r.errors[1].level).toBe('error');
-      expect((r.errors[0].message[0]: any).line).toBe(6);
-      expect((r.errors[1].message[0]: any).line).toBe(7);
+      expect(r.errors[0].message[0].line).toBe(6);
+      expect(r.errors[1].message[0].line).toBe(7);
       done();
     }
   );

@@ -23,7 +23,6 @@
  */
 
 // @flow
-/* eslint-disable handle-callback-err */
 
 import path from 'path';
 import {exec} from 'child_process';
@@ -36,7 +35,7 @@ import {ThriftFileConverter} from '../main/convert';
 export const flowResultTest = (
   files: {[string]: string},
   testFn: ({|
-    errors: Array<{|level: string, message: Array<string>|}>,
+    errors: Array<{|level: string, message: Array<{|line: number|}>|}>,
   |}) => void,
   withsource: boolean = true
 ) => {
