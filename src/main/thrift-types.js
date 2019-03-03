@@ -24,9 +24,8 @@
 
 // @flow
 
-import {BaseType, ListType, MapType, SetType} from 'thriftrw/ast';
 import {id} from './identifier';
-import {type AstNode} from './ast-types';
+import type {AstNode} from './ast-types';
 
 export class TypeConverter {
   static primitives = {
@@ -58,53 +57,69 @@ export class TypeConverter {
     this.identifiersTable = identifiersTable;
   }
 
-  annotation(t: BaseType): string {
-    const jsType = t.annotations && t.annotations['js.type'];
-    // https://github.com/thriftrw/thriftrw-node/blob/8d36b5b83e5d22bf6c28339e3e894eb4926e556f/i64.js#L179
-    if (t.baseType === 'i64' && jsType) {
-      return TypeConverter.i64Mappings[jsType];
+  baseType(t: AstNode): string | void {
+    if (t.type !== 'BaseType') {
+      return undefined;
     }
-    return '';
+    if (t.baseType === 'i64') {
+      const jsType = t.annotations['js.type'];
+      if (jsType !== undefined) {
+        return TypeConverter.i64Mappings[jsType];
+      }
+    }
+    return TypeConverter.primitives[t.baseType];
   }
 
-  convert = (t: BaseType): string => {
+  convert = (t: AstNode): string => {
     if (!t) {
-      throw new Error(`Assertion failed. t is not defined`);
+      throw new Error(`Assertion failed. t is not defined.`);
     }
-    return (
+    let type =
       this.arrayType(t) ||
       this.mapType(t) ||
       this.enumType(t) ||
-      this.annotation(t) ||
-      TypeConverter.primitives[t.baseType] ||
-      id(t.name)
-    );
+      this.baseType(t);
+    if (type) {
+      return type;
+    }
+    if (t.type === 'Identifier') {
+      type = id(t.name);
+    }
+    if (type) {
+      return type;
+    }
+    throw new Error(`Unhandled convertion for node ${JSON.stringify(t)}`);
   };
 
-  enumType = (thriftValueType: BaseType) => {
+  enumType = (thriftValueType: AstNode): string | void => {
     if (this.isEnum(thriftValueType)) {
       // Enums are values, not types. To refer to the type,
       // we use $Values<...>.
+      if (thriftValueType.type !== 'Identifier') {
+        throw new Error(
+          'Assertion failure. Enum reference has to be an identifier'
+        );
+      }
       return `$Values<typeof ${thriftValueType.name}>`;
     }
-    return null;
+    return undefined;
   };
 
-  arrayType = (thriftValueType: BaseType) =>
-    (thriftValueType instanceof ListType ||
-      thriftValueType instanceof SetType) &&
-    `${this.convert(thriftValueType.valueType)}[]`;
+  arrayType = (node: AstNode) =>
+    ((node.type === 'List' || node.type === 'Set') &&
+      `${this.convert(node.valueType)}[]`) ||
+    undefined;
 
-  mapType(t: BaseType) {
-    if (t instanceof MapType) {
-      const ktype = this.convert(t.keyType);
-      const vtype = this.convert(t.valueType);
-      return `{[${ktype}]: ${vtype}}`;
+  mapType(t: AstNode): string | void {
+    if (t.type === 'Map') {
+      const keyType = this.convert(t.keyType);
+      const valueType = this.convert(t.valueType);
+      return `{[${keyType}]: ${valueType}}`;
     }
-    return null;
+    return undefined;
   }
 
-  isEnum(def: BaseType) {
+  isEnum(def: AstNode) {
     // Enums export const, not type
     if (!def.name) {
       return undefined;

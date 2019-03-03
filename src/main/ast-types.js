@@ -1,7 +1,7 @@
 // @flow
 
 type Annotations = {|
-  'js.type'?: 'Long',
+  'js.type'?: 'Long' | 'Date',
 |};
 type Primitives =
   | 'i8'
@@ -80,13 +80,13 @@ export type Enum = {|
 export type Typedef = {|
   id: Identifier,
   type: 'Typedef',
-  valueType: Identifier,
+  valueType: Identifier | BaseType,
 |};
 
 export type FunctionDefinition = {|
   id: Identifier,
   fields: Array<Field>,
-  returns: {||},
+  returns: Identifier | BaseType,
 |};
 
 export type Service = {|
@@ -120,6 +120,25 @@ export type ConstEntry = {|
   value: Literal | Identifier | ConstMap,
 |};
 
+export type List = {|
+  id: Identifier,
+  type: 'List',
+  valueType: Identifier | BaseType,
+|};
+
+export type Map = {|
+  id: Identifier,
+  type: 'Map',
+  keyType: Identifier | BaseType,
+  valueType: Identifier | BaseType,
+|};
+
+export type Set = {|
+  id: Identifier,
+  type: 'Set',
+  valueType: Identifier | BaseType,
+|};
+
 export type ConstMap = {|
   id: Identifier,
   type: 'ConstMap',
@@ -136,15 +155,14 @@ export type Definition =
   | Const;
 
 export type AstNode =
+  | Definition
+  | Identifier
   | BaseType
-  | Struct
+  | List
+  | Map
+  | Set
   | Field
-  | Enum
   | EnumDefinition
-  | Typedef
   | Union
-  | Exception
-  | Const
   | ConstEntry
-  | ConstMap
-  | Service;
+  | ConstMap;
