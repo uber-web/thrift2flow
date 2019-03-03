@@ -231,7 +231,10 @@ export class ThriftFileConverter {
                   this.thrift.filename
                 );
                 if (!enumType && this.isEnum(defAndFilename)) {
-                  enumType = `Array<${this.getIdentifier(scope, 'type')}>`;
+                  enumType = `$ReadOnlyArray<${this.getIdentifier(
+                    scope,
+                    'type'
+                  )}>`;
                 }
               }
             }
