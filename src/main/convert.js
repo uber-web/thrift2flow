@@ -52,6 +52,18 @@ const thriftOptions = {
   allowOptionalArguments: true,
 };
 
+type Ast = {|
+  definitions: Array<Definition>,
+  headers: $ReadOnlyArray<{|
+    type: 'Include',
+    // ie., foo.thrift
+    id: string,
+    namespace: string | null,
+    line: number,
+    column: number,
+  |}>,
+|};
+
 function includeIdentifierOfFilename(filename: string): string {
   const match = filename.match(/([^/]+).thrift$/);
   if (!match) {

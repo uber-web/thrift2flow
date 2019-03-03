@@ -151,6 +151,7 @@ export type Definition =
   | Exception
   | Union
   | Enum
+  | EnumDefinition
   | Typedef
   | Service
   | Const;
