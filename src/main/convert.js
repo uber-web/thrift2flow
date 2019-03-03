@@ -215,7 +215,9 @@ export class ThriftFileConverter {
     const values = def.definitions
       .map((d, index) => `'${d.id.name}': '${d.id.name}',`)
       .join('\n');
-    return `export const ${otherName || def.id.name}: $ReadOnly<{|
+    return `export const ${
+      otherName !== undefined ? otherName : def.id.name
+    }: $ReadOnly<{|
   ${values}
 |}>  = Object.freeze({
   ${values}
@@ -240,7 +242,7 @@ export class ThriftFileConverter {
                   scope,
                   this.thrift.filename
                 );
-                if (!enumType && this.isEnum(defAndFilename)) {
+                if (enumType === undefined && this.isEnum(defAndFilename)) {
                   enumType = `$ReadOnlyArray<${this.getIdentifier(
                     scope,
                     'type'
@@ -544,7 +546,7 @@ export class ThriftFileConverter {
 
   isEnumIdentifier(def: AstNode) {
     // Enums export const, not type
-    if (!def.name) {
+    if (def.name === undefined) {
       return undefined;
     }
     return this.identifiersTable[def.name].type === 'Enum';
@@ -554,12 +556,12 @@ export class ThriftFileConverter {
     if (!t) {
       throw new Error(`Assertion failed. t is not defined.`);
     }
-    let type =
+    let type: string | void =
       this.convertArrayType(t) ||
       this.convertMapType(t) ||
       this.convertEnumType(t) ||
       this.convertBaseType(t);
-    if (type) {
+    if (type !== undefined) {
       return type;
     }
     if (t.type === 'Identifier') {
