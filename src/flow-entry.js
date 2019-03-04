@@ -3,4 +3,9 @@
 // This file is copied to lib during build to support Flow
 // coverage when used as a dependency.
 
-export * from '../src/main/index';
+import _convert, {
+  ThriftFileConverter as _ThriftFileConverter,
+} from '../src/main/index';
+
+export default _convert;
+export const ThriftFileConverter = _ThriftFileConverter;
