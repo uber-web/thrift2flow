@@ -76,6 +76,7 @@ const primitives = {
 const i64Mappings = {
   Long: 'thrift2flow$Long',
   Date: 'string',
+  Integer: 'number',
 };
 
 export class ThriftFileConverter {
@@ -509,10 +510,14 @@ export class ThriftFileConverter {
       return undefined;
     }
     if (t.baseType === 'i64') {
-      const jsType = t.annotations['js.type'];
-      if (jsType !== undefined) {
+      const jsType: string | void = t.annotations['js.type'];
+      if (jsType === 'Long' || jsType === 'Date' || jsType === 'Integer') {
         return i64Mappings[jsType];
       }
+      if (jsType !== undefined) {
+        throw new Error(`Unknown or invalid js.type annotation of ${jsType}.`);
+      }
+      // i64 defaults to Buffer
     }
     return primitives[t.baseType];
   }
