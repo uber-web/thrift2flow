@@ -30,9 +30,7 @@ import 'source-map-support/register';
 import 'babel-polyfill';
 import path from 'path';
 import fs from 'fs';
-// flowlint-next-line untyped-import:off
 import yargs from 'yargs';
-// flowlint-next-line untyped-import:off
 import mkdirp from 'mkdirp';
 import convert from './index';
 
