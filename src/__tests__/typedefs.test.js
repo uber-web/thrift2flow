@@ -27,13 +27,45 @@ import {flowResultTest} from './util';
 
 import {ThriftFileConverter} from '../main/convert';
 import path from 'path';
+// flowlint-next-line untyped-import:off
 import fs from 'fs-extra';
+// flowlint-next-line untyped-import:off
 import tmp from 'tmp';
 
+test('Long module is imported when needed', () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/typedef-long-import.thrift`,
+    false
+  );
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+import thrift2flow$Long from \\"long\\";
+
+export type Long = thrift2flow$Long;
+"
+`);
+});
+
+test('typedefs should reference enum types not value', () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/typedef-enum-value-reference.thrift`,
+    false
+  );
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+import * as base from \\"./base\\";
+
+export type TimeRangeByDayOfWeek = {
+  [$Values<typeof base.Weekday>]: base.TimeRange[]
+};
+"
+`);
+});
 test('typedef Date', done => {
   flowResultTest(
     {
-      // language=thrift
       'types.thrift': `
 typedef byte MyByte
 typedef MyByte TransitiveTypedef
@@ -50,7 +82,6 @@ struct MyStruct {
   3: OtherStruct f_OtherStruct
 }
 `,
-      // language=JavaScript
       'index.js': `
 // @flow
 import type {
@@ -95,7 +126,7 @@ struct UserActivitiesRequest {
     .map(p => path.resolve(root, p))
     .forEach(p => {
       let output = new ThriftFileConverter(p, true).generateFlowFile();
-      let longIndex = output.indexOf('import Long');
+      let longIndex = output.indexOf('import thrift2flow$Long');
       expect(longIndex).not.toBe(-1);
     });
 });
@@ -115,7 +146,7 @@ typedef i64 (js.type = "Long") Points
     .map(p => path.resolve(root, p))
     .forEach(p => {
       let output = new ThriftFileConverter(p, true).generateFlowFile();
-      let longIndex = output.indexOf('import Long');
+      let longIndex = output.indexOf('import thrift2flow$Long');
       // Expected long definition but did not find one
       expect(longIndex).not.toBe(-1);
     });

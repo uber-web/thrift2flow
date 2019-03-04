@@ -24,76 +24,40 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../util';
-import fs from 'fs';
+import {Thrift} from 'thriftrw';
 import {ThriftFileConverter} from '../../main/convert';
 
-test('consts', done => {
-  flowResultTest(
-    {
-      'types.thrift': fs
-        .readFileSync(`${__dirname}/types.thrift.fixture`)
-        .toString(),
-      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
-    },
-    result => {
-      expect(result.errors).toEqual([]);
-      done();
-    }
-  );
+test('thriftrw parses enum i32 const array as strings', () => {
+  const thrift = new Thrift({
+    entryPoint: 'src/__tests__/fixtures/const-list.thrift',
+    allowFilesystemAccess: true,
+  });
+  expect(thrift.DIRECTIONS).toEqual(['LEFT', 'RIGHT', 'LEFT', 'RIGHT']);
 });
 
 test('const map values are numbers', () => {
   const converter = new ThriftFileConverter(
-    `src/__tests__/fixtures/const-map-literal-type.thrift`,
+    `src/__tests__/fixtures/const-list.thrift`,
     false
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
 "// @flow
 
-export const ShieldType: $ReadOnly<{|
-  O: \\"O\\",
-  U: \\"U\\"
+export const Direction: $ReadOnly<{|
+  LEFT: \\"LEFT\\",
+  RIGHT: \\"RIGHT\\"
 |}> = Object.freeze({
-  O: \\"O\\",
-  U: \\"U\\"
+  LEFT: \\"LEFT\\",
+  RIGHT: \\"RIGHT\\"
 });
 
-export const PRIORITIES: { [$Values<typeof ShieldType>]: number } = {
-  [ShieldType.O]: 2,
-  [ShieldType.U]: 10
-};
-
-export const LABELS: { [$Values<typeof ShieldType>]: string } = {
-  [ShieldType.O]: \\"ooooooo\\",
-  [ShieldType.U]: \\"uuuuuuu\\"
-};
-"
-`);
-});
-
-test('constant maps', () => {
-  const converter = new ThriftFileConverter(
-    'src/__tests__/fixtures/const-enum-values.thrift',
-    false
-  );
-  const jsContent = converter.generateFlowFile();
-  expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
-
-export const PlaceType: $ReadOnly<{|
-  A: \\"A\\",
-  B: \\"B\\"
-|}> = Object.freeze({
-  A: \\"A\\",
-  B: \\"B\\"
-});
-
-export const UUID_TO_PLACE_TYPE: { [string]: $Values<typeof PlaceType> } = {
-  [\\"123\\"]: PlaceType.A,
-  [\\"456\\"]: PlaceType.B
-};
+export const DIRECTIONS: $ReadOnlyArray<$Values<typeof Direction>> = [
+  Direction.LEFT,
+  Direction.RIGHT,
+  Direction.LEFT,
+  Direction.RIGHT
+];
 "
 `);
 });

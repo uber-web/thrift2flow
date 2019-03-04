@@ -8,3 +8,7 @@
 
 [options]
 emoji=true
+include_warnings=true
+
+[lints]
+all=error

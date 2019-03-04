@@ -1,5 +1,4 @@
 // @flow
-
 /*
  * MIT License
  *
@@ -24,76 +23,37 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../util';
-import fs from 'fs';
-import {ThriftFileConverter} from '../../main/convert';
+import {ThriftFileConverter} from '../main/convert';
 
-test('consts', done => {
-  flowResultTest(
-    {
-      'types.thrift': fs
-        .readFileSync(`${__dirname}/types.thrift.fixture`)
-        .toString(),
-      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
-    },
-    result => {
-      expect(result.errors).toEqual([]);
-      done();
-    }
-  );
-});
-
-test('const map values are numbers', () => {
+test('structs and have enum properties', () => {
   const converter = new ThriftFileConverter(
-    `src/__tests__/fixtures/const-map-literal-type.thrift`,
+    `src/__tests__/fixtures/duplicate-file-names/entry.thrift`,
     false
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
 "// @flow
 
-export const ShieldType: $ReadOnly<{|
-  O: \\"O\\",
-  U: \\"U\\"
-|}> = Object.freeze({
-  O: \\"O\\",
-  U: \\"U\\"
-});
+import * as common from \\"./a/common\\";
+import * as unrelated from \\"./unrelated\\";
 
-export const PRIORITIES: { [$Values<typeof ShieldType>]: number } = {
-  [ShieldType.O]: 2,
-  [ShieldType.U]: 10
-};
-
-export const LABELS: { [$Values<typeof ShieldType>]: string } = {
-  [ShieldType.O]: \\"ooooooo\\",
-  [ShieldType.U]: \\"uuuuuuu\\"
-};
+export type Foo = {| propA?: $Values<typeof common.EntityTypeA> |};
 "
 `);
 });
 
-test('constant maps', () => {
+test('unions in typedefs from transitive dependencies are referenced as types', () => {
   const converter = new ThriftFileConverter(
-    'src/__tests__/fixtures/const-enum-values.thrift',
+    `src/__tests__/fixtures/typedef-include/entry.thrift`,
     false
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
 "// @flow
 
-export const PlaceType: $ReadOnly<{|
-  A: \\"A\\",
-  B: \\"B\\"
-|}> = Object.freeze({
-  A: \\"A\\",
-  B: \\"B\\"
-});
+import * as fileb from \\"./fileb\\";
 
-export const UUID_TO_PLACE_TYPE: { [string]: $Values<typeof PlaceType> } = {
-  [\\"123\\"]: PlaceType.A,
-  [\\"456\\"]: PlaceType.B
-};
+export type AStruct = {| prop?: $Values<typeof fileb.ShadowEnum> |};
 "
 `);
 });

@@ -24,12 +24,12 @@
     "thrift2flow": "lib/cli.js"
   },
   "scripts": {
-    "build": "babel src/main -d lib --source-maps",
+    "build": "babel src/main -d lib --source-maps && cp src/flow-entry.js lib/index.js.flow",
     "watch": "babel src/main -d lib --source-maps --watch",
     "check": "npm run prettier && npm run lint && npm run test",
     "debug": "node --nolazy --inspect-brk=9229 lib/index.js",
     "download-typedefs": "mkdir -p typedefs && curl -o typedefs/flowResult.js https://raw.githubusercontent.com/facebook/flow/master/tsrc/flowResult.js",
-    "flow": "flow check",
+    "flow": "flow",
     "lint": "eslint src",
     "prepare": "npm run build",
     "prettier": "prettier --single-quote --bracket-spacing false --parser flow --tab-width 2 --print-width 100 --write \"{src,test}/**/*.js\"",
