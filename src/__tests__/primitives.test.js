@@ -47,7 +47,6 @@ test('primitives happy path', done => {
   flowResultTest(
     {
       'types.thrift': primitiveStruct,
-      // language=JavaScript
       'index.js': `
 // @flow
 import type {Primitives} from './types';
