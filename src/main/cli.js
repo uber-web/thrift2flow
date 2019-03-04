@@ -27,7 +27,6 @@
 // @flow
 
 import 'source-map-support/register';
-
 import 'babel-polyfill';
 import path from 'path';
 import fs from 'fs';

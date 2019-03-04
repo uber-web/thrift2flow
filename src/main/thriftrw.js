@@ -1,6 +1,5 @@
 // @flow
 
-// flowlint-next-line untyped-import:off
 import {Thrift} from 'thriftrw';
 import type {Ast} from './ast-types';
 // This file is a type wrapper to thriftrw
