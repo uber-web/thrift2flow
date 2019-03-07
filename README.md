@@ -5,6 +5,9 @@
 Automagically converts [Apache Thrift](https://thrift.apache.org/) specs to
 [Flowtype](https://flow.org/) type definition files!
 
+NOTE: This library tries to align with the [thriftrw](https://github.com/thriftrw/thriftrw-node) JS semantics which means it may not be compatible with generated code
+from the apache thrift project.
+
 Example:
 
 ```thrift
@@ -35,7 +38,7 @@ export type Customer = {
 
 ```
 npm install -g thrift2flow
-thrift2flow my/service.thrift
+thrift2flow --path="idl/code.foo.bar" --outputDir="src/types/idl" idl/code.foo.bar/*/*/*.thrift
 ```
 
 ## Contributing
