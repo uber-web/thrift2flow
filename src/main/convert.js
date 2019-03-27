@@ -329,11 +329,12 @@ export class ThriftFileConverter {
     `{|${fields
       .map((field: Field) => {
         const valueType = field.valueType;
+        let optionalPrefix = this.isOptional(field) ? '?' : '';
         let value =
           valueType.type === 'Identifier'
             ? this.getIdentifier(valueType.name, 'type')
             : this.convertType(valueType);
-        return `${field.name}${this.isOptional(field) ? '?' : ''}: ${value};`;
+        return `${field.name}${optionalPrefix}: ${optionalPrefix}${value};`;
       })
       .join('\n')}|}`;
 

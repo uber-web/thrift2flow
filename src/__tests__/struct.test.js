@@ -37,7 +37,21 @@ test('structs and have enum properties', () => {
 import * as common from \\"./a/common\\";
 import * as unrelated from \\"./unrelated\\";
 
-export type Foo = {| propA?: $Values<typeof common.EntityTypeA> |};
+export type Foo = {| propA?: ?$Values<typeof common.EntityTypeA> |};
+"
+`);
+});
+
+test('structs with optional properties', () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/optional-struct.thrift`,
+    false
+  );
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchInlineSnapshot(`
+"// @flow
+
+export type MyStruct = {| a?: ?string |};
 "
 `);
 });
@@ -53,7 +67,7 @@ test('unions in typedefs from transitive dependencies are referenced as types', 
 
 import * as fileb from \\"./fileb\\";
 
-export type AStruct = {| prop?: $Values<typeof fileb.ShadowEnum> |};
+export type AStruct = {| prop?: ?$Values<typeof fileb.ShadowEnum> |};
 "
 `);
 });
