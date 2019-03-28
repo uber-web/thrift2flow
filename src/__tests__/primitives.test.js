@@ -113,12 +113,11 @@ function go(s : Primitives) {
 `,
     },
     r => {
-      expect(r.errors.length).toBe(2);
-      expect(r.errors.length).toBe(2);
+      expect(r.errors.length).toBe(4);
       expect(r.errors[0].level).toBe('error');
       expect(r.errors[1].level).toBe('error');
       expect(r.errors[0].message[0].line).toBe(8);
-      expect(r.errors[1].message[0].line).toBe(9);
+      expect(r.errors[2].message[0].line).toBe(9);
       done();
     }
   );
