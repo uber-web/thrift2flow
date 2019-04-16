@@ -24,17 +24,17 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../util';
-import fs from 'fs';
-import {ThriftFileConverter} from '../../main/convert';
+import { flowResultTest } from "../util";
+import fs from "fs";
+import { ThriftFileConverter } from "../../main/convert";
 
-test('consts', done => {
+test("consts", done => {
   flowResultTest(
     {
-      'types.thrift': fs
+      "types.thrift": fs
         .readFileSync(`${__dirname}/types.thrift.fixture`)
         .toString(),
-      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
+      "index.js": fs.readFileSync(`${__dirname}/index.js.fixture`).toString()
     },
     result => {
       expect(result.errors).toEqual([]);
@@ -43,7 +43,7 @@ test('consts', done => {
   );
 });
 
-test('const map values are numbers', () => {
+test("const map values are numbers", () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/const-map-literal-type.thrift`,
     false
@@ -60,22 +60,34 @@ export const ShieldType: $ReadOnly<{|
   U: \\"U\\"
 });
 
+export const o: string = \\"ooooooo\\";
+
 export const PRIORITIES: { [$Values<typeof ShieldType>]: number } = {
   [ShieldType.O]: 2,
   [ShieldType.U]: 10
 };
 
 export const LABELS: { [$Values<typeof ShieldType>]: string } = {
-  [ShieldType.O]: \\"ooooooo\\",
+  [ShieldType.O]: o,
   [ShieldType.U]: \\"uuuuuuu\\"
+};
+
+export const THINGS: { [$Values<typeof ShieldType>]: string[] } = {
+  [ShieldType.O]: [o, \\"abcd\\"],
+  [ShieldType.U]: [\\"uuuuuuu\\"]
+};
+
+export const NUMS: { [number]: string } = {
+  [0]: \\"aaa\\",
+  [1]: \\"bbb\\"
 };
 "
 `);
 });
 
-test('constant maps', () => {
+test("constant maps", () => {
   const converter = new ThriftFileConverter(
-    'src/__tests__/fixtures/const-enum-values.thrift',
+    "src/__tests__/fixtures/const-enum-values.thrift",
     false
   );
   const jsContent = converter.generateFlowFile();

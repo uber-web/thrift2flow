@@ -58,6 +58,13 @@ export const DIRECTIONS: $ReadOnlyArray<$Values<typeof Direction>> = [
   Direction.LEFT,
   Direction.RIGHT
 ];
+
+export const DIRECTIONS_LIST: $ReadOnlyArray<$Values<typeof Direction>> = [
+  Direction.LEFT,
+  Direction.RIGHT,
+  Direction.LEFT,
+  Direction.RIGHT
+];
 "
 `);
 });
