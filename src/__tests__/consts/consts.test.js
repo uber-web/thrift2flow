@@ -77,6 +77,15 @@ export const THINGS: { [$Values<typeof ShieldType>]: string[] } = {
   [ShieldType.U]: [\\"uuuuuuu\\"]
 };
 
+export const ITEMS: $Values<typeof ShieldType>[] = [ShieldType.O, ShieldType.U];
+
+export const MAP_CONST_LIST: {
+  [$Values<typeof ShieldType>]: $Values<typeof ShieldType>[]
+} = {
+  [ShieldType.O]: ITEMS,
+  [ShieldType.U]: []
+};
+
 export const NUMS: { [number]: string } = {
   [0]: \\"aaa\\",
   [1]: \\"bbb\\"
