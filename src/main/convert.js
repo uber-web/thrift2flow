@@ -296,7 +296,6 @@ export class ThriftFileConverter {
     let value;
     const entryValueType = entry.value.type;
     const entryKeyType = entry.key.type;
-    console.log(entry);
     if (entry.key.type === 'Literal') {
       if (typeof entry.key.value === 'string') {
         key = `'${entry.key.value}'`;
@@ -332,7 +331,6 @@ export class ThriftFileConverter {
       console.error(entry);
       throw new Error(`key or value is undefined`);
     }
-    console.log('CONST ENTRY', key, value);
     const result = `[${key}]: ${value},`;
     return result;
   };
