@@ -60,14 +60,26 @@ export const ShieldType: $ReadOnly<{|
   U: \\"U\\"
 });
 
+export const o: string = \\"ooooooo\\";
+
 export const PRIORITIES: { [$Values<typeof ShieldType>]: number } = {
   [ShieldType.O]: 2,
   [ShieldType.U]: 10
 };
 
 export const LABELS: { [$Values<typeof ShieldType>]: string } = {
-  [ShieldType.O]: \\"ooooooo\\",
+  [ShieldType.O]: o,
   [ShieldType.U]: \\"uuuuuuu\\"
+};
+
+export const THINGS: { [$Values<typeof ShieldType>]: string[] } = {
+  [ShieldType.O]: [o, \\"abcd\\"],
+  [ShieldType.U]: [\\"uuuuuuu\\"]
+};
+
+export const NUMS: { [number]: string } = {
+  [0]: \\"aaa\\",
+  [1]: \\"bbb\\"
 };
 "
 `);

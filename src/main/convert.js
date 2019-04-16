@@ -40,6 +40,7 @@ import type {
   FunctionDefinition,
   Service,
   Const,
+  ConstList,
   ConstEntry,
   ConstMap,
   AstNode,
@@ -278,13 +279,29 @@ export class ThriftFileConverter {
     return `export const ${def.id.name}: ${fieldType} = ${value};`;
   };
 
+  generateConstList(def: ConstList) {
+    return `[${def.values
+      .map(entry => {
+        if (entry.type === 'Identifier') {
+          return entry.name;
+        } else {
+          return `"${entry.value}"`;
+        }
+      })
+      .join(',')}]`;
+  }
+
   generateConstEntry = (entry: ConstEntry) => {
     let key;
     let value;
     const entryValueType = entry.value.type;
     const entryKeyType = entry.key.type;
     if (entry.key.type === 'Literal') {
-      key = `'${entry.key.value}'`;
+      if (typeof entry.key.value === 'string') {
+        key = `'${entry.key.value}'`;
+      } else {
+        key = entry.key.value;
+      }
     } else if (entry.key.type === 'Identifier') {
       key = this.getIdentifier(entry.key.name, 'value');
     } else {
@@ -303,6 +320,8 @@ export class ThriftFileConverter {
       value = this.getIdentifier(entry.value.name, 'value');
     } else if (entry.value.type === 'ConstMap') {
       value = this.generateConstMap(entry.value);
+    } else if (entry.value.type === 'ConstList') {
+      value = this.generateConstList(entry.value);
     } else {
       throw new Error(`Unhandled entry.key.type ${entryValueType}`);
     }
