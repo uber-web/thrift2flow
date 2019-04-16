@@ -218,30 +218,10 @@ export class ThriftFileConverter {
 
   generateConst = (def: Const) => {
     let value: string | void;
-    let enumType: ?string;
     if (def.value.type === 'ConstList') {
       value = `[${def.value.values
         .map((val: Identifier | Literal) => {
           if (val.type === 'Identifier') {
-            if (val.name.includes('.')) {
-              const {definition} = this.definitionOfIdentifier(
-                val.name,
-                this.thrift.filename
-              );
-              if (definition.type == 'EnumDefinition') {
-                const scope = val.name.split('.')[0];
-                const defAndFilename = this.definitionOfIdentifier(
-                  scope,
-                  this.thrift.filename
-                );
-                if (enumType === undefined && this.isEnum(defAndFilename)) {
-                  enumType = `$ReadOnlyArray<${this.getIdentifier(
-                    scope,
-                    'type'
-                  )}>`;
-                }
-              }
-            }
             return this.getIdentifier(val.name, 'value');
           }
           if (val.type === 'Literal' && typeof val.value === 'string') {
@@ -275,7 +255,7 @@ export class ThriftFileConverter {
         throw new Error(`value is undefined for ${def.id.name}`);
       }
     }
-    const fieldType = enumType || this.convertType(def.fieldType);
+    const fieldType = this.convertType(def.fieldType);
     return `export const ${def.id.name}: ${fieldType} = ${value};`;
   };
 

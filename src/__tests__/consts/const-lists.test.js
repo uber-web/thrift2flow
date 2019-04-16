@@ -52,14 +52,14 @@ export const Direction: $ReadOnly<{|
   RIGHT: \\"RIGHT\\"
 });
 
-export const DIRECTIONS: $ReadOnlyArray<$Values<typeof Direction>> = [
+export const DIRECTIONS: number[] = [
   Direction.LEFT,
   Direction.RIGHT,
   Direction.LEFT,
   Direction.RIGHT
 ];
 
-export const DIRECTIONS_LIST: $ReadOnlyArray<$Values<typeof Direction>> = [
+export const DIRECTIONS_LIST: number[] = [
   Direction.LEFT,
   Direction.RIGHT,
   Direction.LEFT,

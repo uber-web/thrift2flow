@@ -22,6 +22,16 @@ const map<ShieldType, list<string>> THINGS = {
   ShieldType.U: ["uuuuuuu"],
 }
 
+const list<ShieldType> ITEMS = [
+  ShieldType.O,
+  ShieldType.U,
+];
+
+const map<ShieldType, list<ShieldType>> MAP_CONST_LIST = {
+  ShieldType.O: ITEMS,
+  ShieldType.U: [],
+}
+
 const map<i32, string> NUMS = {
   0: "aaa",
   1: "bbb",
