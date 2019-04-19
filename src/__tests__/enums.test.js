@@ -23,9 +23,49 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from './util';
+import {flowResultTest} from '../test-util';
 import {ThriftFileConverter} from '../main/convert';
 import {Thrift} from 'thriftrw';
+
+test('thriftrw enums work in map constants', () => {
+  const fixturePath = 'src/__tests__/fixtures/enums-as-map-keys.thrift';
+  const thrift = new Thrift({
+    entryPoint: fixturePath,
+    allowFilesystemAccess: true,
+  });
+  expect(thrift.THE_ENUM_PROP.DEFAULT).toEqual('DEFAULT');
+  const converter = new ThriftFileConverter(fixturePath, false);
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+export const THE_ENUM_PROP: $ReadOnly<{|
+  DEFAULT: \\"DEFAULT\\",
+  LOW: \\"LOW\\",
+  HIGH: \\"HIGH\\"
+|}> = Object.freeze({
+  DEFAULT: \\"DEFAULT\\",
+  LOW: \\"LOW\\",
+  HIGH: \\"HIGH\\"
+});
+
+export const THE_STRING_MAP: {| \\"0\\": string, \\"1\\": string, \\"2\\": string |} = {
+  [0]: \\"Some default string\\",
+  [1]: \\"Some low string\\",
+  [2]: \\"Some high string\\"
+};
+
+export const THE_STRING_KEY_MAP: {|
+  DEFAULT: string,
+  LOW: string,
+  HIGH: string
+|} = {
+  [THE_ENUM_PROP.DEFAULT]: \\"some other default\\",
+  [THE_ENUM_PROP.LOW]: \\"some other low\\",
+  [THE_ENUM_PROP.HIGH]: \\"some other high\\"
+};
+"
+`);
+});
 
 test('thriftrw enums are strings not numbers', () => {
   const thrift = new Thrift({

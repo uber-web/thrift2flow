@@ -25,7 +25,7 @@
  */
 
 import fs from 'fs';
-import {flowResultTest} from '../util';
+import {flowResultTest} from '../../test-util';
 
 test('arrays and sets', done => {
   flowResultTest(
