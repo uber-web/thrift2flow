@@ -23,17 +23,17 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../test-util';
-import {ThriftFileConverter} from '../main/convert';
-import {Thrift} from 'thriftrw';
+import { flowResultTest } from "../test-util";
+import { ThriftFileConverter } from "../main/convert";
+import { Thrift } from "thriftrw";
 
-test('thriftrw enums work in map constants', () => {
-  const fixturePath = 'src/__tests__/fixtures/enums-as-map-keys.thrift';
+test("thriftrw enums work in map constants", () => {
+  const fixturePath = "src/__tests__/fixtures/enums-as-map-keys.thrift";
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true,
+    allowFilesystemAccess: true
   });
-  expect(thrift.THE_ENUM_PROP.DEFAULT).toEqual('DEFAULT');
+  expect(thrift.THE_ENUM_PROP.DEFAULT).toEqual("DEFAULT");
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow
@@ -49,9 +49,9 @@ export const THE_ENUM_PROP: $ReadOnly<{|
 });
 
 export const THE_STRING_MAP: {| \\"0\\": string, \\"1\\": string, \\"2\\": string |} = {
-  [0]: \\"Some default string\\",
-  [1]: \\"Some low string\\",
-  [2]: \\"Some high string\\"
+  \\"0\\": \\"Some default string\\",
+  \\"1\\": \\"Some low string\\",
+  \\"2\\": \\"Some high string\\"
 };
 
 export const THE_STRING_KEY_MAP: {|
@@ -67,34 +67,34 @@ export const THE_STRING_KEY_MAP: {|
 `);
 });
 
-test('thriftrw enums are strings not numbers', () => {
+test("thriftrw enums are strings not numbers", () => {
   const thrift = new Thrift({
-    entryPoint: 'src/__tests__/fixtures/my-enum.thrift',
-    allowFilesystemAccess: true,
+    entryPoint: "src/__tests__/fixtures/my-enum.thrift",
+    allowFilesystemAccess: true
   });
-  expect(thrift.MyEnum.OK).toEqual('OK');
-  expect(thrift.MyEnum.ERROR).toEqual('ERROR');
+  expect(thrift.MyEnum.OK).toEqual("OK");
+  expect(thrift.MyEnum.ERROR).toEqual("ERROR");
 });
 
-test('enum to JS', () => {
+test("enum to JS", () => {
   const converter = new ThriftFileConverter(
-    'src/__tests__/fixtures/my-enum.thrift',
+    "src/__tests__/fixtures/my-enum.thrift",
     false
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchSnapshot();
 });
 
-test('enums work with typedefs', () => {
+test("enums work with typedefs", () => {
   const converter = new ThriftFileConverter(
-    'src/__tests__/fixtures/my-enum-with-typedef.thrift',
+    "src/__tests__/fixtures/my-enum-with-typedef.thrift",
     false
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchSnapshot();
 });
 
-test('typedefs of enums can be referenced from structs', () => {
+test("typedefs of enums can be referenced from structs", () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/enum-typedef-struct.thrift`,
     false
@@ -126,10 +126,10 @@ export type MyStruct = {|
 `);
 });
 
-test('enums with typedefs', done => {
+test("enums with typedefs", done => {
   flowResultTest(
     {
-      'types.thrift': `
+      "types.thrift": `
 typedef MyEnum EnumTypedef
 
 enum MyEnum {
@@ -142,7 +142,7 @@ struct MyStruct {
   2: EnumTypedef f_EnumTypedef
 }
 `,
-      'index.js': `
+      "index.js": `
 // @flow
 import { MyEnum, type MyStruct, EnumTypedef } from './types';
 
@@ -158,7 +158,7 @@ const okFromMap: 'OK' = MyEnum.OK;
 const errorFromMap: 'ERROR' = MyEnum.ERROR;
 
 const t: $Values<typeof EnumTypedef> = ok;
-`,
+`
     },
     (r: FlowResult) => {
       expect(r.errors).toEqual([]);
@@ -167,11 +167,11 @@ const t: $Values<typeof EnumTypedef> = ok;
   );
 });
 
-test('enums with errors', done => {
+test("enums with errors", done => {
   flowResultTest(
     {
       // language=thrift
-      'types.thrift': `
+      "types.thrift": `
 typedef MyEnum EnumTypedef
 
 enum MyEnum {
@@ -185,7 +185,7 @@ struct MyStruct {
 }
 `,
       // language=JavaScript
-      'index.js': `
+      "index.js": `
 // @flow
 import {type MyStruct, EnumTypedef, MyEnum} from './types';
 
@@ -198,7 +198,7 @@ const struct: MyStruct = {
 }
 
 const t: $Values<typeof EnumTypedef> = 'NOT CORRECT';
-`,
+`
     },
     (r: FlowResult) => {
       expect(r.errors.length).toEqual(5);

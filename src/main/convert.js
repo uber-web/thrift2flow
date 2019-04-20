@@ -297,10 +297,12 @@ export class ThriftFileConverter {
       if (typeof entry.key.value === 'string') {
         key = `'${entry.key.value}'`;
       } else {
-        key = entry.key.value;
+        // Keys are always strings in JS.
+        key = `'${entry.key.value}'`;
       }
     } else if (entry.key.type === 'Identifier') {
-      key = this.getIdentifier(entry.key.name, 'value');
+      // computed key based off of identifier.
+      key = `[${this.getIdentifier(entry.key.name, 'value')}]`;
     } else {
       throw new Error(`Unhandled entry.key.type ${entryKeyType}`);
     }
@@ -328,7 +330,7 @@ export class ThriftFileConverter {
       console.error(entry);
       throw new Error(`key or value is undefined`);
     }
-    const result = `[${key}]: ${value},`;
+    const result = `${key}: ${value},`;
     return result;
   };
 

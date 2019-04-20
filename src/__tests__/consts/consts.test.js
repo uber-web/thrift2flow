@@ -24,17 +24,17 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../../test-util';
-import fs from 'fs';
-import {ThriftFileConverter} from '../../main/convert';
+import { flowResultTest } from "../../test-util";
+import fs from "fs";
+import { ThriftFileConverter } from "../../main/convert";
 
-test('consts', done => {
+test("consts", done => {
   flowResultTest(
     {
-      'types.thrift': fs
+      "types.thrift": fs
         .readFileSync(`${__dirname}/types.thrift.fixture`)
         .toString(),
-      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
+      "index.js": fs.readFileSync(`${__dirname}/index.js.fixture`).toString()
     },
     result => {
       expect(result.errors).toEqual([]);
@@ -43,7 +43,7 @@ test('consts', done => {
   );
 });
 
-test('const map values are numbers', () => {
+test("const map values are numbers", () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/const-map-literal-type.thrift`,
     false
@@ -88,16 +88,16 @@ export const MAP_CONST_LIST: {|
 };
 
 export const NUMS: {| \\"0\\": string, \\"1\\": string |} = {
-  [0]: \\"aaa\\",
-  [1]: \\"bbb\\"
+  \\"0\\": \\"aaa\\",
+  \\"1\\": \\"bbb\\"
 };
 "
 `);
 });
 
-test('constant maps', () => {
+test("constant maps", () => {
   const converter = new ThriftFileConverter(
-    'src/__tests__/fixtures/const-enum-values.thrift',
+    "src/__tests__/fixtures/const-enum-values.thrift",
     false
   );
   const jsContent = converter.generateFlowFile();
@@ -116,8 +116,8 @@ export const UUID_TO_PLACE_TYPE: {|
   \\"123\\": $Values<typeof PlaceType>,
   \\"456\\": $Values<typeof PlaceType>
 |} = {
-  [\\"123\\"]: PlaceType.A,
-  [\\"456\\"]: PlaceType.B
+  \\"123\\": PlaceType.A,
+  \\"456\\": PlaceType.B
 };
 "
 `);
