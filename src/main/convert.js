@@ -262,7 +262,7 @@ export class ThriftFileConverter {
         def.fieldType.baseType === 'i64' &&
         value !== undefined
       ) {
-        const numValue = Number(value) > 0 ? Number(value) : Number(-value);
+        const numValue = Number(value) > 0 ? Number(value) : - Number(value);
         return `export const ${def.id.name}: ${String(numValue)} = ${String(numValue)};`;
       }
     }
