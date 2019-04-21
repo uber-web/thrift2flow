@@ -6,3 +6,4 @@
 /.tmp
 /flow-typed
 /src/__tests__
+/src/test-util.js
