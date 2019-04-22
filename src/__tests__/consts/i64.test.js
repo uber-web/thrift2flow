@@ -24,15 +24,13 @@
  * SOFTWARE.
  */
 
-import { flowResultTest } from "../../test-util";
-import fs from "fs";
-import { Thrift } from "thriftrw";
-import { ThriftFileConverter } from "../../main/convert";
+import {Thrift} from 'thriftrw';
+import {ThriftFileConverter} from '../../main/convert';
 
-test("thriftrw parses i64 consts as numbers", () => {
+test('thriftrw parses i64 consts as numbers', () => {
   const thrift = new Thrift({
-    entryPoint: "src/__tests__/fixtures/i64.thrift",
-    allowFilesystemAccess: true
+    entryPoint: 'src/__tests__/fixtures/i64.thrift',
+    allowFilesystemAccess: true,
   });
   expect(thrift.MY_VALUE_1).toEqual(1);
   expect(thrift.MY_VALUE_2).toEqual(1);
@@ -40,7 +38,7 @@ test("thriftrw parses i64 consts as numbers", () => {
   expect(thrift.MY_VALUE_4).toEqual(1);
 });
 
-test("i64 const", () => {
+test('i64 const', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/i64.thrift`,
     false

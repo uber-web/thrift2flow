@@ -262,8 +262,10 @@ export class ThriftFileConverter {
         def.fieldType.baseType === 'i64' &&
         value !== undefined
       ) {
-        const numValue = Number(value) > 0 ? Number(value) : - Number(value);
-        return `export const ${def.id.name}: ${String(numValue)} = ${String(numValue)};`;
+        const numValue = Number(value) > 0 ? Number(value) : -Number(value);
+        return `export const ${def.id.name}: ${String(numValue)} = ${String(
+          numValue
+        )};`;
       }
     }
     if (value === undefined) {
@@ -562,11 +564,15 @@ export class ThriftFileConverter {
       if (def.type === 'Const' && def.value.type === 'ConstMap') {
         const entries = def.value.entries.map(entry => {
           if (entry.key.type === 'Identifier') {
-            const identifierValue: AstNode = this.identifiersTable[entry.key.name];
+            const identifierValue: AstNode = this.identifiersTable[
+              entry.key.name
+            ];
             if (identifierValue.type === 'EnumDefinition') {
               return `'${identifierValue.id.name}': ${valueType}`;
             } else {
-              throw new Error(`Unknown identifierValue type ${identifierValue.type}`);
+              throw new Error(
+                `Unknown identifierValue type ${identifierValue.type}`
+              );
             }
           } else if (entry.key.type === 'Literal') {
             return `'${entry.key.value}': ${valueType}`;
