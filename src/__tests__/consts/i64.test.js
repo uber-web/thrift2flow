@@ -24,58 +24,41 @@
  * SOFTWARE.
  */
 
-import fs from 'fs';
-import {flowResultTest} from '../../test-util';
+import {Thrift} from 'thriftrw';
+import {ThriftFileConverter} from '../../main/convert';
 
-test('arrays and sets', done => {
-  flowResultTest(
-    {
-      'types.thrift': fs
-        .readFileSync(`${__dirname}/fixtures/types.thrift.fixture`)
-        .toString(),
-      'index.js': fs
-        .readFileSync(`${__dirname}/fixtures/index.js.fixture`)
-        .toString(),
-    },
-    r => {
-      expect(r.errors).toEqual([]);
-      done();
-    }
-  );
+test('thriftrw parses i64 consts as numbers', () => {
+  const thrift = new Thrift({
+    entryPoint: 'src/__tests__/fixtures/i64.thrift',
+    allowFilesystemAccess: true,
+  });
+  expect(thrift.MY_VALUE_1).toEqual(1);
+  expect(thrift.MY_VALUE_2).toEqual(1);
+  expect(thrift.MY_VALUE_3).toEqual(1);
+  expect(thrift.MY_VALUE_4).toEqual(1);
 });
 
-test('maps', done => {
-  flowResultTest(
-    {
-      'types.thrift': `
-typedef byte MyByte
-
-struct OtherStruct {
-  1: i32 num
-}
-
-struct MyStruct {
-  1: map<string,i32> f_i32
-  2: map<MyByte,MyByte> f_MyByte
-  3: map<string,OtherStruct> f_OtherStruct
-}
-`,
-      'index.js': `
-// @flow
-import type {MyStruct,OtherStruct} from './types';
-
-function go(s : MyStruct) {
-  const numbers : number[] = [
-      s.f_i32['ok'], s.f_MyByte[18], s.f_OtherStruct['hello'].num
-  ];
-  const structs : OtherStruct[] = [s.f_OtherStruct['hello']];
-  return [numbers, structs];
-}
-`,
-    },
-    r => {
-      expect(r.errors).toEqual([]);
-      done();
-    }
+test('i64 const', () => {
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/i64.thrift`,
+    false
   );
+  // const i64 values (and possibly typdefs), counter
+  // to the docs, are not decoded as Dates and are also
+  // non-negative.
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchInlineSnapshot(`
+"// @flow
+
+export const MY_VALUE_1: 1 = 1;
+
+export const MY_VALUE_2: 1 = 1;
+
+export const MY_VALUE_3: 1 = 1;
+
+export const MY_VALUE_4: 1 = 1;
+
+export const MY_VALUE_5: 39 = 39;
+"
+`);
 });

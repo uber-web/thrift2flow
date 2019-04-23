@@ -262,7 +262,10 @@ export class ThriftFileConverter {
         def.fieldType.baseType === 'i64' &&
         value !== undefined
       ) {
-        value = `Buffer.from([${value}])`;
+        const numValue = Number(value) > 0 ? Number(value) : -Number(value);
+        return `export const ${def.id.name}: ${String(numValue)} = ${String(
+          numValue
+        )};`;
       }
     }
     if (value === undefined) {
@@ -272,7 +275,7 @@ export class ThriftFileConverter {
         throw new Error(`value is undefined for ${def.id.name}`);
       }
     }
-    const fieldType = enumType || this.convertType(def.fieldType);
+    const fieldType = enumType || this.convertType(def.fieldType, def);
     return `export const ${def.id.name}: ${fieldType} = ${value};`;
   };
 
@@ -297,10 +300,12 @@ export class ThriftFileConverter {
       if (typeof entry.key.value === 'string') {
         key = `'${entry.key.value}'`;
       } else {
-        key = entry.key.value;
+        // Keys are always strings in JS.
+        key = `'${entry.key.value}'`;
       }
     } else if (entry.key.type === 'Identifier') {
-      key = this.getIdentifier(entry.key.name, 'value');
+      // computed key based off of identifier.
+      key = `[${this.getIdentifier(entry.key.name, 'value')}]`;
     } else {
       throw new Error(`Unhandled entry.key.type ${entryKeyType}`);
     }
@@ -328,7 +333,7 @@ export class ThriftFileConverter {
       console.error(entry);
       throw new Error(`key or value is undefined`);
     }
-    const result = `[${key}]: ${value},`;
+    const result = `${key}: ${value},`;
     return result;
   };
 
@@ -553,7 +558,31 @@ export class ThriftFileConverter {
     return undefined;
   }
 
-  convertMapType(t: AstNode): string | void {
+  convertMapType(t: AstNode, def?: Definition): string | void {
+    if (t.type === 'Map' && def) {
+      const valueType = this.convertType(t.valueType);
+      if (def.type === 'Const' && def.value.type === 'ConstMap') {
+        const entries = def.value.entries.map(entry => {
+          if (entry.key.type === 'Identifier') {
+            const identifierValue: AstNode = this.identifiersTable[
+              entry.key.name
+            ];
+            if (identifierValue.type === 'EnumDefinition') {
+              return `'${identifierValue.id.name}': ${valueType}`;
+            } else {
+              throw new Error(
+                `Unknown identifierValue type ${identifierValue.type}`
+              );
+            }
+          } else if (entry.key.type === 'Literal') {
+            return `'${entry.key.value}': ${valueType}`;
+          } else {
+            throw new Error('unsupported');
+          }
+        });
+        return `{|  ${entries.join(',')} |}`;
+      }
+    }
     if (t.type === 'Map') {
       const keyType = this.convertType(t.keyType);
       const valueType = this.convertType(t.valueType);
@@ -570,13 +599,13 @@ export class ThriftFileConverter {
     return this.identifiersTable[def.name].type === 'Enum';
   }
 
-  convertType(t: AstNode): string {
+  convertType(t: AstNode, def?: Definition): string {
     if (!t) {
       throw new Error(`Assertion failed. t is not defined.`);
     }
     let type: string | void =
       this.convertArrayType(t) ||
-      this.convertMapType(t) ||
+      this.convertMapType(t, def) ||
       this.convertEnumType(t) ||
       this.convertBaseType(t);
     if (type !== undefined) {

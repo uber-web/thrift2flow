@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from './util';
+import {flowResultTest} from '../test-util';
 
 test('services happy path', done => {
   flowResultTest(
