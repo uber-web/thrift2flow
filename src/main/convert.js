@@ -201,10 +201,9 @@ export class ThriftFileConverter {
     return `export type ${def.id.name} = ${this.convertType(def.valueType)};`;
   };
 
-  generateEnumUnion = (def: Enum) =>
-    def.definitions.length
-      ? def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ')
-      : 'null';
+  generateEnumUnion = (def: Enum) => {
+    return def.definitions.map((d, index) => `"${d.id.name}"`).join(' | ');
+  };
 
   generateEnum = (def: Enum, otherName?: string) => {
     const values = def.definitions

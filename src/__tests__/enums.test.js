@@ -101,7 +101,6 @@ struct MyStruct {
   1: MyEnum f_MyEnum
   2: EnumTypedef f_EnumTypedef
 }
-
 `,
       'index.js': `
 // @flow
