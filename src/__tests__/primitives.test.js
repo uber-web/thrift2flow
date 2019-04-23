@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from './util';
+import {flowResultTest} from '../test-util';
 
 // language=thrift
 const primitiveStruct = `

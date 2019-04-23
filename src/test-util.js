@@ -31,7 +31,7 @@ import fs from 'fs';
 import fsExtra from 'fs-extra';
 import uuid from 'uuid/v4';
 
-import {ThriftFileConverter} from '../main/convert';
+import {ThriftFileConverter} from './main/convert';
 
 export const flowResultTest = (
   files: {[string]: string},

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from './util';
+import {flowResultTest} from '../test-util';
 import {ThriftFileConverter} from '../main/convert';
 
 test('Long module is imported when needed', () => {

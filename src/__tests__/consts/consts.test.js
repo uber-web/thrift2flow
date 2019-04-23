@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../util';
+import {flowResultTest} from '../../test-util';
 import fs from 'fs';
 import {ThriftFileConverter} from '../../main/convert';
 
@@ -62,33 +62,34 @@ export const ShieldType: $ReadOnly<{|
 
 export const o: string = \\"ooooooo\\";
 
-export const PRIORITIES: { [$Values<typeof ShieldType>]: number } = {
+export const PRIORITIES: {| O: number, U: number |} = {
   [ShieldType.O]: 2,
   [ShieldType.U]: 10
 };
 
-export const LABELS: { [$Values<typeof ShieldType>]: string } = {
+export const LABELS: {| O: string, U: string |} = {
   [ShieldType.O]: o,
   [ShieldType.U]: \\"uuuuuuu\\"
 };
 
-export const THINGS: { [$Values<typeof ShieldType>]: string[] } = {
+export const THINGS: {| O: string[], U: string[] |} = {
   [ShieldType.O]: [o, \\"abcd\\"],
   [ShieldType.U]: [\\"uuuuuuu\\"]
 };
 
 export const ITEMS: $Values<typeof ShieldType>[] = [ShieldType.O, ShieldType.U];
 
-export const MAP_CONST_LIST: {
-  [$Values<typeof ShieldType>]: $Values<typeof ShieldType>[]
-} = {
+export const MAP_CONST_LIST: {|
+  O: $Values<typeof ShieldType>[],
+  U: $Values<typeof ShieldType>[]
+|} = {
   [ShieldType.O]: ITEMS,
   [ShieldType.U]: []
 };
 
-export const NUMS: { [number]: string } = {
-  [0]: \\"aaa\\",
-  [1]: \\"bbb\\"
+export const NUMS: {| \\"0\\": string, \\"1\\": string |} = {
+  \\"0\\": \\"aaa\\",
+  \\"1\\": \\"bbb\\"
 };
 "
 `);
@@ -111,9 +112,12 @@ export const PlaceType: $ReadOnly<{|
   B: \\"B\\"
 });
 
-export const UUID_TO_PLACE_TYPE: { [string]: $Values<typeof PlaceType> } = {
-  [\\"123\\"]: PlaceType.A,
-  [\\"456\\"]: PlaceType.B
+export const UUID_TO_PLACE_TYPE: {|
+  \\"123\\": $Values<typeof PlaceType>,
+  \\"456\\": $Values<typeof PlaceType>
+|} = {
+  \\"123\\": PlaceType.A,
+  \\"456\\": PlaceType.B
 };
 "
 `);
