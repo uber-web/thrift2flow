@@ -1,0 +1,14 @@
+typedef string Status
+typedef double Score
+
+const Status NOT_ELIGIBLE = "not_eligible"
+const string STATUS_ELIGIBLE_LITERAL = "eligible"
+
+const Score MIN_SCORE = 3.24
+const double MAX_SCORE = 4.00
+
+struct MyStruct {
+  1: required Status f_status
+  2: required Score f_score
+  2: optional string f_otherStatus
+}

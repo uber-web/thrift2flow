@@ -1,6 +1,6 @@
 {
   "name": "thrift2flow",
-  "version": "0.6.0",
+  "version": "0.7.2-0",
   "description": "Convert Thrift definitions to Flowtype declarations",
   "homepage": "https://github.com/uber-node/thrift2flow",
   "bugs": {
@@ -21,22 +21,19 @@
   "license": "MIT",
   "main": "lib/index.js",
   "bin": {
-    "thrift2flow": "lib/index.js"
+    "thrift2flow": "lib/cli.js"
   },
   "scripts": {
-    "clean-test-output": "git clean -Xdf test-output/",
-    "build-test": "babel src -d dist-test --source-maps",
-    "build": "babel src/main -d lib --source-maps",
+    "build": "babel src/main -d lib --source-maps && cp src/flow-entry.js lib/index.js.flow",
     "watch": "babel src/main -d lib --source-maps --watch",
     "check": "npm run prettier && npm run lint && npm run test",
     "debug": "node --nolazy --inspect-brk=9229 lib/index.js",
     "download-typedefs": "mkdir -p typedefs && curl -o typedefs/flowResult.js https://raw.githubusercontent.com/facebook/flow/master/tsrc/flowResult.js",
-    "flow": "flow check",
+    "flow": "flow",
     "lint": "eslint src",
     "prepare": "npm run build",
     "prettier": "prettier --single-quote --bracket-spacing false --parser flow --tab-width 2 --print-width 100 --write \"{src,test}/**/*.js\"",
-    "test": "npm run build-test && node dist-test/test/index.spec.js",
-    "test-keep-output": "npm run build-test && KEEP_TEST_OUTPUT=true node dist-test/test/index.spec.js"
+    "test": "rm -rf .tmp && yarn jest .test.js"
   },
   "engines": {
     "node": ">=6.10",
@@ -53,25 +50,24 @@
     "yargs": "^8.0.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-syntax-flow": "^7.2.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "babel-eslint": "^9.0.0",
-    "babel-plugin-syntax-flow": "^6.18.0",
-    "babel-plugin-transform-flow-strip-types": "^6.22.0",
-    "babel-preset-env": "^1.4.0",
-    "babel-preset-es2017": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "babel-preset-stage-3": "^6.24.1",
     "eslint": "^5.6.0",
     "eslint-config-fusion": "^4.0.0",
     "eslint-plugin-cup": "^2.0.0",
     "eslint-plugin-flowtype": "^2.50.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jest": "^21.22.1",
+    "eslint-plugin-jest": "^22.3.0",
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.11.1",
-    "flow-bin": "^0.65.0",
+    "flow-bin": "^0.94.0",
     "fs-extra": "^4.0.3",
-    "tape": "^4.6.3",
+    "jest": "^24.1.0",
     "tmp": "^0.0.33"
   }
 }

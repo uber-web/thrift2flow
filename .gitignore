@@ -5,7 +5,7 @@
 /.idea
 /coverage
 /.vscode
-/test-output
+.tmp
 
 yarn-error.log
 yarn.lock

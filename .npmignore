@@ -3,4 +3,6 @@
 /typedefs
 /.idea
 /coverage
-/test-output
+/.tmp
+/flow-typed
+/src/__tests__
