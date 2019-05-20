@@ -201,6 +201,7 @@ export class ThriftFileConverter {
   generateConst = (def: Const) => {
     let value: string | void;
     let enumType: ?string;
+    let readOnly = false;
     if (def.value.type === 'ConstList') {
       value = `[${def.value.values
         .map((val: Identifier | Literal) => {
@@ -244,13 +245,16 @@ export class ThriftFileConverter {
     }
     if (value === undefined) {
       if (def.value.type === 'ConstMap') {
+        readOnly = true;
         value = this.generateConstMap(def.value);
       } else {
         throw new Error(`value is undefined for ${def.id.name}`);
       }
     }
     const fieldType = enumType || this.convertType(def.fieldType, def);
-    return `export const ${def.id.name}: ${fieldType} = ${value};`;
+    return `export const ${def.id.name}: ${
+      readOnly ? `$ReadOnly<${fieldType}>` : fieldType
+    } = ${value};`;
   };
 
   generateConstList(def: ConstList) {
@@ -293,7 +297,11 @@ export class ThriftFileConverter {
         throw new Error(`Unhandled const map entry type`);
       }
     } else if (entry.value.type === 'Identifier') {
-      value = this.getIdentifier(entry.value.name, 'value');
+      if (entry.value.name === 'false' || entry.value.name === 'true') {
+        value = entry.value.name;
+      } else {
+        value = this.getIdentifier(entry.value.name, 'value');
+      }
     } else if (entry.value.type === 'ConstMap') {
       value = this.generateConstMap(entry.value);
     } else if (entry.value.type === 'ConstList') {

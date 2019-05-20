@@ -60,32 +60,32 @@ export const ShieldType: $ReadOnly<{|
 
 export const o: string = \\"ooooooo\\";
 
-export const PRIORITIES: {| O: number, U: number |} = {
+export const PRIORITIES: $ReadOnly<{| O: number, U: number |}> = {
   [ShieldType.O]: 2,
   [ShieldType.U]: 10
 };
 
-export const LABELS: {| O: string, U: string |} = {
+export const LABELS: $ReadOnly<{| O: string, U: string |}> = {
   [ShieldType.O]: o,
   [ShieldType.U]: \\"uuuuuuu\\"
 };
 
-export const THINGS: {| O: string[], U: string[] |} = {
+export const THINGS: $ReadOnly<{| O: string[], U: string[] |}> = {
   [ShieldType.O]: [o, \\"abcd\\"],
   [ShieldType.U]: [\\"uuuuuuu\\"]
 };
 
 export const ITEMS: $Values<typeof ShieldType>[] = [ShieldType.O, ShieldType.U];
 
-export const MAP_CONST_LIST: {|
+export const MAP_CONST_LIST: $ReadOnly<{|
   O: $Values<typeof ShieldType>[],
   U: $Values<typeof ShieldType>[]
-|} = {
+|}> = {
   [ShieldType.O]: ITEMS,
   [ShieldType.U]: []
 };
 
-export const NUMS: {| \\"0\\": string, \\"1\\": string |} = {
+export const NUMS: $ReadOnly<{| \\"0\\": string, \\"1\\": string |}> = {
   \\"0\\": \\"aaa\\",
   \\"1\\": \\"bbb\\"
 };
@@ -110,10 +110,10 @@ export const PlaceType: $ReadOnly<{|
   B: \\"B\\"
 });
 
-export const UUID_TO_PLACE_TYPE: {|
+export const UUID_TO_PLACE_TYPE: $ReadOnly<{|
   \\"123\\": $Values<typeof PlaceType>,
   \\"456\\": $Values<typeof PlaceType>
-|} = {
+|}> = {
   \\"123\\": PlaceType.A,
   \\"456\\": PlaceType.B
 };
