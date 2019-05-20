@@ -36,7 +36,7 @@ import {ThriftFileConverter} from './main/convert';
 export const flowResultTest = (
   files: {[string]: string},
   testFn: ({|
-    errors: Array<{|level: string, message: Array<{|line: number|}>|}>,
+    errors: Array<{|level: string, message: Array<{|line: number|}>|}>
   |}) => void,
   withsource: boolean = true
 ) => {
@@ -63,10 +63,7 @@ export const flowResultTest = (
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
-      fs.writeFileSync(
-        jsPath,
-        new ThriftFileConverter(p, withsource).generateFlowFile()
-      );
+      fs.writeFileSync(jsPath, new ThriftFileConverter(p, withsource).generateFlowFile());
     });
   fs.writeFileSync(
     path.resolve(root, '.flowconfig'),

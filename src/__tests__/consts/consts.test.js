@@ -31,10 +31,8 @@ import {ThriftFileConverter} from '../../main/convert';
 test('consts', done => {
   flowResultTest(
     {
-      'types.thrift': fs
-        .readFileSync(`${__dirname}/types.thrift.fixture`)
-        .toString(),
-      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
+      'types.thrift': fs.readFileSync(`${__dirname}/types.thrift.fixture`).toString(),
+      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString()
     },
     result => {
       expect(result.errors).toEqual([]);

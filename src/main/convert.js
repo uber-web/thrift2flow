@@ -44,13 +44,13 @@ import type {
   ConstEntry,
   ConstMap,
   AstNode,
-  Definition,
+  Definition
 } from './ast-types';
 
 const thriftOptions = {
   strict: false,
   allowFilesystemAccess: true,
-  allowOptionalArguments: true,
+  allowOptionalArguments: true
 };
 
 function includeIdentifierOfFilename(filename: string): string {
@@ -71,13 +71,13 @@ const primitives = {
   i64: 'Buffer',
   double: 'number',
   string: 'string',
-  void: 'void',
+  void: 'void'
 };
 
 const i64Mappings = {
   Long: 'thrift2flow$Long',
   Date: 'string',
-  Integer: 'number',
+  Integer: 'number'
 };
 
 export class ThriftFileConverter {
@@ -85,7 +85,7 @@ export class ThriftFileConverter {
   thrift: {|
     asts: {[filename: string]: Ast},
     filename: string,
-    idls: {[filename: string]: {||}},
+    idls: {[filename: string]: {||}}
   |};
   withsource: boolean;
   ast: Ast;
@@ -108,38 +108,28 @@ export class ThriftFileConverter {
         const includeIdentifier = includeIdentifierOfFilename(filename);
         return {
           filename: filename,
-          includePrefix: `${includeIdentifier}.`,
+          includePrefix: `${includeIdentifier}.`
         };
       })
       .concat([
         {
           filename: this.thrift.filename,
-          includePrefix: '',
-        },
-      ])
-      .map(
-        ({
-          filename,
-          includePrefix,
-        }: {|
-          filename: string,
-          includePrefix: string,
-        |}) => {
-          this.thrift.asts[filename].definitions.forEach(definition => {
-            const identifier = `${includePrefix}${definition.id.name}`;
-            this.identifiersTable[identifier] = definition;
-            if (definition.type === 'Enum') {
-              definition.definitions.forEach(enumDefinition => {
-                this.identifiersTable[
-                  `${includePrefix}${definition.id.name}.${
-                    enumDefinition.id.name
-                  }`
-                ] = enumDefinition;
-              });
-            }
-          });
+          includePrefix: ''
         }
-      );
+      ])
+      .map(({filename, includePrefix}: {|filename: string, includePrefix: string|}) => {
+        this.thrift.asts[filename].definitions.forEach(definition => {
+          const identifier = `${includePrefix}${definition.id.name}`;
+          this.identifiersTable[identifier] = definition;
+          if (definition.type === 'Enum') {
+            definition.definitions.forEach(enumDefinition => {
+              this.identifiersTable[
+                `${includePrefix}${definition.id.name}.${enumDefinition.id.name}`
+              ] = enumDefinition;
+            });
+          }
+        });
+      });
   }
 
   generateFlowFile: () => string = () => {
@@ -147,7 +137,7 @@ export class ThriftFileConverter {
       '// @flow',
       this.withsource && `// Source: ${this.thriftPath}`,
       this.generateImports(),
-      ...this.ast.definitions.map(this.convertDefinitionToCode),
+      ...this.ast.definitions.map(this.convertDefinitionToCode)
     ]
       .filter(Boolean)
       .join('\n\n');
@@ -172,17 +162,13 @@ export class ThriftFileConverter {
         return this.generateConst(def);
       default:
         throw new Error(
-          `Unknown definition type ${defType} found in ${path.basename(
-            this.thriftPath
-          )}`
+          `Unknown definition type ${defType} found in ${path.basename(this.thriftPath)}`
         );
     }
   };
 
   generateService = (def: Service) =>
-    `export type ${def.id.name} = {\n${def.functions
-      .map(this.generateFunction)
-      .join(',')}};`;
+    `export type ${def.id.name} = {\n${def.functions.map(this.generateFunction).join(',')}};`;
 
   generateFunction = (fn: FunctionDefinition) =>
     `${fn.id.name}: (${
@@ -204,12 +190,8 @@ export class ThriftFileConverter {
   };
 
   generateEnum = (def: Enum, otherName?: string) => {
-    const values = def.definitions
-      .map((d, index) => `'${d.id.name}': '${d.id.name}',`)
-      .join('\n');
-    return `export const ${
-      otherName !== undefined ? otherName : def.id.name
-    }: $ReadOnly<{|
+    const values = def.definitions.map((d, index) => `'${d.id.name}': '${d.id.name}',`).join('\n');
+    return `export const ${otherName !== undefined ? otherName : def.id.name}: $ReadOnly<{|
   ${values}
 |}>  = Object.freeze({
   ${values}
@@ -224,16 +206,10 @@ export class ThriftFileConverter {
         .map((val: Identifier | Literal) => {
           if (val.type === 'Identifier') {
             if (val.name.includes('.')) {
-              const {definition} = this.definitionOfIdentifier(
-                val.name,
-                this.thrift.filename
-              );
+              const {definition} = this.definitionOfIdentifier(val.name, this.thrift.filename);
               if (definition.type == 'EnumDefinition') {
                 const scope = val.name.split('.')[0];
-                const defAndFilename = this.definitionOfIdentifier(
-                  scope,
-                  this.thrift.filename
-                );
+                const defAndFilename = this.definitionOfIdentifier(scope, this.thrift.filename);
                 if (enumType === undefined && this.isEnum(defAndFilename)) {
                   enumType = `${this.getIdentifier(scope, 'type')}[]`;
                 }
@@ -263,9 +239,7 @@ export class ThriftFileConverter {
         value !== undefined
       ) {
         const numValue = Number(value) > 0 ? Number(value) : -Number(value);
-        return `export const ${def.id.name}: ${String(numValue)} = ${String(
-          numValue
-        )};`;
+        return `export const ${def.id.name}: ${String(numValue)} = ${String(numValue)};`;
       }
     }
     if (value === undefined) {
@@ -366,9 +340,7 @@ export class ThriftFileConverter {
     if (!fields.length) {
       return '{||}';
     }
-    return fields
-      .map((f: Field) => `{|${f.name}: ${this.convertType(f.valueType)}|}`)
-      .join(' | ');
+    return fields.map((f: Field) => `{|${f.name}: ${this.convertType(f.valueType)}|}`).join(' | ');
   };
 
   isOptional = (field: Field) => field.optional;
@@ -377,9 +349,7 @@ export class ThriftFileConverter {
     const includes = this.ast.headers.filter(f => f.type === 'Include');
     const relativePaths: Array<string> = includes
       .map(i => path.parse(i.id))
-      .map((parsed: {dir: string, name: string}) =>
-        path.join(parsed.dir, parsed.name)
-      )
+      .map((parsed: {dir: string, name: string}) => path.join(parsed.dir, parsed.name))
       .map((p: string) => (p.startsWith('.') ? p : `./${p}`));
     const generatedImports = relativePaths.map((relpath, index) => {
       let baseName = path.basename(relpath);
@@ -437,13 +407,9 @@ export class ThriftFileConverter {
     if (definition) {
       return {definition, filename};
     }
-    const [scope, name] = identifier.includes('.')
-      ? identifier.split('.')
-      : [null, identifier];
+    const [scope, name] = identifier.includes('.') ? identifier.split('.') : [null, identifier];
     if (scope === null) {
-      throw new Error(
-        `local identifier ${identifier} missing in file ${filename}, name ${name}`
-      );
+      throw new Error(`local identifier ${identifier} missing in file ${filename}, name ${name}`);
     }
     const headerInclude = ast.headers
       .filter(f => f.type === 'Include')
@@ -451,37 +417,21 @@ export class ThriftFileConverter {
         return path.basename(header.id, '.thrift') === `${scope}`;
       });
     if (!headerInclude) {
-      throw new Error(
-        `header include not found for scope ${scope} in filename ${filename}.`
-      );
+      throw new Error(`header include not found for scope ${scope} in filename ${filename}.`);
     }
-    const otherFilename = path.resolve(
-      path.dirname(filename),
-      headerInclude.id
-    );
+    const otherFilename = path.resolve(path.dirname(filename), headerInclude.id);
     return this.definitionOfIdentifier(name, otherFilename);
   }
 
   /**
    * Follows typedef references to determine if a given identifier refers to an Enum.
    */
-  isEnum({
-    definition,
-    filename,
-  }: {
-    definition: AstNode,
-    filename: string,
-  }): boolean {
+  isEnum({definition, filename}: {definition: AstNode, filename: string}): boolean {
     if (definition.type === 'Enum') {
       return true;
     }
-    if (
-      definition.type === 'Typedef' &&
-      definition.valueType.type === 'Identifier'
-    ) {
-      return this.isEnum(
-        this.definitionOfIdentifier(definition.valueType.name, filename)
-      );
+    if (definition.type === 'Typedef' && definition.valueType.type === 'Identifier') {
+      return this.isEnum(this.definitionOfIdentifier(definition.valueType.name, filename));
     }
     return false;
   }
@@ -489,10 +439,10 @@ export class ThriftFileConverter {
   getIdentifier = (identifier: string, kind: 'type' | 'value'): string => {
     // Enums can be referenced as either types and as values. For flow we need to slip
     // this up.
-    const {
-      definition: def,
-      filename: defFilename,
-    } = this.definitionOfIdentifier(identifier, this.thrift.filename);
+    const {definition: def, filename: defFilename} = this.definitionOfIdentifier(
+      identifier,
+      this.thrift.filename
+    );
     if (kind === 'type') {
       if (this.isEnum({definition: def, filename: defFilename})) {
         return `$Values<typeof ${identifier}>`;
@@ -508,11 +458,7 @@ export class ThriftFileConverter {
     while (queue.length) {
       let [node, ...newQueue] = queue;
       queue = newQueue;
-      if (
-        node.type === 'Struct' ||
-        node.type === 'Exception' ||
-        node.type === 'Union'
-      ) {
+      if (node.type === 'Struct' || node.type === 'Exception' || node.type === 'Union') {
         for (const field of node.fields) {
           queue = [...queue, field];
         }
@@ -549,9 +495,7 @@ export class ThriftFileConverter {
       // Enums are values, not types. To refer to the type,
       // we use $Values<...>.
       if (thriftValueType.type !== 'Identifier') {
-        throw new Error(
-          'Assertion failure. Enum reference has to be an identifier'
-        );
+        throw new Error('Assertion failure. Enum reference has to be an identifier');
       }
       return `$Values<typeof ${thriftValueType.name}>`;
     }
@@ -564,15 +508,11 @@ export class ThriftFileConverter {
       if (def.type === 'Const' && def.value.type === 'ConstMap') {
         const entries = def.value.entries.map(entry => {
           if (entry.key.type === 'Identifier') {
-            const identifierValue: AstNode = this.identifiersTable[
-              entry.key.name
-            ];
+            const identifierValue: AstNode = this.identifiersTable[entry.key.name];
             if (identifierValue.type === 'EnumDefinition') {
               return `'${identifierValue.id.name}': ${valueType}`;
             } else {
-              throw new Error(
-                `Unknown identifierValue type ${identifierValue.type}`
-              );
+              throw new Error(`Unknown identifierValue type ${identifierValue.type}`);
             }
           } else if (entry.key.type === 'Literal') {
             return `'${entry.key.value}': ${valueType}`;

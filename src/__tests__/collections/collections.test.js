@@ -30,12 +30,8 @@ import {flowResultTest} from '../../test-util';
 test('arrays and sets', done => {
   flowResultTest(
     {
-      'types.thrift': fs
-        .readFileSync(`${__dirname}/fixtures/types.thrift.fixture`)
-        .toString(),
-      'index.js': fs
-        .readFileSync(`${__dirname}/fixtures/index.js.fixture`)
-        .toString(),
+      'types.thrift': fs.readFileSync(`${__dirname}/fixtures/types.thrift.fixture`).toString(),
+      'index.js': fs.readFileSync(`${__dirname}/fixtures/index.js.fixture`).toString()
     },
     r => {
       expect(r.errors).toEqual([]);
@@ -71,7 +67,7 @@ function go(s : MyStruct) {
   const structs : OtherStruct[] = [s.f_OtherStruct['hello']];
   return [numbers, structs];
 }
-`,
+`
     },
     r => {
       expect(r.errors).toEqual([]);
