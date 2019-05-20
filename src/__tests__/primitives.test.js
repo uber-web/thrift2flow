@@ -59,7 +59,7 @@ function go(s : Primitives) {
   const strings : string[] = [s.f_string];
   return [numbers, booleans, strings, buffers];
 }
-`,
+`
     },
     r => {
       expect(r.errors).toEqual([]);
@@ -81,7 +81,7 @@ function go(s : Primitives) {
   const booleans : boolean[] = [s.f_byte];
   return [numbers, booleans];
 }
-`,
+`
     },
     r => {
       expect(r.errors.length).toBe(2);
@@ -110,7 +110,7 @@ function go(s : Primitives) {
       s.f_default.length
   ];
 }
-`,
+`
     },
     r => {
       expect(r.errors.length).toBe(4);
@@ -139,7 +139,7 @@ import type {Optionals} from './types';
 function go() : Optionals {
   return {f_byte: 0, notActualField: true};
 }
-`,
+`
     },
     r => {
       expect(r.errors.length).toBe(1);

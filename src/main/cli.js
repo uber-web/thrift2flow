@@ -37,16 +37,15 @@ import convert from './index';
 const argv = yargs
   .usage('Usage: $0 [options] <thrift files..>')
   .option('path', {
-    describe:
-      'common path used for generated code. In most projects this is likely just `idl`.',
+    describe: 'common path used for generated code. In most projects this is likely just `idl`.'
   })
   .option('outputDir', {
     describe: 'The root output directory for the generated code.',
-    default: 'flow-output',
+    default: 'flow-output'
   })
   .option('withsource', {
     describe: 'prepend the source path of the thrift file',
-    default: false,
+    default: false
   })
   .help('h')
   .alias('h', 'help').argv;
@@ -61,15 +60,13 @@ if (!thriftPaths.length) {
 const options = {
   withSource: argv.withsource,
   commonPath: path.resolve(process.cwd(), argv.path),
-  outputDir: argv.outputDir,
+  outputDir: argv.outputDir
 };
 
 const allOutput = convert(thriftPaths, options);
 
 for (const jsFilename in allOutput) {
   mkdirp(path.dirname(jsFilename), () =>
-    fs.writeFile(jsFilename, allOutput[jsFilename], () =>
-      console.log(`Wrote ${jsFilename}`)
-    )
+    fs.writeFile(jsFilename, allOutput[jsFilename], () => console.log(`Wrote ${jsFilename}`))
   );
 }

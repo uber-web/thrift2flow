@@ -30,7 +30,7 @@ import {ThriftFileConverter} from '../../main/convert';
 test('thriftrw parses i64 consts as numbers', () => {
   const thrift = new Thrift({
     entryPoint: 'src/__tests__/fixtures/i64.thrift',
-    allowFilesystemAccess: true,
+    allowFilesystemAccess: true
   });
   expect(thrift.MY_VALUE_1).toEqual(1);
   expect(thrift.MY_VALUE_2).toEqual(1);
@@ -39,10 +39,7 @@ test('thriftrw parses i64 consts as numbers', () => {
 });
 
 test('i64 const', () => {
-  const converter = new ThriftFileConverter(
-    `src/__tests__/fixtures/i64.thrift`,
-    false
-  );
+  const converter = new ThriftFileConverter(`src/__tests__/fixtures/i64.thrift`, false);
   // const i64 values (and possibly typdefs), counter
   // to the docs, are not decoded as Dates and are also
   // non-negative.

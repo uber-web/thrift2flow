@@ -8,11 +8,11 @@ export default function(options: {|
   strict: boolean,
   allowFilesystemAccess: boolean,
   allowOptionalArguments: boolean,
-  entryPoint: string,
+  entryPoint: string
 |}): {|
   asts: {[filename: string]: Ast},
   filename: string,
-  idls: {[filename: string]: {||}},
+  idls: {[filename: string]: {||}}
 |} {
   return new Thrift(options);
 }
