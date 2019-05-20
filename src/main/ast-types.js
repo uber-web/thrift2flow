@@ -1,7 +1,7 @@
 // @flow
 
 type Annotations = {|
-  'js.type'?: 'Long' | 'Date'
+  'js.type'?: 'long' | 'Long' | 'Date',
 |};
 type Primitives =
   | 'i8'
@@ -17,38 +17,38 @@ type Primitives =
 export type BaseType = {|
   type: 'BaseType',
   baseType: Primitives,
-  annotations: Annotations
+  annotations: Annotations,
 |};
 
 export type Identifier = {|
   type: 'Identifier',
   name: string,
-  annotations: Annotations
+  annotations: Annotations,
 |};
 
 export type Struct = {|
   id: Identifier,
   type: 'Struct',
-  fields: Array<Field>
+  fields: Array<Field>,
 |};
 
 export type Union = {|
   id: Identifier,
   type: 'Union',
-  fields: Array<Field>
+  fields: Array<Field>,
 |};
 
 export type Exception = {|
   id: Identifier,
   type: 'Exception',
-  fields: Array<Field>
+  fields: Array<Field>,
 |};
 
 export type FieldIdentifier = {|
   type: 'FieldIdentifier',
   value: number,
   line: number,
-  column: number
+  column: number,
 |};
 export type Field = {|
   id: FieldIdentifier,
@@ -59,7 +59,7 @@ export type Field = {|
   required: boolean,
   optional: boolean,
   defaultValue: {||} | null,
-  annotations: Annotations
+  annotations: Annotations,
 |};
 
 export type EnumDefinition = {|
@@ -67,83 +67,83 @@ export type EnumDefinition = {|
   id: Identifier,
   fieldType: Identifier | Literal,
   value: Literal,
-  annotations: Annotations
+  annotations: Annotations,
 |};
 
 export type Enum = {|
   id: Identifier,
   type: 'Enum',
   definitions: Array<EnumDefinition>,
-  annotations: Annotations
+  annotations: Annotations,
 |};
 
 export type Typedef = {|
   id: Identifier,
   type: 'Typedef',
-  valueType: Identifier | BaseType
+  valueType: Identifier | BaseType,
 |};
 
 export type FunctionDefinition = {|
   id: Identifier,
   fields: Array<Field>,
-  returns: Identifier | BaseType
+  returns: Identifier | BaseType,
 |};
 
 export type Service = {|
   id: Identifier,
   type: 'Service',
-  functions: Array<FunctionDefinition>
+  functions: Array<FunctionDefinition>,
 |};
 
 export type Const = {|
   id: Identifier,
   type: 'Const',
   fieldType: Identifier | Literal | BaseType,
-  value: ConstList | ConstEntry | ConstMap | Literal
+  value: ConstList | ConstEntry | ConstMap | Literal,
 |};
 
 export type Literal = {|
   id: Identifier,
   type: 'Literal',
-  value: string | number
+  value: string | number,
 |};
 
 export type ConstList = {|
   id: Identifier,
   type: 'ConstList',
-  values: Array<Identifier | Literal>
+  values: Array<Identifier | Literal>,
 |};
 
 export type ConstEntry = {|
   id: Identifier,
   type: 'ConstEntry',
   key: Literal | Identifier,
-  value: Literal | Identifier | ConstMap
+  value: Literal | Identifier | ConstMap,
 |};
 
 export type List = {|
   id: Identifier,
   type: 'List',
-  valueType: Identifier | BaseType
+  valueType: Identifier | BaseType,
 |};
 
 export type Map = {|
   id: Identifier,
   type: 'Map',
   keyType: Identifier | BaseType,
-  valueType: Identifier | BaseType
+  valueType: Identifier | BaseType,
 |};
 
 export type Set = {|
   id: Identifier,
   type: 'Set',
-  valueType: Identifier | BaseType
+  valueType: Identifier | BaseType,
 |};
 
 export type ConstMap = {|
   id: Identifier,
   type: 'ConstMap',
-  entries: Array<ConstEntry>
+  entries: Array<ConstEntry>,
 |};
 
 export type Definition =
@@ -178,6 +178,6 @@ export type Ast = {|
     id: string,
     namespace: string | null,
     line: number,
-    column: number
-  |}>
+    column: number,
+  |}>,
 |};
