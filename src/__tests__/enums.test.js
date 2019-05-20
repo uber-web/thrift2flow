@@ -48,17 +48,21 @@ export const THE_ENUM_PROP: $ReadOnly<{|
   HIGH: \\"HIGH\\"
 });
 
-export const THE_STRING_MAP: {| \\"0\\": string, \\"1\\": string, \\"2\\": string |} = {
+export const THE_STRING_MAP: $ReadOnly<{|
+  \\"0\\": string,
+  \\"1\\": string,
+  \\"2\\": string
+|}> = {
   \\"0\\": \\"Some default string\\",
   \\"1\\": \\"Some low string\\",
   \\"2\\": \\"Some high string\\"
 };
 
-export const THE_STRING_KEY_MAP: {|
+export const THE_STRING_KEY_MAP: $ReadOnly<{|
   DEFAULT: string,
   LOW: string,
   HIGH: string
-|} = {
+|}> = {
   [THE_ENUM_PROP.DEFAULT]: \\"some other default\\",
   [THE_ENUM_PROP.LOW]: \\"some other low\\",
   [THE_ENUM_PROP.HIGH]: \\"some other high\\"
