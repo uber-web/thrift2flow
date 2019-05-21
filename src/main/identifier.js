@@ -1,5 +1,5 @@
 // @flow
-const reservedTypes = ['any', 'mixed', 'number', 'throw'];
+const reservedTypes = ['any', 'mixed', 'number', 'throw', 'Class'];
 
 export function id(s: string): string {
   const split = s.split('.');
