@@ -79,6 +79,7 @@ const i64Mappings = {
   long: 'thrift2flow$Long',
   Date: 'string',
   Integer: 'number',
+  Number: 'number',
 };
 
 export class ThriftFileConverter {
@@ -549,7 +550,8 @@ export class ThriftFileConverter {
         jsType === 'long' ||
         jsType === 'Long' ||
         jsType === 'Date' ||
-        jsType === 'Integer'
+        jsType === 'Integer' ||
+        jsType === 'Number'
       ) {
         return i64Mappings[jsType];
       }
