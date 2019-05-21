@@ -80,6 +80,8 @@ const i64Mappings = {
   Date: 'string',
   Integer: 'number',
   Number: 'number',
+  Buffer: 'number',
+  Double: 'number',
 };
 
 export class ThriftFileConverter {
@@ -551,7 +553,9 @@ export class ThriftFileConverter {
         jsType === 'Long' ||
         jsType === 'Date' ||
         jsType === 'Integer' ||
-        jsType === 'Number'
+        jsType === 'Number' ||
+        jsType === 'Buffer' ||
+        jsType === 'Double'
       ) {
         return i64Mappings[jsType];
       }
