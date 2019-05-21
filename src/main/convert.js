@@ -481,7 +481,7 @@ export class ThriftFileConverter {
     return false;
   };
 
-  convertBaseType(t: AstNode): string | void {
+  convertBaseType(t: AstNode, def?: Definition): string | void {
     if (t.type !== 'BaseType') {
       return undefined;
     }
@@ -494,6 +494,14 @@ export class ThriftFileConverter {
         throw new Error(`Unknown or invalid js.type annotation of ${jsType}.`);
       }
       // i64 defaults to Buffer
+    }
+    if (
+      t.baseType === 'string' &&
+      def &&
+      def.type === 'Const' &&
+      typeof def.value.value === 'string'
+    ) {
+      return `'${def.value.value}'`;
     }
     return primitives[t.baseType];
   }
@@ -519,7 +527,10 @@ export class ThriftFileConverter {
             const identifierValue: AstNode = this.identifiersTable[entry.key.name];
             if (identifierValue.type === 'EnumDefinition') {
               return `'${identifierValue.id.name}': ${valueType}`;
+            } else if (identifierValue.type === 'Const') {
+              return `'${identifierValue.value.value}': ${valueType}`;
             } else {
+              console.log('identifierValue', identifierValue);
               throw new Error(`Unknown identifierValue type ${identifierValue.type}`);
             }
           } else if (entry.key.type === 'Literal') {
@@ -555,7 +566,7 @@ export class ThriftFileConverter {
       this.convertArrayType(t) ||
       this.convertMapType(t, def) ||
       this.convertEnumType(t) ||
-      this.convertBaseType(t);
+      this.convertBaseType(t, def);
     if (type !== undefined) {
       return type;
     }
