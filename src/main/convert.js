@@ -269,6 +269,9 @@ export class ThriftFileConverter {
           numValue
         )};`;
       }
+      if (def.value.type === 'Identifier') {
+        return `export const ${def.id.name} = ${def.value.name}`;
+      }
     }
     if (value === undefined) {
       if (def.value.type === 'ConstMap') {

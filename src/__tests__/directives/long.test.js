@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-import { Thrift } from "thriftrw";
-import { ThriftFileConverter } from "../../main/convert";
+import {Thrift} from 'thriftrw';
+import {ThriftFileConverter} from '../../main/convert';
 
-test("thriftrw parses long and Long as numbers", () => {
-  const fixturePath = "src/__tests__/fixtures/long.thrift";
+test('thriftrw parses long and Long as numbers', () => {
+  const fixturePath = 'src/__tests__/fixtures/long.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
     allowFilesystemAccess: true
