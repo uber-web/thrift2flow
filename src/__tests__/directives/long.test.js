@@ -30,7 +30,7 @@ test('thriftrw parses long and Long as numbers', () => {
   const fixturePath = 'src/__tests__/fixtures/long.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.MY_STRUCT.posNum1).toEqual(1);
   expect(thrift.MY_STRUCT.posNum2).toEqual(1);
@@ -61,6 +61,26 @@ export const MY_STRUCT: $ReadOnly<MyStruct> = {
   negNum1: 1,
   negNum2: 1,
   negNum3: 1
+};
+"
+`);
+});
+
+test('The `long` import is included from service definition', () => {
+  const fixturePath = 'src/__tests__/fixtures/long-from-service.thrift';
+  const converter = new ThriftFileConverter(fixturePath, false);
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+import thrift2flow$Long from \\"long\\";
+
+export type Validate = {
+  getStatus: ({| userUUID: string |}) => boolean,
+  getSummary: ({|
+    userUUID: string,
+    startTime: thrift2flow$Long,
+    endTime: thrift2flow$Long
+  |}) => string
 };
 "
 `);

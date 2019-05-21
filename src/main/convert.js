@@ -531,10 +531,17 @@ export class ThriftFileConverter {
         for (const field of node.fields) {
           queue = [...queue, field];
         }
+      } else if (node.type === 'Service') {
+        for (const func of node.functions) {
+          for (const field of func.fields) {
+            queue = [...queue, field];
+          }
+        }
       } else if (
         node.valueType &&
         node.valueType.annotations &&
-        node.valueType.annotations['js.type'] === 'Long'
+        (node.valueType.annotations['js.type'] === 'Long' ||
+          node.valueType.annotations['js.type'] === 'long')
       ) {
         return true;
       }
