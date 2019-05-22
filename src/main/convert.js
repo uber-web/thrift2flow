@@ -68,7 +68,7 @@ const primitives = {
   i8: 'number',
   i16: 'number',
   i32: 'number',
-  i64: 'Buffer',
+  i64: 'number',
   double: 'number',
   string: 'string',
   void: 'void',
@@ -545,6 +545,9 @@ export class ThriftFileConverter {
           node.annotations['js.type'] === 'long')
       ) {
         return true;
+      }
+      if (node.valueType) {
+        queue = [...queue, node.valueType];
       }
     }
     return false;

@@ -52,14 +52,14 @@ test('primitives happy path', done => {
 import type {Primitives} from './types';
 
 function go(s : Primitives) {
-  const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_double];
-  const buffers : Buffer[] = [s.f_i64, s.f_binary];
+  const numbers : number[] = [s.f_byte, s.f_i8, s.f_i16, s.f_i32, s.f_double, s.f_i64];
+  const buffers : Buffer[] = [s.f_binary];
 
   const booleans : boolean[] = [s.f_boolean];
   const strings : string[] = [s.f_string];
   return [numbers, booleans, strings, buffers];
 }
-`
+`,
     },
     r => {
       expect(r.errors).toEqual([]);
@@ -81,7 +81,7 @@ function go(s : Primitives) {
   const booleans : boolean[] = [s.f_byte];
   return [numbers, booleans];
 }
-`
+`,
     },
     r => {
       expect(r.errors.length).toBe(2);
@@ -110,7 +110,7 @@ function go(s : Primitives) {
       s.f_default.length
   ];
 }
-`
+`,
     },
     r => {
       expect(r.errors.length).toBe(4);
@@ -139,7 +139,7 @@ import type {Optionals} from './types';
 function go() : Optionals {
   return {f_byte: 0, notActualField: true};
 }
-`
+`,
     },
     r => {
       expect(r.errors.length).toBe(1);

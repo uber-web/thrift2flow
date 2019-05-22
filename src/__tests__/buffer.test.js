@@ -27,7 +27,7 @@
 import {ThriftFileConverter} from '../main/convert';
 import {Thrift} from 'thriftrw';
 
-test('Se how thriftrw decodes js.type i64', () => {
+test('See how thriftrw decodes js.type i64', () => {
   const fixturePath = 'src/__tests__/fixtures/buffer.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
@@ -40,6 +40,24 @@ test('Se how thriftrw decodes js.type i64', () => {
 "// @flow
 
 export const MY_BUFF: 10 = 10;
+"
+`);
+});
+
+test('Ensure flow uses number not buffer for i64', () => {
+  const fixturePath = 'src/__tests__/fixtures/buffer-number.thrift';
+  const thrift = new Thrift({
+    entryPoint: fixturePath,
+    allowFilesystemAccess: true,
+  });
+  expect(thrift.NULL_ID).toEqual(0);
+  const converter = new ThriftFileConverter(fixturePath, false);
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+export type MY_ID = number;
+
+export const NULL_ID: MY_ID = 0;
 "
 `);
 });
