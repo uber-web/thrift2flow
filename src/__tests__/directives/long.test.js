@@ -85,3 +85,18 @@ export type Validate = {
 "
 `);
 });
+
+test('The `long` import is included from service definition on return', () => {
+  const fixturePath = 'src/__tests__/fixtures/long-from-service-return.thrift';
+  const converter = new ThriftFileConverter(fixturePath, false);
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+import thrift2flow$Long from \\"long\\";
+
+export type Validate = {
+  getStatus: ({| userUUID: string |}) => thrift2flow$Long
+};
+"
+`);
+});

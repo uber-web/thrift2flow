@@ -529,19 +529,20 @@ export class ThriftFileConverter {
         node.type === 'Union'
       ) {
         for (const field of node.fields) {
-          queue = [...queue, field];
+          queue = [...queue, field.valueType];
         }
       } else if (node.type === 'Service') {
         for (const func of node.functions) {
+          queue = [...queue, func.returns];
           for (const field of func.fields) {
-            queue = [...queue, field];
+            queue = [...queue, field.valueType];
           }
         }
       } else if (
-        node.valueType &&
-        node.valueType.annotations &&
-        (node.valueType.annotations['js.type'] === 'Long' ||
-          node.valueType.annotations['js.type'] === 'long')
+        node &&
+        node.annotations &&
+        (node.annotations['js.type'] === 'Long' ||
+          node.annotations['js.type'] === 'long')
       ) {
         return true;
       }
