@@ -611,7 +611,10 @@ export class ThriftFileConverter {
             ];
             if (identifierValue.type === 'EnumDefinition') {
               return `'${identifierValue.id.name}': ${valueType}`;
-            } else if (identifierValue.type === 'Const') {
+            } else if (
+              identifierValue.type === 'Const' &&
+              typeof identifierValue.value.value === 'string'
+            ) {
               return `'${identifierValue.value.value}': ${valueType}`;
             } else {
               throw new Error(
