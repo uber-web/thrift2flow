@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-import { Thrift } from "thriftrw";
-import { ThriftFileConverter } from "../../main/convert";
+import {Thrift} from 'thriftrw';
+import {ThriftFileConverter} from '../../main/convert';
 
-test("thriftrw parses long and Long as numbers", () => {
-  const fixturePath = "src/__tests__/fixtures/long.thrift";
+test('thriftrw parses long and Long as numbers', () => {
+  const fixturePath = 'src/__tests__/fixtures/long.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
     allowFilesystemAccess: true
@@ -66,8 +66,8 @@ export const MY_STRUCT: $ReadOnly<MyStruct> = {
 `);
 });
 
-test("The `long` import is included from service definition", () => {
-  const fixturePath = "src/__tests__/fixtures/long-from-service.thrift";
+test('The `long` import is included from service definition', () => {
+  const fixturePath = 'src/__tests__/fixtures/long-from-service.thrift';
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow
@@ -86,8 +86,8 @@ export type Validate = {
 `);
 });
 
-test("The `long` import is included from service definition on return", () => {
-  const fixturePath = "src/__tests__/fixtures/long-from-service-return.thrift";
+test('The `long` import is included from service definition on return', () => {
+  const fixturePath = 'src/__tests__/fixtures/long-from-service-return.thrift';
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow

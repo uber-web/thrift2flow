@@ -31,7 +31,7 @@ test('See how thriftrw decodes js.type i64', () => {
   const fixturePath = 'src/__tests__/fixtures/buffer.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true,
+    allowFilesystemAccess: true
   });
   // thriftrw seems to decode Buffer types as number.
   expect(thrift.MY_BUFF).toEqual(10);
@@ -48,7 +48,7 @@ test('Ensure flow uses number not buffer for i64', () => {
   const fixturePath = 'src/__tests__/fixtures/buffer-number.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true,
+    allowFilesystemAccess: true
   });
   expect(thrift.NULL_ID).toEqual(0);
   const converter = new ThriftFileConverter(fixturePath, false);
