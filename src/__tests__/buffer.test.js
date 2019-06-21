@@ -24,11 +24,11 @@
  */
 
 // import {flowResultTest} from '../test-util';
-import {ThriftFileConverter} from '../main/convert';
-import {Thrift} from 'thriftrw';
+import { ThriftFileConverter } from "../main/convert";
+import { Thrift } from "thriftrw";
 
-test('See how thriftrw decodes js.type i64', () => {
-  const fixturePath = 'src/__tests__/fixtures/buffer.thrift';
+test("See how thriftrw decodes js.type i64", () => {
+  const fixturePath = "src/__tests__/fixtures/buffer.thrift";
   const thrift = new Thrift({
     entryPoint: fixturePath,
     allowFilesystemAccess: true
@@ -44,8 +44,27 @@ export const MY_BUFF: 10 = 10;
 `);
 });
 
-test('Ensure flow uses number not buffer for i64', () => {
-  const fixturePath = 'src/__tests__/fixtures/buffer-number.thrift';
+test("Try using the toBufferResult fromBufferResult when parsing a struct with an i64 value", () => {
+  const fixturePath = "src/__tests__/fixtures/struct-with-i64.thrift";
+  const thrift = new Thrift({
+    entryPoint: fixturePath,
+    allowFilesystemAccess: true
+  });
+  var myStruct = new thrift.MyStruct({ myProp: 0xa0 });
+  const buffer = thrift.MyStruct.toBuffer(myStruct);
+  const structAgain = thrift.MyStruct.fromBufferResult(buffer);
+  expect(Buffer.isBuffer(structAgain.value.myProp)).toBeTruthy();
+  const converter = new ThriftFileConverter(fixturePath, false);
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+export type MyStruct = {| myProp: number | Buffer |};
+"
+`);
+});
+
+test("Ensure flow uses number not buffer for i64", () => {
+  const fixturePath = "src/__tests__/fixtures/buffer-number.thrift";
   const thrift = new Thrift({
     entryPoint: fixturePath,
     allowFilesystemAccess: true
@@ -55,7 +74,7 @@ test('Ensure flow uses number not buffer for i64', () => {
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow
 
-export type MY_ID = number;
+export type MY_ID = number | Buffer;
 
 export const NULL_ID: MY_ID = 0;
 "

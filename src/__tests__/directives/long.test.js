@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-import {Thrift} from 'thriftrw';
-import {ThriftFileConverter} from '../../main/convert';
+import { Thrift } from "thriftrw";
+import { ThriftFileConverter } from "../../main/convert";
 
-test('thriftrw parses long and Long as numbers', () => {
-  const fixturePath = 'src/__tests__/fixtures/long.thrift';
+test("thriftrw parses long and Long as numbers", () => {
+  const fixturePath = "src/__tests__/fixtures/long.thrift";
   const thrift = new Thrift({
     entryPoint: fixturePath,
     allowFilesystemAccess: true
@@ -46,12 +46,12 @@ test('thriftrw parses long and Long as numbers', () => {
 import thrift2flow$Long from \\"long\\";
 
 export type MyStruct = {|
-  posNum1?: ?thrift2flow$Long,
-  posNum2?: ?thrift2flow$Long,
-  posNum3?: ?number,
-  negNum1?: ?thrift2flow$Long,
-  negNum2?: ?thrift2flow$Long,
-  negNum3?: ?number
+  posNum1?: ?(number | thrift2flow$Long),
+  posNum2?: ?(number | thrift2flow$Long),
+  posNum3?: ?(number | Buffer),
+  negNum1?: ?(number | thrift2flow$Long),
+  negNum2?: ?(number | thrift2flow$Long),
+  negNum3?: ?(number | Buffer)
 |};
 
 export const MY_STRUCT: $ReadOnly<MyStruct> = {
@@ -66,8 +66,8 @@ export const MY_STRUCT: $ReadOnly<MyStruct> = {
 `);
 });
 
-test('The `long` import is included from service definition', () => {
-  const fixturePath = 'src/__tests__/fixtures/long-from-service.thrift';
+test("The `long` import is included from service definition", () => {
+  const fixturePath = "src/__tests__/fixtures/long-from-service.thrift";
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow
@@ -78,16 +78,16 @@ export type Validate = {
   getStatus: ({| userUUID: string |}) => boolean,
   getSummary: ({|
     userUUID: string,
-    startTime: thrift2flow$Long,
-    endTime: thrift2flow$Long
+    startTime: number | thrift2flow$Long,
+    endTime: number | thrift2flow$Long
   |}) => string
 };
 "
 `);
 });
 
-test('The `long` import is included from service definition on return', () => {
-  const fixturePath = 'src/__tests__/fixtures/long-from-service-return.thrift';
+test("The `long` import is included from service definition on return", () => {
+  const fixturePath = "src/__tests__/fixtures/long-from-service-return.thrift";
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
 "// @flow
@@ -95,7 +95,7 @@ test('The `long` import is included from service definition on return', () => {
 import thrift2flow$Long from \\"long\\";
 
 export type Validate = {
-  getStatus: ({| userUUID: string |}) => thrift2flow$Long
+  getStatus: ({| userUUID: string |}) => number | thrift2flow$Long
 };
 "
 `);

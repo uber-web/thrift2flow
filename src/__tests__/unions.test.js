@@ -23,10 +23,10 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../test-util';
-import {ThriftFileConverter} from '../main/convert';
+import { flowResultTest } from "../test-util";
+import { ThriftFileConverter } from "../main/convert";
 
-test('Long module is imported when needed', () => {
+test("Long module is imported when needed", () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/union-long-import.thrift`,
     false
@@ -41,17 +41,17 @@ export type RawValue =
   | {| boolValue: boolean |}
   | {| doubleValue: number |}
   | {| int32Value: number |}
-  | {| int64Value: thrift2flow$Long |}
+  | {| int64Value: number | thrift2flow$Long |}
   | {| stringValue: string |};
 "
 `);
 });
 
-test('unions', done => {
+test("unions", done => {
   flowResultTest(
     {
       // language=thrift
-      'types.thrift': `
+      "types.thrift": `
 typedef MyUnion UnionTypedef
 typedef MyEmptyUnion EmptyUnionTypedef
 
@@ -71,7 +71,7 @@ struct MyStruct {
 }
 `,
       // language=JavaScript
-      'index.js': `
+      "index.js": `
 // @flow
 import type { MyStruct, UnionTypedef, EmptyUnionTypedef } from './types';
 
