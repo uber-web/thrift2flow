@@ -43,6 +43,21 @@ test('consts', done => {
 
 test('const map values are numbers', () => {
   const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/const-string-literal.thrift`,
+    false
+  );
+  const jsContent = converter.generateFlowFile();
+  expect(jsContent).toMatchInlineSnapshot(`
+"// @flow
+
+export const A_STRING_LITERAL: \\"my-string-literal-value\\" =
+  \\"my-string-literal-value\\";
+"
+`);
+});
+
+test('const map values are numbers', () => {
+  const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/const-map-literal-type.thrift`,
     false
   );
@@ -58,7 +73,7 @@ export const ShieldType: $ReadOnly<{|
   U: \\"U\\"
 });
 
-export const o: string = \\"ooooooo\\";
+export const o: \\"ooooooo\\" = \\"ooooooo\\";
 
 export const PRIORITIES: $ReadOnly<{| O: number, U: number |}> = {
   [ShieldType.O]: 2,

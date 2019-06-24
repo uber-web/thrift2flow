@@ -1,7 +1,7 @@
 // @flow
 
 type Annotations = {|
-  'js.type'?: 'Long' | 'Date'
+  'js.type'?: 'long' | 'Long' | 'Date' | 'Number' | 'Buffer'
 |};
 type Primitives =
   | 'i8'
