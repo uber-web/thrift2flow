@@ -1,3 +1,7 @@
+# v1.0.0
+
+* Major version bump to prevent backwards-incompatible changes in the future.
+
 # v0.7.0
 
 * Update CLI command line options to require both `outputDir` and `path`.
