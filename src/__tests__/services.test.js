@@ -51,7 +51,7 @@ function checkVoids(s : MyService) {
 function ensureVoid(f : any => void) {
     f(0);
 }
-`
+`,
     },
     r => {
       expect(r.errors).toEqual([]);

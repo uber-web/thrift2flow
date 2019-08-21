@@ -31,7 +31,7 @@ test('convert const map witth enums', () => {
   const fixturePath = 'src/__tests__/fixtures/const-map.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(thrift.USER_TYPES.admin).toEqual(true);

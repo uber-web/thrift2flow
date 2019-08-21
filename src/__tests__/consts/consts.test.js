@@ -31,8 +31,10 @@ import {ThriftFileConverter} from '../../main/convert';
 test('consts', done => {
   flowResultTest(
     {
-      'types.thrift': fs.readFileSync(`${__dirname}/types.thrift.fixture`).toString(),
-      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString()
+      'types.thrift': fs
+        .readFileSync(`${__dirname}/types.thrift.fixture`)
+        .toString(),
+      'index.js': fs.readFileSync(`${__dirname}/index.js.fixture`).toString(),
     },
     result => {
       expect(result.errors).toEqual([]);
@@ -41,7 +43,7 @@ test('consts', done => {
   );
 });
 
-test('const map values are numbers', () => {
+test('const string literals', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/const-string-literal.thrift`,
     false
@@ -108,7 +110,7 @@ export const NUMS: $ReadOnly<{| \\"0\\": string, \\"1\\": string |}> = {
 `);
 });
 
-test('constant maps', () => {
+test('constant enum values', () => {
   const converter = new ThriftFileConverter(
     'src/__tests__/fixtures/const-enum-values.thrift',
     false

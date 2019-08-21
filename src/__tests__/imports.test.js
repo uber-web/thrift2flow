@@ -61,7 +61,7 @@ struct MyStruct {
               const numbers : number[] = [s.f_OtherStruct.num];
               return [numbers];
             }
-          `
+          `,
     },
     ({errors}) => {
       expect(errors).toEqual([]);
@@ -99,7 +99,7 @@ function go(s : MyStruct) {
   const numbers : number[] = [s.a];
   return [numbers];
 }
-    `
+    `,
     },
     ({errors}) => {
       expect(errors).toEqual([]);
@@ -144,7 +144,7 @@ struct MyStruct {
               const numbers : number[] = [s.f_OtherStruct.num];
               return [numbers];
             }
-          `
+          `,
     },
     ({errors}) => {
       expect(errors).toEqual([]);

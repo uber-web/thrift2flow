@@ -23,16 +23,16 @@
  * SOFTWARE.
  */
 
-import { flowResultTest } from "../test-util";
+import {flowResultTest} from '../test-util';
 
-import { ThriftFileConverter } from "../main/convert";
-import path from "path";
+import {ThriftFileConverter} from '../main/convert';
+import path from 'path';
 // flowlint-next-line untyped-import:off
-import fs from "fs-extra";
+import fs from 'fs-extra';
 // flowlint-next-line untyped-import:off
-import tmp from "tmp";
+import tmp from 'tmp';
 
-test("Long module is imported when needed", () => {
+test('Long module is imported when needed', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/typedef-long-import.thrift`,
     false
@@ -47,7 +47,7 @@ export type Long = number | thrift2flow$Long;
 `);
 });
 
-test("typedefs should reference enum types not value", () => {
+test('typedefs should reference enum types not value', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/typedef-enum-value-reference.thrift`,
     false
@@ -63,10 +63,10 @@ export type TimeRangeByDayOfWeek = {
 "
 `);
 });
-test("typedef Date", done => {
+test('typedef Date', done => {
   flowResultTest(
     {
-      "types.thrift": `
+      'types.thrift': `
 typedef byte MyByte
 typedef MyByte TransitiveTypedef
 typedef i64 (js.type = 'Date') Timestamp
@@ -82,7 +82,7 @@ struct MyStruct {
   3: OtherStruct f_OtherStruct
 }
 `,
-      "index.js": `
+      'index.js': `
 // @flow
 import type {
     MyStruct,
@@ -97,7 +97,7 @@ function go(s : MyStruct) {
 
   return [numbers, structs, timestamps];
 }
-          `
+          `,
     },
     r => {
       expect(r.errors.length).toBe(0);
@@ -106,47 +106,47 @@ function go(s : MyStruct) {
   );
 });
 
-test("typedef long in struct", () => {
+test('typedef long in struct', () => {
   let files = {
     // language=thrift
-    "types.thrift": `
+    'types.thrift': `
 struct UserActivitiesRequest {
   10: required string userUUID
   20: optional list<string> workflowUUIDs
   30: optional i64(js.type = "Long") fromTimestampNano
   40: optional i64(js.type = "Long") toTimestampNano
 }
-`
+`,
   };
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
   paths
-    .filter(p => p.endsWith(".thrift"))
+    .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p => {
       let output = new ThriftFileConverter(p, true).generateFlowFile();
-      let longIndex = output.indexOf("import thrift2flow$Long");
+      let longIndex = output.indexOf('import thrift2flow$Long');
       expect(longIndex).not.toBe(-1);
     });
 });
 
-test("typedef long in global scope", () => {
+test('typedef long in global scope', () => {
   let files = {
     // language=thrift
-    "types.thrift": `
+    'types.thrift': `
 typedef i64 (js.type = "Long") Points
-`
+`,
   };
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
   paths.forEach(p => fs.writeFileSync(path.resolve(root, p), files[p]));
   paths
-    .filter(p => p.endsWith(".thrift"))
+    .filter(p => p.endsWith('.thrift'))
     .map(p => path.resolve(root, p))
     .forEach(p => {
       let output = new ThriftFileConverter(p, true).generateFlowFile();
-      let longIndex = output.indexOf("import thrift2flow$Long");
+      let longIndex = output.indexOf('import thrift2flow$Long');
       // Expected long definition but did not find one
       expect(longIndex).not.toBe(-1);
     });

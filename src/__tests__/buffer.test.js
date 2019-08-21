@@ -24,14 +24,14 @@
  */
 
 // import {flowResultTest} from '../test-util';
-import { ThriftFileConverter } from "../main/convert";
-import { Thrift } from "thriftrw";
+import {ThriftFileConverter} from '../main/convert';
+import {Thrift} from 'thriftrw';
 
-test("See how thriftrw decodes js.type i64", () => {
-  const fixturePath = "src/__tests__/fixtures/buffer.thrift";
+test('See how thriftrw decodes js.type i64', () => {
+  const fixturePath = 'src/__tests__/fixtures/buffer.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   // thriftrw seems to decode Buffer types as number.
   expect(thrift.MY_BUFF).toEqual(10);
@@ -44,13 +44,13 @@ export const MY_BUFF: 10 = 10;
 `);
 });
 
-test("Try using the toBufferResult fromBufferResult when parsing a struct with an i64 value", () => {
-  const fixturePath = "src/__tests__/fixtures/struct-with-i64.thrift";
+test('Try using the toBufferResult fromBufferResult when parsing a struct with an i64 value', () => {
+  const fixturePath = 'src/__tests__/fixtures/struct-with-i64.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
-  var myStruct = new thrift.MyStruct({ myProp: 0xa0 });
+  var myStruct = new thrift.MyStruct({myProp: 0xa0});
   const buffer = thrift.MyStruct.toBuffer(myStruct);
   const structAgain = thrift.MyStruct.fromBufferResult(buffer);
   expect(Buffer.isBuffer(structAgain.value.myProp)).toBeTruthy();
@@ -63,11 +63,11 @@ export type MyStruct = {| myProp: number | Buffer |};
 `);
 });
 
-test("Ensure flow uses number not buffer for i64", () => {
-  const fixturePath = "src/__tests__/fixtures/buffer-number.thrift";
+test('Ensure flow uses number not buffer for i64', () => {
+  const fixturePath = 'src/__tests__/fixtures/buffer-number.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.NULL_ID).toEqual(0);
   const converter = new ThriftFileConverter(fixturePath, false);
