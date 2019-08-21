@@ -23,7 +23,6 @@
  * SOFTWARE.
  */
 
-import {flowResultTest} from '../../test-util';
 import {ThriftFileConverter} from '../../main/convert';
 import {Thrift} from 'thriftrw';
 
@@ -31,7 +30,7 @@ test('thriftrw enums work in map constants', () => {
   const fixturePath = 'src/__tests__/identifiers/def.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.MY_ACCESS.allowed).toEqual(false);
   const converter = new ThriftFileConverter(fixturePath, false);

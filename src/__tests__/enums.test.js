@@ -31,7 +31,7 @@ test('thriftrw enums work in map constants', () => {
   const fixturePath = 'src/__tests__/fixtures/enums-as-map-keys.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.THE_ENUM_PROP.DEFAULT).toEqual('DEFAULT');
   const converter = new ThriftFileConverter(fixturePath, false);
@@ -74,14 +74,17 @@ export const THE_STRING_KEY_MAP: $ReadOnly<{|
 test('thriftrw enums are strings not numbers', () => {
   const thrift = new Thrift({
     entryPoint: 'src/__tests__/fixtures/my-enum.thrift',
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.MyEnum.OK).toEqual('OK');
   expect(thrift.MyEnum.ERROR).toEqual('ERROR');
 });
 
 test('enum to JS', () => {
-  const converter = new ThriftFileConverter('src/__tests__/fixtures/my-enum.thrift', false);
+  const converter = new ThriftFileConverter(
+    'src/__tests__/fixtures/my-enum.thrift',
+    false
+  );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchSnapshot();
 });
@@ -159,7 +162,7 @@ const okFromMap: 'OK' = MyEnum.OK;
 const errorFromMap: 'ERROR' = MyEnum.ERROR;
 
 const t: $Values<typeof EnumTypedef> = ok;
-`
+`,
     },
     (r: FlowResult) => {
       expect(r.errors).toEqual([]);
@@ -199,7 +202,7 @@ const struct: MyStruct = {
 }
 
 const t: $Values<typeof EnumTypedef> = 'NOT CORRECT';
-`
+`,
     },
     (r: FlowResult) => {
       expect(r.errors.length).toEqual(5);

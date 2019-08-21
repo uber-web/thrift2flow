@@ -30,13 +30,16 @@ import {ThriftFileConverter} from '../../main/convert';
 test('thriftrw parses enum i32 const array as strings', () => {
   const thrift = new Thrift({
     entryPoint: 'src/__tests__/fixtures/const-list.thrift',
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.DIRECTIONS).toEqual(['LEFT', 'RIGHT', 'LEFT', 'RIGHT']);
 });
 
 test('const map values are numbers', () => {
-  const converter = new ThriftFileConverter(`src/__tests__/fixtures/const-list.thrift`, false);
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/const-list.thrift`,
+    false
+  );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
 "// @flow

@@ -6,12 +6,15 @@ import path from 'path';
 type OptionsType = {|
   withSource?: boolean,
   commonPath: string,
-  outputDir?: string
+  outputDir?: string,
 |};
 
 export const ThriftFileConverter = Converter;
 
-export default function convert(thriftPaths: Array<string>, options: OptionsType) {
+export default function convert(
+  thriftPaths: Array<string>,
+  options: OptionsType
+) {
   const {withSource = false, outputDir = 'flow-output', commonPath} = options;
   const allOutput = {};
   for (const thriftPath of thriftPaths) {
@@ -21,7 +24,9 @@ export default function convert(thriftPaths: Array<string>, options: OptionsType
       .filter(p => thriftPaths.indexOf(p) === -1)
       .forEach(p => thriftPaths.push(p));
     const root = commonPath;
-    const relativeThriftPath = path.dirname(path.relative(root, converter.thriftPath));
+    const relativeThriftPath = path.dirname(
+      path.relative(root, converter.thriftPath)
+    );
     const jsFilename = path.resolve(
       outputDir,
       relativeThriftPath,

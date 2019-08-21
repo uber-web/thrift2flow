@@ -7,7 +7,7 @@ test('const lists are transformed  correctly', () => {
   const fixturePath = 'src/__tests__/fixtures/const-list-of-lists.thrift';
   const thrift = new Thrift({
     entryPoint: fixturePath,
-    allowFilesystemAccess: true
+    allowFilesystemAccess: true,
   });
   expect(thrift.BBB_LIST).toEqual(['BBB']);
 

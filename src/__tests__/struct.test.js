@@ -43,7 +43,10 @@ export type Foo = {| propA?: ?$Values<typeof common.EntityTypeA> |};
 });
 
 test('structs with optional properties', () => {
-  const converter = new ThriftFileConverter(`src/__tests__/fixtures/optional-struct.thrift`, false);
+  const converter = new ThriftFileConverter(
+    `src/__tests__/fixtures/optional-struct.thrift`,
+    false
+  );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
 "// @flow
