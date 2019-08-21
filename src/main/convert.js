@@ -383,7 +383,10 @@ export class ThriftFileConverter {
       return '{||}';
     }
     return fields
-      .map((f: Field) => `{|${f.name}: ${this.convertType(f.valueType)}|}`)
+      .map(
+        (f: Field) =>
+          `{|type: "${f.name}",${f.name}: ${this.convertType(f.valueType)}|}`
+      )
       .join(' | ');
   };
 
