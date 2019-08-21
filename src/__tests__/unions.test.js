@@ -37,12 +37,12 @@ test('Long module is imported when needed', () => {
 import thrift2flow$Long from \\"long\\";
 
 export type RawValue =
-  | {| binaryValue: Buffer |}
-  | {| boolValue: boolean |}
-  | {| doubleValue: number |}
-  | {| int32Value: number |}
-  | {| int64Value: number | thrift2flow$Long |}
-  | {| stringValue: string |};
+  | {| type: \\"binaryValue\\", binaryValue: Buffer |}
+  | {| type: \\"boolValue\\", boolValue: boolean |}
+  | {| type: \\"doubleValue\\", doubleValue: number |}
+  | {| type: \\"int32Value\\", int32Value: number |}
+  | {| type: \\"int64Value\\", int64Value: number | thrift2flow$Long |}
+  | {| type: \\"stringValue\\", stringValue: string |};
 "
 `);
 });
@@ -82,6 +82,13 @@ function go(s : MyStruct, u: UnionTypedef, eu: EmptyUnionTypedef) {
   const emptyunionDefs: EmptyUnionTypedef[] = [s.f_EmptyUnionTypedef];
   const strings: string[] = [s.f_MyUnion.name || ''];
   const numbers: number[] = [s.f_MyUnion.size || -1];
+  const myUnion = s.f_MyUnion;
+  // testing out type refinement using the type key
+  if (myUnion.type === 'name') {
+    (myUnion.name: string)
+  } else {
+    (myUnion.size: number)
+  }
   return [unions,unions,unionDefs,emptyunionDefs,strings,numbers];
 }
 `,
