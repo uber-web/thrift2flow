@@ -93,11 +93,11 @@ import type {
 function go(s : MyStruct) {
   const numbers : number[] = [s.f_MyByte, s.f_TransitiveTypedef, s.f_OtherStruct.num];
   const structs : OtherStruct[] = [s.f_OtherStruct];
-  const timestamps : Timestamp[] = ["string", s.f_OtherStruct.ts];
+  const timestamps : Timestamp[] = [10, s.f_OtherStruct.ts];
 
   return [numbers, structs, timestamps];
 }
-          `
+          `,
     },
     r => {
       expect(r.errors.length).toBe(0);
@@ -116,7 +116,7 @@ struct UserActivitiesRequest {
   30: optional i64(js.type = "Long") fromTimestampNano
   40: optional i64(js.type = "Long") toTimestampNano
 }
-`
+`,
   };
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
@@ -136,7 +136,7 @@ test('typedef long in global scope', () => {
     // language=thrift
     'types.thrift': `
 typedef i64 (js.type = "Long") Points
-`
+`,
   };
   const root = tmp.dirSync().name;
   const paths = Object.keys(files);
