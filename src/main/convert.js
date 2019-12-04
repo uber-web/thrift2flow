@@ -363,7 +363,7 @@ export class ThriftFileConverter {
     `export type ${name} = ${this.generateStructContents(fields)};`;
 
   generateStructContents = (fields: Array<Field>) =>
-    `{|${fields
+    `$ReadOnly<{|${fields
       .map((field: Field) => {
         const valueType = field.valueType;
         let optionalPrefix = this.isOptional(field) ? '?' : '';
@@ -371,9 +371,9 @@ export class ThriftFileConverter {
           valueType.type === 'Identifier'
             ? this.getIdentifier(valueType.name, 'type')
             : this.convertType(valueType);
-        return `${field.name}${optionalPrefix}: ${optionalPrefix}${value};`;
+        return `${field.name}${optionalPrefix}: $ReadOnly<${optionalPrefix}${value}>;`;
       })
-      .join('\n')}|}`;
+      .join('\n')}|}>`;
 
   generateUnion = ({id: {name}, fields}: Union) =>
     `export type ${name} = ${this.generateUnionContents(fields)};`;
