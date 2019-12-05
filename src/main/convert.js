@@ -185,7 +185,7 @@ export class ThriftFileConverter {
   };
 
   generateService = (def: Service) =>
-    `export type ${def.id.name} = {\n${def.functions
+    `export type ${id(def.id.name)} = {\n${def.functions
       .map(this.generateFunction)
       .join(',')}};`;
 
@@ -201,7 +201,9 @@ export class ThriftFileConverter {
         return this.generateEnum(otherDef, def.id.name);
       }
     }
-    return `export type ${def.id.name} = ${this.convertType(def.valueType)};`;
+    return `export type ${id(def.id.name)} = ${this.convertType(
+      def.valueType
+    )};`;
   };
 
   generateEnumUnion = (def: Enum) => {
@@ -269,12 +271,12 @@ export class ThriftFileConverter {
         value !== undefined
       ) {
         const numValue = Number(value) > 0 ? Number(value) : -Number(value);
-        return `export const ${def.id.name}: ${String(numValue)} = ${String(
+        return `export const ${id(def.id.name)}: ${String(numValue)} = ${String(
           numValue
         )};`;
       }
       if (def.value.type === 'Identifier') {
-        return `export const ${def.id.name} = ${def.value.name}`;
+        return `export const ${id(def.id.name)} = ${id(def.value.name)}`;
       }
     }
     if (value === undefined) {
@@ -286,7 +288,7 @@ export class ThriftFileConverter {
       }
     }
     const fieldType = enumType || this.convertType(def.fieldType, def);
-    return `export const ${def.id.name}: ${
+    return `export const ${id(def.id.name)}: ${
       readOnly ? `$ReadOnly<${fieldType}>` : fieldType
     } = ${value};`;
   };
@@ -360,7 +362,7 @@ export class ThriftFileConverter {
   };
 
   generateStruct = ({id: {name}, fields}: Struct | Exception) =>
-    `export type ${name} = ${this.generateStructContents(fields)};`;
+    `export type ${id(name)} = ${this.generateStructContents(fields)};`;
 
   generateStructContents = (fields: Array<Field>) =>
     `{|${fields
@@ -376,7 +378,7 @@ export class ThriftFileConverter {
       .join('\n')}|}`;
 
   generateUnion = ({id: {name}, fields}: Union) =>
-    `export type ${name} = ${this.generateUnionContents(fields)};`;
+    `export type ${id(name)} = ${this.generateUnionContents(fields)};`;
 
   generateUnionContents = (fields: Array<Field>) => {
     if (!fields.length) {

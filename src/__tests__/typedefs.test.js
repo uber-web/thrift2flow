@@ -131,6 +131,21 @@ struct UserActivitiesRequest {
     });
 });
 
+test('typedef reserved type', () => {
+  const root = tmp.dirSync().name;
+  const p = path.resolve(root, 'types.thrift');
+  fs.writeFileSync(p, `typedef string Symbol`);
+  let output = new ThriftFileConverter(p, true).generateFlowFile();
+  expect(output).toMatchInlineSnapshot(`
+"// @flow
+
+// Source: /var/folders/sz/v9gcp6kx09g3b49qqnll68lc0000gp/T/tmp-35121caTR4AtzFmXM/types.thrift
+
+export type _Symbol = string;
+"
+`);
+});
+
 test('typedef long in global scope', () => {
   let files = {
     // language=thrift
