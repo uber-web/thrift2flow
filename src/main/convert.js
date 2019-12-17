@@ -276,6 +276,7 @@ export class ThriftFileConverter {
         )};`;
       }
       if (def.value.type === 'Identifier') {
+        // $FlowFixMe
         return `export const ${id(def.id.name)} = ${id(def.value.name)}`;
       }
     }
