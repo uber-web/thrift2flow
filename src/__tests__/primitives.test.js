@@ -26,6 +26,8 @@
 
 import {flowResultTest} from '../test-util';
 
+jest.setTimeout(10000);
+
 // language=thrift
 const primitiveStruct = `
   struct Primitives {

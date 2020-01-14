@@ -98,7 +98,7 @@ export class ThriftFileConverter {
 
   constructor(thriftPath: string, withsource: boolean) {
     this.thriftPath = path.resolve(thriftPath);
-    this.thrift = thrift({...thriftOptions, entryPoint: thriftPath});
+    this.thrift = thrift({...thriftOptions, entryPoint: this.thriftPath});
     this.ast = this.thrift.asts[this.thrift.filename];
     this.initIdentifiersTable();
     this.withsource = withsource;
@@ -136,9 +136,7 @@ export class ThriftFileConverter {
             if (definition.type === 'Enum') {
               definition.definitions.forEach(enumDefinition => {
                 this.identifiersTable[
-                  `${includePrefix}${definition.id.name}.${
-                    enumDefinition.id.name
-                  }`
+                  `${includePrefix}${definition.id.name}.${enumDefinition.id.name}`
                 ] = enumDefinition;
               });
             }

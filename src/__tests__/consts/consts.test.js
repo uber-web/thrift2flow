@@ -28,6 +28,8 @@ import {flowResultTest} from '../../test-util';
 import fs from 'fs';
 import {ThriftFileConverter} from '../../main/convert';
 
+jest.setTimeout(10000);
+
 test('consts', done => {
   flowResultTest(
     {

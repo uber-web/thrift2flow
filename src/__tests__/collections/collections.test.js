@@ -27,6 +27,8 @@
 import fs from 'fs';
 import {flowResultTest} from '../../test-util';
 
+jest.setTimeout(10000);
+
 test('arrays and sets', done => {
   flowResultTest(
     {

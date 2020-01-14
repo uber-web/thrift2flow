@@ -32,6 +32,8 @@ import fs from 'fs-extra';
 // flowlint-next-line untyped-import:off
 import tmp from 'tmp';
 
+jest.setTimeout(10000);
+
 test('Long module is imported when needed', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/typedef-long-import.thrift`,

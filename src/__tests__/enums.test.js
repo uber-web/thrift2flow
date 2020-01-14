@@ -27,6 +27,8 @@ import {flowResultTest} from '../test-util';
 import {ThriftFileConverter} from '../main/convert';
 import {Thrift} from 'thriftrw';
 
+jest.setTimeout(10000);
+
 test('thriftrw enums work in map constants', () => {
   const fixturePath = 'src/__tests__/fixtures/enums-as-map-keys.thrift';
   const thrift = new Thrift({
