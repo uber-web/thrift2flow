@@ -26,6 +26,8 @@
 import {flowResultTest} from '../test-util';
 import {ThriftFileConverter} from '../main/convert';
 
+jest.setTimeout(10000);
+
 test('Long module is imported when needed', () => {
   const converter = new ThriftFileConverter(
     `src/__tests__/fixtures/union-long-import.thrift`,

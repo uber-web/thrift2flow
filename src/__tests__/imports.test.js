@@ -25,6 +25,8 @@
 
 import {flowResultTest} from '../test-util';
 
+jest.setTimeout(10000);
+
 test('imports in same folder', done => {
   flowResultTest(
     {

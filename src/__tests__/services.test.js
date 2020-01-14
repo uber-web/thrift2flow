@@ -25,6 +25,8 @@
 
 import {flowResultTest} from '../test-util';
 
+jest.setTimeout(10000);
+
 test('services happy path', done => {
   flowResultTest(
     {
