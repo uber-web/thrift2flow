@@ -24,6 +24,7 @@
  */
 
 import {flowResultTest} from '../test-util';
+import {ThriftFileConverter} from '../main/convert';
 
 jest.setTimeout(10000);
 
@@ -60,4 +61,25 @@ function ensureVoid(f : any => void) {
       done();
     }
   );
+});
+
+test('Extending a service', () => {
+  const fixturePath = 'src/__tests__/fixtures/extending-service.thrift';
+  const converter = new ThriftFileConverter(fixturePath, false);
+  expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
+"// @flow
+
+import * as service from \\"./service\\";
+
+export type ExtendingService = service.RealService;
+
+export type ExtendingServiceWithMethods = {
+  getNumberTwo: ({|
+    a: string,
+    what: boolean
+  |}) => number,
+  ...service.RealService
+};
+"
+`);
 });

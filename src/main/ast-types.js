@@ -93,6 +93,7 @@ export type Service = {|
   id: Identifier,
   type: 'Service',
   functions: Array<FunctionDefinition>,
+  baseService: Identifier,
 |};
 
 export type Const = {|
