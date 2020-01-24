@@ -136,7 +136,9 @@ export class ThriftFileConverter {
             if (definition.type === 'Enum') {
               definition.definitions.forEach(enumDefinition => {
                 this.identifiersTable[
-                  `${includePrefix}${definition.id.name}.${enumDefinition.id.name}`
+                  `${includePrefix}${definition.id.name}.${
+                    enumDefinition.id.name
+                  }`
                 ] = enumDefinition;
               });
             }
@@ -182,10 +184,18 @@ export class ThriftFileConverter {
     }
   };
 
-  generateService = (def: Service) =>
-    `export type ${id(def.id.name)} = {\n${def.functions
-      .map(this.generateFunction)
-      .join(',')}};`;
+  generateService = (def: Service) => {
+    const functions = def.functions.map(this.generateFunction).join(',');
+    if (def.baseService && def.baseService.name) {
+      if (def.functions.length === 0) {
+        return `export type ${id(def.id.name)} = ${def.baseService.name}`;
+      }
+      return `export type ${id(def.id.name)} = {\n${functions}, ...${
+        def.baseService.name
+      }};`;
+    }
+    return `export type ${id(def.id.name)} = {${functions}};`;
+  };
 
   generateFunction = (fn: FunctionDefinition) =>
     `${fn.id.name}: (${
