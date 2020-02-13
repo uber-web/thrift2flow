@@ -136,9 +136,7 @@ export class ThriftFileConverter {
             if (definition.type === 'Enum') {
               definition.definitions.forEach(enumDefinition => {
                 this.identifiersTable[
-                  `${includePrefix}${definition.id.name}.${
-                    enumDefinition.id.name
-                  }`
+                  `${includePrefix}${definition.id.name}.${enumDefinition.id.name}`
                 ] = enumDefinition;
               });
             }
