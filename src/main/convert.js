@@ -85,20 +85,23 @@ const i64Mappings = {
   Double: 'number',
 };
 
+type Parsed = {|
+  asts: {[filename: string]: Ast},
+  filename: string,
+  idls: {[filename: string]: {||}},
+|};
+
 export class ThriftFileConverter {
   thriftPath: string;
-  thrift: {|
-    asts: {[filename: string]: Ast},
-    filename: string,
-    idls: {[filename: string]: {||}},
-  |};
+  thrift: Parsed;
   withsource: boolean;
   ast: Ast;
   identifiersTable: {[key: string]: AstNode};
 
-  constructor(thriftPath: string, withsource: boolean) {
+  constructor(thriftPath: string, withsource: boolean, parsed?: Parsed) {
     this.thriftPath = path.resolve(thriftPath);
-    this.thrift = thrift({...thriftOptions, entryPoint: this.thriftPath});
+    this.thrift =
+      parsed || thrift({...thriftOptions, entryPoint: this.thriftPath});
     this.ast = this.thrift.asts[this.thrift.filename];
     this.initIdentifiersTable();
     this.withsource = withsource;
@@ -145,7 +148,7 @@ export class ThriftFileConverter {
       );
   }
 
-  generateFlowFile: () => string = () => {
+  generateFlowFile: (?boolean) => string = skipFormat => {
     const result = [
       '// @flow',
       this.withsource && `// Source: ${this.thriftPath}`,
@@ -154,7 +157,9 @@ export class ThriftFileConverter {
     ]
       .filter(Boolean)
       .join('\n\n');
-    return prettier.format(result, {parser: 'flow'});
+    return skipFormat === true
+      ? result
+      : prettier.format(result, {parser: 'flow'});
   };
 
   convertDefinitionToCode = (def: Definition) => {
