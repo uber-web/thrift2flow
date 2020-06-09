@@ -652,7 +652,7 @@ export class ThriftFileConverter {
     if (t.type === 'Map') {
       const keyType = this.convertType(t.keyType);
       const valueType = this.convertType(t.valueType);
-      return `{[${keyType}]: ${valueType}}`;
+      return `{| [${keyType}]: ${valueType} |}`;
     }
     return undefined;
   }

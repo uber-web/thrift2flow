@@ -59,9 +59,9 @@ test('typedefs should reference enum types not value', () => {
 
 import * as base from \\"./base\\";
 
-export type TimeRangeByDayOfWeek = {
+export type TimeRangeByDayOfWeek = {|
   [$Values<typeof base.Weekday>]: base.TimeRange[]
-};
+|};
 "
 `);
 });
