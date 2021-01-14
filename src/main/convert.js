@@ -91,6 +91,8 @@ type Parsed = {|
   idls: {[filename: string]: {||}},
 |};
 
+const longDeclaration = "import thrift2flow$Long from 'long'";
+
 export class ThriftFileConverter {
   thriftPath: string;
   thrift: Parsed;
@@ -157,9 +159,10 @@ export class ThriftFileConverter {
     ]
       .filter(Boolean)
       .join('\n\n');
-    return skipFormat === true
+    return (skipFormat === true
       ? result
-      : prettier.format(result, {parser: 'flow'});
+      : prettier.format(result, {parser: 'flow'})
+    ).replace(`${longDeclaration};`, `/*:: ${longDeclaration}; */`); // use flow comment to avoid need for runtime installation of `long` package
   };
 
   convertDefinitionToCode = (def: Definition) => {
@@ -432,7 +435,7 @@ export class ThriftFileConverter {
     });
 
     if (this.isLongDefined()) {
-      generatedImports.push("import thrift2flow$Long from 'long'");
+      generatedImports.push(longDeclaration);
     }
     return generatedImports.join('\n');
   };
