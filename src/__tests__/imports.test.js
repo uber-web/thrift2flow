@@ -32,12 +32,14 @@ test('imports in same folder', done => {
     {
       'other.thrift': `
         typedef i32 Thing
+        typedef string Symbol
       `,
       'shared.thrift': `
 include "./other.thrift"
 
 struct ThingStruct {
     1: other.Thing thing
+    1: other.Symbol symbol
 }
 struct OtherStruct {
     1: i32 num
