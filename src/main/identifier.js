@@ -14,5 +14,12 @@ export function id(s: string): string {
   if (reservedTypes.includes(s) || reservedTypes.includes(split[0])) {
     return `_${s}`;
   }
+
+  if (split.length > 1) {
+    const lastItem = split.pop();
+    if (reservedTypes.includes(lastItem)) {
+      s = split.join('.') + `.${id(lastItem)}`;
+    }
+  }
   return s;
 }
