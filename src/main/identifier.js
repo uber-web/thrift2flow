@@ -1,6 +1,7 @@
 // @flow
 const reservedTypes = [
   'any',
+  'static',
   'mixed',
   'number',
   'throw',

@@ -80,12 +80,20 @@ test('imports with special type file names', done => {
       'any.thrift': `
         typedef i32 Thing
       `,
+      'static.thrift': `
+      union ThriftDataValue {
+        1: bool unknown
+        2: bool asBool
+      }
+      `,
       'shared.thrift': `
 include "./any.thrift"
+include "./static.thrift"
 struct MyStruct {
     1: any.Thing a
     2: map<string, any.Thing> b
     3: map<any.Thing, string> c
+    4: static.ThriftDataValue d
 }
 typedef any.Thing MyTypedef
 const any.Thing MyConst = 10;
