@@ -38,16 +38,19 @@ test('convert const map witth enums', () => {
   expect(thrift.USER_TYPES.user).toEqual(true);
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const ADMIN_FOOO: \\"admin\\" = \\"admin\\";
+    export const ADMIN_FOOO: 'admin' = 'admin';
 
-export const USER_BAAAR: \\"user\\" = \\"user\\";
+    export const USER_BAAAR: 'user' = 'user';
 
-export const USER_TYPES: $ReadOnly<{| admin: boolean, user: boolean |}> = {
-  [ADMIN_FOOO]: true,
-  [USER_BAAAR]: true
-};
-"
-`);
+    export const USER_TYPES: $ReadOnly<{|
+      'admin': boolean,
+      'user': boolean,
+    |}> = {
+      [ADMIN_FOOO]: true,
+      [USER_BAAAR]: true,
+    };
+    "
+  `);
 });

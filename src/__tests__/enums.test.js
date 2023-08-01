@@ -38,39 +38,39 @@ test('thriftrw enums work in map constants', () => {
   expect(thrift.THE_ENUM_PROP.DEFAULT).toEqual('DEFAULT');
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const THE_ENUM_PROP: $ReadOnly<{|
-  DEFAULT: \\"DEFAULT\\",
-  LOW: \\"LOW\\",
-  HIGH: \\"HIGH\\"
-|}> = Object.freeze({
-  DEFAULT: \\"DEFAULT\\",
-  LOW: \\"LOW\\",
-  HIGH: \\"HIGH\\"
-});
+    export const THE_ENUM_PROP: $ReadOnly<{|
+      'DEFAULT': 'DEFAULT',
+      'LOW': 'LOW',
+      'HIGH': 'HIGH',
+    |}> = Object.freeze({
+      'DEFAULT': 'DEFAULT',
+      'LOW': 'LOW',
+      'HIGH': 'HIGH',
+    });
 
-export const THE_STRING_MAP: $ReadOnly<{|
-  \\"0\\": string,
-  \\"1\\": string,
-  \\"2\\": string
-|}> = {
-  \\"0\\": \\"Some default string\\",
-  \\"1\\": \\"Some low string\\",
-  \\"2\\": \\"Some high string\\"
-};
+    export const THE_STRING_MAP: $ReadOnly<{|
+      '0': string,
+      '1': string,
+      '2': string,
+    |}> = {
+      '0': 'Some default string',
+      '1': 'Some low string',
+      '2': 'Some high string',
+    };
 
-export const THE_STRING_KEY_MAP: $ReadOnly<{|
-  DEFAULT: string,
-  LOW: string,
-  HIGH: string
-|}> = {
-  [THE_ENUM_PROP.DEFAULT]: \\"some other default\\",
-  [THE_ENUM_PROP.LOW]: \\"some other low\\",
-  [THE_ENUM_PROP.HIGH]: \\"some other high\\"
-};
-"
-`);
+    export const THE_STRING_KEY_MAP: $ReadOnly<{|
+      'DEFAULT': string,
+      'LOW': string,
+      'HIGH': string,
+    |}> = {
+      [THE_ENUM_PROP.DEFAULT]: 'some other default',
+      [THE_ENUM_PROP.LOW]: 'some other low',
+      [THE_ENUM_PROP.HIGH]: 'some other high',
+    };
+    "
+  `);
 });
 
 test('thriftrw enums are strings not numbers', () => {
@@ -106,30 +106,30 @@ test('typedefs of enums can be referenced from structs', () => {
     false
   );
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const EnumTypedef: $ReadOnly<{|
-  OK: \\"OK\\",
-  ERROR: \\"ERROR\\"
-|}> = Object.freeze({
-  OK: \\"OK\\",
-  ERROR: \\"ERROR\\"
-});
+    export const EnumTypedef: $ReadOnly<{|
+      'OK': 'OK',
+      'ERROR': 'ERROR',
+    |}> = Object.freeze({
+      'OK': 'OK',
+      'ERROR': 'ERROR',
+    });
 
-export const MyEnum: $ReadOnly<{|
-  OK: \\"OK\\",
-  ERROR: \\"ERROR\\"
-|}> = Object.freeze({
-  OK: \\"OK\\",
-  ERROR: \\"ERROR\\"
-});
+    export const MyEnum: $ReadOnly<{|
+      'OK': 'OK',
+      'ERROR': 'ERROR',
+    |}> = Object.freeze({
+      'OK': 'OK',
+      'ERROR': 'ERROR',
+    });
 
-export type MyStruct = {|
-  f_MyEnum: $Values<typeof MyEnum>,
-  f_EnumTypedef: $Values<typeof EnumTypedef>
-|};
-"
-`);
+    export type MyStruct = {|
+      f_MyEnum: $Values<typeof MyEnum>,
+      f_EnumTypedef: $Values<typeof EnumTypedef>,
+    |};
+    "
+  `);
 });
 
 test('enums with typedefs', done => {

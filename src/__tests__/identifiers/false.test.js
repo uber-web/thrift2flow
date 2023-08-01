@@ -35,13 +35,15 @@ test('thriftrw enums work in map constants', () => {
   expect(thrift.MY_ACCESS.allowed).toEqual(false);
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export type Access = {| allowed?: ?boolean |};
+    export type Access = {|
+      allowed?: ?boolean,
+    |};
 
-export const MY_ACCESS: $ReadOnly<Access> = {
-  allowed: false
-};
-"
-`);
+    export const MY_ACCESS: $ReadOnly<Access> = {
+      'allowed': false,
+    };
+    "
+  `);
 });

@@ -37,11 +37,11 @@ test('See how thriftrw decodes js.type i64', () => {
   expect(thrift.MY_BUFF).toEqual(10);
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const MY_BUFF: 10 = 10;
-"
-`);
+    export const MY_BUFF: 10 = 10;
+    "
+  `);
 });
 
 test('Try using the toBufferResult fromBufferResult when parsing a struct with an i64 value', () => {
@@ -56,11 +56,13 @@ test('Try using the toBufferResult fromBufferResult when parsing a struct with a
   expect(Buffer.isBuffer(structAgain.value.myProp)).toBeTruthy();
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export type MyStruct = {| myProp: number | Buffer |};
-"
-`);
+    export type MyStruct = {|
+      myProp: (number | Buffer),
+    |};
+    "
+  `);
 });
 
 test('Ensure flow uses number not buffer for i64', () => {
@@ -72,11 +74,11 @@ test('Ensure flow uses number not buffer for i64', () => {
   expect(thrift.NULL_ID).toEqual(0);
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export type MY_ID = number | Buffer;
+    export type MY_ID = (number | Buffer);
 
-export const NULL_ID: MY_ID = 0;
-"
-`);
+    export const NULL_ID: MY_ID = 0;
+    "
+  `);
 });
