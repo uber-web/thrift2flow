@@ -24,7 +24,6 @@
  */
 
 import thrift from './thriftrw';
-import prettier from 'prettier';
 import path from 'path';
 import {id} from './identifier';
 import type {
@@ -91,7 +90,7 @@ type Parsed = {|
   idls: {[filename: string]: {||}},
 |};
 
-const longDeclaration = "import thrift2flow$Long from 'long'";
+const longDeclaration = "import thrift2flow$Long from 'long';";
 
 export class ThriftFileConverter {
   thriftPath: string;
@@ -99,6 +98,7 @@ export class ThriftFileConverter {
   withsource: boolean;
   ast: Ast;
   identifiersTable: {[key: string]: AstNode};
+  indent: number;
 
   constructor(thriftPath: string, withsource: boolean, parsed?: Parsed) {
     this.thriftPath = path.resolve(thriftPath);
@@ -107,6 +107,7 @@ export class ThriftFileConverter {
     this.ast = this.thrift.asts[this.thrift.filename];
     this.initIdentifiersTable();
     this.withsource = withsource;
+    this.indent = 0;
   }
 
   initIdentifiersTable() {
@@ -150,7 +151,7 @@ export class ThriftFileConverter {
       );
   }
 
-  generateFlowFile: (?boolean) => string = skipFormat => {
+  generateFlowFile: () => string = () => {
     const result = [
       '// @flow',
       this.withsource && `// Source: ${this.thriftPath}`,
@@ -158,11 +159,22 @@ export class ThriftFileConverter {
       ...this.ast.definitions.map(this.convertDefinitionToCode),
     ]
       .filter(Boolean)
-      .join('\n\n');
-    return (skipFormat === true
-      ? result
-      : prettier.format(result, {parser: 'flow'})
-    ).replace(`${longDeclaration};`, `/*:: ${longDeclaration}; */`); // use flow comment to avoid need for runtime installation of `long` package
+      .join('\n\n')
+      .replace(`${longDeclaration};`, `/*:: ${longDeclaration}; */`); // use flow comment to avoid need for runtime installation of `long` package
+
+    return `${result}\n`;
+  };
+
+  withBlockIndent = <T>(fn: () => T): T => {
+    this.indent++;
+    const res = fn();
+    this.indent--;
+
+    return res;
+  };
+
+  getIndent = (diff?: number): string => {
+    return ''.padStart(Math.max(0, this.indent + (diff || 0)) * 2, ' ');
   };
 
   convertDefinitionToCode = (def: Definition) => {
@@ -191,22 +203,35 @@ export class ThriftFileConverter {
   };
 
   generateService = (def: Service) => {
-    const functions = def.functions.map(this.generateFunction).join(',');
-    if (def.baseService && def.baseService.name) {
-      if (def.functions.length === 0) {
-        return `export type ${id(def.id.name)} = ${def.baseService.name}`;
+    return this.withBlockIndent(() => {
+      const indent = this.getIndent();
+      const functions = def.functions
+        .map(fn => this.generateFunction(fn, indent))
+        .join('\n');
+      if (def.baseService && def.baseService.name) {
+        if (!functions.length) {
+          return `export type ${id(def.id.name)} = ${def.baseService.name};`;
+        }
+
+        return `export type ${id(def.id.name)} = {\n${functions}\n${indent}...${
+          def.baseService.name
+        },\n${this.getIndent(-1)}};`;
       }
-      return `export type ${id(def.id.name)} = {\n${functions}, ...${
-        def.baseService.name
-      }};`;
-    }
-    return `export type ${id(def.id.name)} = {${functions}};`;
+
+      if (!functions.length) {
+        return `export type ${id(def.id.name)} = {};`;
+      }
+
+      return `export type ${id(
+        def.id.name
+      )} = {\n${functions}\n${this.getIndent(-1)}};`;
+    });
   };
 
-  generateFunction = (fn: FunctionDefinition) =>
-    `${fn.id.name}: (${
+  generateFunction = (fn: FunctionDefinition, indent: string) =>
+    `${indent}${fn.id.name}: (${
       fn.fields.length ? this.generateStructContents([...fn.fields]) : ''
-    }) => ${this.convertType(fn.returns)}`;
+    }) => ${this.convertType(fn.returns)},`;
 
   generateTypedef = (def: Typedef) => {
     if (def.valueType.type === 'Identifier') {
@@ -225,16 +250,17 @@ export class ThriftFileConverter {
   };
 
   generateEnum = (def: Enum, otherName?: string) => {
-    const values = def.definitions
-      .map((d, index) => `'${d.id.name}': '${d.id.name}',`)
-      .join('\n');
-    return `export const ${
-      otherName !== undefined ? otherName : def.id.name
-    }: $ReadOnly<{|
-  ${values}
-|}>  = Object.freeze({
-  ${values}
-});`;
+    return this.withBlockIndent(() => {
+      const indent = this.getIndent();
+      const values = def.definitions
+        .map((d, index) => `${indent}'${d.id.name}': '${d.id.name}',`)
+        .join('\n');
+      return `export const ${
+        otherName !== undefined ? otherName : def.id.name
+      }: $ReadOnly<{|\n${values}\n|}> = Object.freeze({\n${values}\n${this.getIndent(
+        -1
+      )}});`;
+    });
   };
 
   generateConst = (def: Const) => {
@@ -242,33 +268,41 @@ export class ThriftFileConverter {
     let enumType: ?string;
     let readOnly = false;
     if (def.value.type === 'ConstList') {
-      value = `[${def.value.values
-        .map((val: Identifier | Literal) => {
-          if (val.type === 'Identifier') {
-            if (val.name.includes('.')) {
-              const {definition} = this.definitionOfIdentifier(
-                val.name,
-                this.thrift.filename
-              );
-              if (definition.type == 'EnumDefinition') {
-                const scope = val.name.split('.')[0];
-                const defAndFilename = this.definitionOfIdentifier(
-                  scope,
+      if (!def.value.values.length) {
+        return '[]';
+      }
+      const listValues = def.value.values;
+
+      value = this.withBlockIndent(() => {
+        const indent = this.getIndent();
+        return `[\n${listValues
+          .map((val: Identifier | Literal) => {
+            if (val.type === 'Identifier') {
+              if (val.name.includes('.')) {
+                const {definition} = this.definitionOfIdentifier(
+                  val.name,
                   this.thrift.filename
                 );
-                if (enumType === undefined && this.isEnum(defAndFilename)) {
-                  enumType = `${this.getIdentifier(scope, 'type')}[]`;
+                if (definition.type == 'EnumDefinition') {
+                  const scope = val.name.split('.')[0];
+                  const defAndFilename = this.definitionOfIdentifier(
+                    scope,
+                    this.thrift.filename
+                  );
+                  if (enumType === undefined && this.isEnum(defAndFilename)) {
+                    enumType = `${this.getIdentifier(scope, 'type')}[]`;
+                  }
                 }
               }
+              return `${indent}${this.getIdentifier(val.name, 'value')},`;
             }
-            return this.getIdentifier(val.name, 'value');
-          }
-          if (val.type === 'Literal' && typeof val.value === 'string') {
-            return `'${val.value}'`;
-          }
-          return val.value;
-        })
-        .join(',')}]`;
+            if (val.type === 'Literal' && typeof val.value === 'string') {
+              return `${indent}'${val.value}',`;
+            }
+            return val.value;
+          })
+          .join('\n')}\n${this.getIndent(-1)}]`;
+      });
     } else {
       if (def.value.type === 'Literal') {
         if (typeof def.value.value === 'string') {
@@ -308,17 +342,24 @@ export class ThriftFileConverter {
     } = ${value};`;
   };
 
-  generateConstList(def: ConstList) {
-    return `[${def.values
-      .map(entry => {
-        if (entry.type === 'Identifier') {
-          return entry.name;
-        } else {
-          return `"${entry.value}"`;
-        }
-      })
-      .join(',')}]`;
-  }
+  generateConstList = (def: ConstList) => {
+    return this.withBlockIndent(() => {
+      if (!def.values.length) {
+        return '[]';
+      }
+
+      const indent = this.getIndent();
+      return `[\n${def.values
+        .map(entry => {
+          if (entry.type === 'Identifier') {
+            return `${indent}${entry.name},`;
+          } else {
+            return `${indent}"${entry.value}",`;
+          }
+        })
+        .join('\n')}\n${this.getIndent(-1)}]`;
+    });
+  };
 
   generateConstEntry = (entry: ConstEntry) => {
     let key;
@@ -366,45 +407,65 @@ export class ThriftFileConverter {
       console.error(entry);
       throw new Error(`key or value is undefined`);
     }
-    const result = `${key}: ${value},`;
+    const result = `${this.getIndent()}${key}: ${value},`;
     return result;
   };
 
   generateConstMap = (def: ConstMap) => {
-    return `{
-      ${def.entries.map(entry => this.generateConstEntry(entry)).join('\n')}
-    } `;
+    return this.withBlockIndent(() => {
+      if (!def.entries.length) {
+        return '{}';
+      }
+
+      return `{\n${def.entries
+        .map(entry => this.generateConstEntry(entry))
+        .join('\n')}\n${this.getIndent(-1)}}`;
+    });
   };
 
   generateStruct = ({id: {name}, fields}: Struct | Exception) =>
     `export type ${id(name)} = ${this.generateStructContents(fields)};`;
 
-  generateStructContents = (fields: Array<Field>) =>
-    `{|${fields
-      .map((field: Field) => {
-        const valueType = field.valueType;
-        let optionalPrefix = this.isOptional(field) ? '?' : '';
-        let value =
-          valueType.type === 'Identifier'
-            ? this.getIdentifier(valueType.name, 'type')
-            : this.convertType(valueType);
-        return `${field.name}${optionalPrefix}: ${optionalPrefix}${value};`;
-      })
-      .join('\n')}|}`;
+  generateStructContents = (fields: Array<Field>) => {
+    return this.withBlockIndent(() => {
+      if (!fields.length) {
+        return '{}';
+      }
+
+      const indent = this.getIndent();
+      return `{|\n${fields
+        .map((field: Field) => {
+          const valueType = field.valueType;
+          let optionalPrefix = this.isOptional(field) ? '?' : '';
+          let value =
+            valueType.type === 'Identifier'
+              ? this.getIdentifier(valueType.name, 'type')
+              : this.convertType(valueType);
+          return `${indent}${field.name}${optionalPrefix}: ${optionalPrefix}${value},`;
+        })
+        .join('\n')}\n${this.getIndent(-1)}|}`;
+    });
+  };
 
   generateUnion = ({id: {name}, fields}: Union) =>
     `export type ${id(name)} = ${this.generateUnionContents(fields)};`;
 
   generateUnionContents = (fields: Array<Field>) => {
-    if (!fields.length) {
-      return '{||}';
-    }
-    return fields
-      .map(
-        (f: Field) =>
-          `{|type: "${f.name}",${f.name}: ${this.convertType(f.valueType)}|}`
-      )
-      .join(' | ');
+    return this.withBlockIndent(() => {
+      if (!fields.length) {
+        return '{||}';
+      }
+
+      const indent = this.getIndent();
+      return fields
+        .map(
+          (f: Field) =>
+            `{|\n${indent}type: "${f.name}",\n${indent}${
+              f.name
+            }: ${this.convertType(f.valueType)},\n${this.getIndent(-1)}|}`
+        )
+        .join(' | ');
+    });
   };
 
   isOptional = (field: Field) => field.optional;
@@ -623,41 +684,52 @@ export class ThriftFileConverter {
   }
 
   convertMapType(t: AstNode, def?: Definition): string | void {
-    if (t.type === 'Map' && def) {
-      const valueType = this.convertType(t.valueType);
-      if (def.type === 'Const' && def.value.type === 'ConstMap') {
-        const entries = def.value.entries.map(entry => {
-          if (entry.key.type === 'Identifier') {
-            const identifierValue: AstNode = this.identifiersTable[
-              entry.key.name
-            ];
-            if (identifierValue.type === 'EnumDefinition') {
-              return `'${identifierValue.id.name}': ${valueType}`;
-            } else if (
-              identifierValue.type === 'Const' &&
-              typeof identifierValue.value.value === 'string'
-            ) {
-              return `'${identifierValue.value.value}': ${valueType}`;
-            } else {
-              throw new Error(
-                `Unknown identifierValue type ${identifierValue.type}`
-              );
-            }
-          } else if (entry.key.type === 'Literal') {
-            return `'${entry.key.value}': ${valueType}`;
-          } else {
-            throw new Error('unsupported');
+    return this.withBlockIndent(() => {
+      if (t.type === 'Map' && def) {
+        const valueType = this.convertType(t.valueType);
+        if (def.type === 'Const' && def.value.type === 'ConstMap') {
+          if (!def.value.entries.length) {
+            return '{}';
           }
-        });
-        return `{|  ${entries.join(',')} |}`;
+          const mapEntries = def.value.entries;
+
+          const indent = this.getIndent();
+          const entries = mapEntries.map(entry => {
+            if (entry.key.type === 'Identifier') {
+              const identifierValue: AstNode = this.identifiersTable[
+                entry.key.name
+              ];
+              if (identifierValue.type === 'EnumDefinition') {
+                return `${indent}'${identifierValue.id.name}': ${valueType},`;
+              } else if (
+                identifierValue.type === 'Const' &&
+                typeof identifierValue.value.value === 'string'
+              ) {
+                return `${indent}'${identifierValue.value.value}': ${valueType},`;
+              } else {
+                throw new Error(
+                  `Unknown identifierValue type ${identifierValue.type}`
+                );
+              }
+            } else if (entry.key.type === 'Literal') {
+              return `${indent}'${entry.key.value}': ${valueType},`;
+            } else {
+              throw new Error('unsupported');
+            }
+          });
+          return `{|\n${entries.join('\n')}\n${this.getIndent(-1)}|}`;
+        }
       }
-    }
-    if (t.type === 'Map') {
-      const keyType = this.convertType(t.keyType);
-      const valueType = this.convertType(t.valueType);
-      return `{| [${keyType}]: ${valueType} |}`;
-    }
-    return undefined;
+      if (t.type === 'Map') {
+        const keyType = this.convertType(t.keyType);
+        const valueType = this.convertType(t.valueType);
+        const indent = this.getIndent();
+        return `{|\n${indent}[${keyType}]: ${valueType},\n${this.getIndent(
+          -1
+        )}|}`;
+      }
+      return undefined;
+    });
   }
 
   isEnumIdentifier(def: AstNode) {

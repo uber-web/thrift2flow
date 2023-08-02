@@ -34,19 +34,31 @@ test('Long module is imported when needed', () => {
     false
   );
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-import thrift2flow$Long from \\"long\\";
+    import thrift2flow$Long from 'long';
 
-export type RawValue =
-  | {| type: \\"binaryValue\\", binaryValue: Buffer |}
-  | {| type: \\"boolValue\\", boolValue: boolean |}
-  | {| type: \\"doubleValue\\", doubleValue: number |}
-  | {| type: \\"int32Value\\", int32Value: number |}
-  | {| type: \\"int64Value\\", int64Value: number | thrift2flow$Long |}
-  | {| type: \\"stringValue\\", stringValue: string |};
-"
-`);
+    export type RawValue = {|
+      type: \\"binaryValue\\",
+      binaryValue: Buffer,
+    |} | {|
+      type: \\"boolValue\\",
+      boolValue: boolean,
+    |} | {|
+      type: \\"doubleValue\\",
+      doubleValue: number,
+    |} | {|
+      type: \\"int32Value\\",
+      int32Value: number,
+    |} | {|
+      type: \\"int64Value\\",
+      int64Value: (number | thrift2flow$Long),
+    |} | {|
+      type: \\"stringValue\\",
+      stringValue: string,
+    |};
+    "
+  `);
 });
 
 test('unions', done => {

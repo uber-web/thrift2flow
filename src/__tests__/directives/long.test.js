@@ -41,62 +41,66 @@ test('thriftrw parses long and Long as numbers', () => {
   expect(thrift.MY_STRUCT.negNum3).toEqual(1);
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-import thrift2flow$Long from \\"long\\";
+    import thrift2flow$Long from 'long';
 
-export type MyStruct = {|
-  posNum1?: ?(number | thrift2flow$Long),
-  posNum2?: ?(number | thrift2flow$Long),
-  posNum3?: ?(number | Buffer),
-  negNum1?: ?(number | thrift2flow$Long),
-  negNum2?: ?(number | thrift2flow$Long),
-  negNum3?: ?(number | Buffer)
-|};
+    export type MyStruct = {|
+      posNum1?: ?(number | thrift2flow$Long),
+      posNum2?: ?(number | thrift2flow$Long),
+      posNum3?: ?(number | Buffer),
+      negNum1?: ?(number | thrift2flow$Long),
+      negNum2?: ?(number | thrift2flow$Long),
+      negNum3?: ?(number | Buffer),
+    |};
 
-export const MY_STRUCT: $ReadOnly<MyStruct> = {
-  posNum1: 1,
-  posNum2: 1,
-  posNum3: 1,
-  negNum1: 1,
-  negNum2: 1,
-  negNum3: 1
-};
-"
-`);
+    export const MY_STRUCT: $ReadOnly<MyStruct> = {
+      'posNum1': 1,
+      'posNum2': 1,
+      'posNum3': 1,
+      'negNum1': 1,
+      'negNum2': 1,
+      'negNum3': 1,
+    };
+    "
+  `);
 });
 
 test('The `long` import is included from service definition', () => {
   const fixturePath = 'src/__tests__/fixtures/long-from-service.thrift';
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-import thrift2flow$Long from \\"long\\";
+    import thrift2flow$Long from 'long';
 
-export type Validate = {
-  getStatus: ({| userUUID: string |}) => boolean,
-  getSummary: ({|
-    userUUID: string,
-    startTime: number | thrift2flow$Long,
-    endTime: number | thrift2flow$Long
-  |}) => string
-};
-"
-`);
+    export type Validate = {
+      getStatus: ({|
+        userUUID: string,
+      |}) => boolean,
+      getSummary: ({|
+        userUUID: string,
+        startTime: (number | thrift2flow$Long),
+        endTime: (number | thrift2flow$Long),
+      |}) => string,
+    };
+    "
+  `);
 });
 
 test('The `long` import is included from service definition on return', () => {
   const fixturePath = 'src/__tests__/fixtures/long-from-service-return.thrift';
   const converter = new ThriftFileConverter(fixturePath, false);
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-import thrift2flow$Long from \\"long\\";
+    import thrift2flow$Long from 'long';
 
-export type Validate = {
-  getStatus: ({| userUUID: string |}) => number | thrift2flow$Long
-};
-"
-`);
+    export type Validate = {
+      getStatus: ({|
+        userUUID: string,
+      |}) => (number | thrift2flow$Long),
+    };
+    "
+  `);
 });

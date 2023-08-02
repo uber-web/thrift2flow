@@ -52,12 +52,11 @@ test('const string literals', () => {
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const A_STRING_LITERAL: \\"my-string-literal-value\\" =
-  \\"my-string-literal-value\\";
-"
-`);
+    export const A_STRING_LITERAL: 'my-string-literal-value' = 'my-string-literal-value';
+    "
+  `);
 });
 
 test('const map values are numbers', () => {
@@ -67,49 +66,69 @@ test('const map values are numbers', () => {
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const ShieldType: $ReadOnly<{|
-  O: \\"O\\",
-  U: \\"U\\"
-|}> = Object.freeze({
-  O: \\"O\\",
-  U: \\"U\\"
-});
+    export const ShieldType: $ReadOnly<{|
+      'O': 'O',
+      'U': 'U',
+    |}> = Object.freeze({
+      'O': 'O',
+      'U': 'U',
+    });
 
-export const o: \\"ooooooo\\" = \\"ooooooo\\";
+    export const o: 'ooooooo' = 'ooooooo';
 
-export const PRIORITIES: $ReadOnly<{| O: number, U: number |}> = {
-  [ShieldType.O]: 2,
-  [ShieldType.U]: 10
-};
+    export const PRIORITIES: $ReadOnly<{|
+      'O': number,
+      'U': number,
+    |}> = {
+      [ShieldType.O]: 2,
+      [ShieldType.U]: 10,
+    };
 
-export const LABELS: $ReadOnly<{| O: string, U: string |}> = {
-  [ShieldType.O]: o,
-  [ShieldType.U]: \\"uuuuuuu\\"
-};
+    export const LABELS: $ReadOnly<{|
+      'O': string,
+      'U': string,
+    |}> = {
+      [ShieldType.O]: o,
+      [ShieldType.U]: 'uuuuuuu',
+    };
 
-export const THINGS: $ReadOnly<{| O: string[], U: string[] |}> = {
-  [ShieldType.O]: [o, \\"abcd\\"],
-  [ShieldType.U]: [\\"uuuuuuu\\"]
-};
+    export const THINGS: $ReadOnly<{|
+      'O': string[],
+      'U': string[],
+    |}> = {
+      [ShieldType.O]: [
+        o,
+        \\"abcd\\",
+      ],
+      [ShieldType.U]: [
+        \\"uuuuuuu\\",
+      ],
+    };
 
-export const ITEMS: $Values<typeof ShieldType>[] = [ShieldType.O, ShieldType.U];
+    export const ITEMS: $Values<typeof ShieldType>[] = [
+      ShieldType.O,
+      ShieldType.U,
+    ];
 
-export const MAP_CONST_LIST: $ReadOnly<{|
-  O: $Values<typeof ShieldType>[],
-  U: $Values<typeof ShieldType>[]
-|}> = {
-  [ShieldType.O]: ITEMS,
-  [ShieldType.U]: []
-};
+    export const MAP_CONST_LIST: $ReadOnly<{|
+      'O': $Values<typeof ShieldType>[],
+      'U': $Values<typeof ShieldType>[],
+    |}> = {
+      [ShieldType.O]: ITEMS,
+      [ShieldType.U]: [],
+    };
 
-export const NUMS: $ReadOnly<{| \\"0\\": string, \\"1\\": string |}> = {
-  \\"0\\": \\"aaa\\",
-  \\"1\\": \\"bbb\\"
-};
-"
-`);
+    export const NUMS: $ReadOnly<{|
+      '0': string,
+      '1': string,
+    |}> = {
+      '0': 'aaa',
+      '1': 'bbb',
+    };
+    "
+  `);
 });
 
 test('constant enum values', () => {
@@ -119,23 +138,23 @@ test('constant enum values', () => {
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const PlaceType: $ReadOnly<{|
-  A: \\"A\\",
-  B: \\"B\\"
-|}> = Object.freeze({
-  A: \\"A\\",
-  B: \\"B\\"
-});
+    export const PlaceType: $ReadOnly<{|
+      'A': 'A',
+      'B': 'B',
+    |}> = Object.freeze({
+      'A': 'A',
+      'B': 'B',
+    });
 
-export const UUID_TO_PLACE_TYPE: $ReadOnly<{|
-  \\"123\\": $Values<typeof PlaceType>,
-  \\"456\\": $Values<typeof PlaceType>
-|}> = {
-  \\"123\\": PlaceType.A,
-  \\"456\\": PlaceType.B
-};
-"
-`);
+    export const UUID_TO_PLACE_TYPE: $ReadOnly<{|
+      '123': $Values<typeof PlaceType>,
+      '456': $Values<typeof PlaceType>,
+    |}> = {
+      '123': PlaceType.A,
+      '456': PlaceType.B,
+    };
+    "
+  `);
 });

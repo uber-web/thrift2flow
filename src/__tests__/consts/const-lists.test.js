@@ -42,29 +42,29 @@ test('const map values are numbers', () => {
   );
   const jsContent = converter.generateFlowFile();
   expect(jsContent).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export const Direction: $ReadOnly<{|
-  LEFT: \\"LEFT\\",
-  RIGHT: \\"RIGHT\\"
-|}> = Object.freeze({
-  LEFT: \\"LEFT\\",
-  RIGHT: \\"RIGHT\\"
-});
+    export const Direction: $ReadOnly<{|
+      'LEFT': 'LEFT',
+      'RIGHT': 'RIGHT',
+    |}> = Object.freeze({
+      'LEFT': 'LEFT',
+      'RIGHT': 'RIGHT',
+    });
 
-export const DIRECTIONS: $Values<typeof Direction>[] = [
-  Direction.LEFT,
-  Direction.RIGHT,
-  Direction.LEFT,
-  Direction.RIGHT
-];
+    export const DIRECTIONS: $Values<typeof Direction>[] = [
+      Direction.LEFT,
+      Direction.RIGHT,
+      Direction.LEFT,
+      Direction.RIGHT,
+    ];
 
-export const DIRECTIONS_LIST: $Values<typeof Direction>[] = [
-  Direction.LEFT,
-  Direction.RIGHT,
-  Direction.LEFT,
-  Direction.RIGHT
-];
-"
-`);
+    export const DIRECTIONS_LIST: $Values<typeof Direction>[] = [
+      Direction.LEFT,
+      Direction.RIGHT,
+      Direction.LEFT,
+      Direction.RIGHT,
+    ];
+    "
+  `);
 });

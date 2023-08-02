@@ -69,13 +69,16 @@ test('Extending a service', () => {
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
     "// @flow
 
-    import * as service from \\"./service\\";
+    import * as service from './service';
 
     export type ExtendingService = service.RealService;
 
     export type ExtendingServiceWithMethods = {
-      getNumberTwo: ({| a: string, what: boolean |}) => number,
-      ...service.RealService
+      getNumberTwo: ({|
+        a: string,
+        what: boolean,
+      |}) => number,
+      ...service.RealService,
     };
     "
   `);

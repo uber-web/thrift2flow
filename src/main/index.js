@@ -8,7 +8,6 @@ type OptionsType = {|
   withSource?: boolean,
   commonPath: string,
   outputDir?: string,
-  skipFormat?: boolean,
 |};
 
 type Parsed = {|
@@ -40,7 +39,7 @@ export default function convert(
       relativeThriftPath,
       `${path.basename(thriftPath, '.thrift')}.js`
     );
-    allOutput[jsFilename] = converter.generateFlowFile(options.skipFormat);
+    allOutput[jsFilename] = converter.generateFlowFile();
   }
   return allOutput;
 }
@@ -68,7 +67,7 @@ export function convertParsed(thriftParsed: Parsed, options: OptionsType) {
       relativeThriftPath,
       `${path.basename(thriftPath, '.thrift')}.js`
     );
-    allOutput[jsFilename] = converter.generateFlowFile(options.skipFormat);
+    allOutput[jsFilename] = converter.generateFlowFile();
   }
   return allOutput;
 }

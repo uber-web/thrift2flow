@@ -40,13 +40,13 @@ test('Long module is imported when needed', () => {
     false
   );
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-import thrift2flow$Long from \\"long\\";
+    import thrift2flow$Long from 'long';
 
-export type Long = number | thrift2flow$Long;
-"
-`);
+    export type Long = (number | thrift2flow$Long);
+    "
+  `);
 });
 
 test('typedefs should reference enum types not value', () => {
@@ -55,15 +55,15 @@ test('typedefs should reference enum types not value', () => {
     false
   );
   expect(converter.generateFlowFile()).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-import * as base from \\"./base\\";
+    import * as base from './base';
 
-export type TimeRangeByDayOfWeek = {|
-  [$Values<typeof base.Weekday>]: base.TimeRange[]
-|};
-"
-`);
+    export type TimeRangeByDayOfWeek = {|
+      [$Values<typeof base.Weekday>]: base.TimeRange[],
+    |};
+    "
+  `);
 });
 test('typedef Date', done => {
   flowResultTest(
@@ -139,11 +139,11 @@ test('typedef reserved type', () => {
   fs.writeFileSync(p, `typedef string Symbol`);
   let output = new ThriftFileConverter(p, false).generateFlowFile();
   expect(output).toMatchInlineSnapshot(`
-"// @flow
+    "// @flow
 
-export type _Symbol = string;
-"
-`);
+    export type _Symbol = string;
+    "
+  `);
 });
 
 test('typedef long in global scope', () => {
