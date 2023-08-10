@@ -1,6 +1,6 @@
 {
   "name": "thrift2flow",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Convert Thrift definitions to Flowtype declarations",
   "homepage": "https://github.com/uber-node/thrift2flow",
   "bugs": {

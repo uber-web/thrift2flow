@@ -429,7 +429,7 @@ export class ThriftFileConverter {
   generateStructContents = (fields: Array<Field>) => {
     return this.withBlockIndent(() => {
       if (!fields.length) {
-        return '{}';
+        return '{||}';
       }
 
       const indent = this.getIndent();
@@ -689,7 +689,7 @@ export class ThriftFileConverter {
         const valueType = this.convertType(t.valueType);
         if (def.type === 'Const' && def.value.type === 'ConstMap') {
           if (!def.value.entries.length) {
-            return '{}';
+            return '{||}';
           }
           const mapEntries = def.value.entries;
 
